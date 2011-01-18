@@ -1,19 +1,5 @@
 ##########################################################################
 # Copyright (C) 2008 Douglas Gregor <doug.gregor@gmail.com>              #
-#                                                                        #
-# Distributed under the Boost Software License, Version 1.0.             #
-# See accompanying file LICENSE_1_0.txt or copy at                       #
-#   http://www.boost.org/LICENSE_1_0.txt                                 #
-##########################################################################
-
-include(CMakeParseArguments)
-
-set(DOXYGEN_SKIP_DOT ON)
-
-
-
-
-##########################################################################
 # Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>             #
 #                                                                        #
 # Distributed under the Boost Software License, Version 1.0.             #
@@ -21,21 +7,31 @@ set(DOXYGEN_SKIP_DOT ON)
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+include(CMakeParseArguments)
 include(FindPackageHandleStandardArgs)
+
+set(DOXYGEN_SKIP_DOT ON)
+find_package(Doxygen)
+
+##########################################################################
+# Documentation tools configuration                                      #
+##########################################################################
 
 # Find xsltproc to transform XML documents via XSLT
 find_program(XSLTPROC_EXECUTABLE xsltproc
-  DOC
-    "xsltproc transforms XML via XSLT"
+  DOC "xsltproc transforms XML via XSLT"
   )
+find_package_handle_standard_args(XSLTPROC DEFAULT_MSG XSLTPROC_EXECUTABLE)
 
 # Apache FO Processor
 find_program(FOP_EXECUTABLE fop
    )
+find_package_handle_standard_args(FOP DEFAULT_MSG FOP_EXECUTABLE)
 
 # DocBook to LaTeX Publishing
 find_program(DBLATEX_EXECUTABLE dblatex
   )
+find_package_handle_standard_args(DBLATEX DEFAULT_MSG DBLATEX_EXECUTABLE)
 # /usr/share/xml/docbook/stylesheet/dblatex/xsl/docbook.xsl
 
 # Find the DocBook DTD (version 4.2)
@@ -72,9 +68,6 @@ find_path(BOOSTBOOK_XSL_DIR docbook.xsl
     "Path to the BoostBook XSL stylesheets"
   )
 
-find_package_handle_standard_args(XSLTPROC DEFAULT_MSG XSLTPROC_EXECUTABLE)
-find_package_handle_standard_args(FOP DEFAULT_MSG FOP_EXECUTABLE)
-find_package_handle_standard_args(DBLATEX DEFAULT_MSG DBLATEX_EXECUTABLE)
 find_package_handle_standard_args(DOCBOOK_DTD DEFAULT_MSG DOCBOOK_DTD_DIR)
 find_package_handle_standard_args(DOCBOOK_XSL DEFAULT_MSG DOCBOOK_XSL_DIR)
 find_package_handle_standard_args(BOOSTBOOK_DTD DEFAULT_MSG BOOSTBOOK_DTD_DIR)
@@ -105,82 +98,11 @@ file(WRITE ${BOOSTBOOK_CATALOG}
     "/>\n"
   "</catalog>\n"
   )
-
 mark_as_advanced(BOOSTBOOK_DTD_DIR BOOSTBOOK_XSL_DIR BOOSTBOOK_CATALOG)
-
 
 
 set(QUICKBOOK_EXECUTABLE quickbook)
 
-##########################################################################
-# Documentation tools configuration                                      #
-##########################################################################
-
-option(BUILD_DOCUMENTATION "Whether to build library documentation" ON)
-option(BUILD_DOCUMENTATION_HTML "Whether to build HTML documentation" ON)
-option(BUILD_DOCUMENTATION_MAN_PAGES "Whether to build Unix man pages" ON)
-
-# Find the DocBook DTD (version 4.2) # TODO: allow newer ones too!
-find_path(DOCBOOK_DTD_DIR 4.2/docbookx.dtd
-  PATHS
-    "/usr/share/xml/docbook/schema/dtd"
-    "${CMAKE_BINARY_DIR}/monolithic/src/docbook_xml"
-  DOC
-    "Path to the DocBook DTD"
-  )
-
-# Find the DocBook XSL stylesheets
-find_path(DOCBOOK_XSL_DIR html/html.xsl
-  PATHS
-    "/usr/share/xml/docbook/stylesheet/nwalsh"
-    "${CMAKE_BINARY_DIR}/monolithic/src/docbook_xsl"
-  DOC
-    "Path to the DocBook XSL stylesheets"
-  )
-
-# Find the BoostBook DTD (it should be in the distribution!)
-find_path(BOOSTBOOK_DTD_DIR boostbook.dtd
-  PATHS
-    "${CMAKE_BINARY_DIR}/monolithic/src/boostbook/dtd"
-  DOC
-    "Path to the BoostBook DTD"
-  )
-mark_as_advanced(BOOSTBOOK_DTD_DIR)
-
-# Find the BoostBook XSL stylesheets (they should be in the distribution!)
-find_path(BOOSTBOOK_XSL_DIR docbook.xsl
-  PATHS
-    "${CMAKE_BINARY_DIR}/monolithic/src/boostbook/xsl"
-  DOC
-    "Path to the BoostBook XSL stylesheets"
-  )
-mark_as_advanced(BOOSTBOOK_XSL_DIR)
-
-set(BOOSTBOOK_CATALOG ${CMAKE_BINARY_DIR}/boostbook_catalog.xml)
-file(WRITE ${BOOSTBOOK_CATALOG}
-  "<?xml version=\"1.0\"?>\n"
-  "<!DOCTYPE catalog\n"
-  "  PUBLIC \"-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN\"\n"
-  "  \"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd\">\n"
-  "<catalog xmlns=\"urn:oasis:names:tc:entity:xmlns:xml:catalog\">\n"
-  "  <rewriteURI"
-    " uriStartString=\"http://www.oasis-open.org/docbook/xml/\""
-    " rewritePrefix=\"file://${DOCBOOK_DTD_DIR}/\""
-    "/>\n"
-  "  <rewriteURI"
-    " uriStartString=\"http://docbook.sourceforge.net/release/xsl/current/\""
-    " rewritePrefix=\"file://${DOCBOOK_XSL_DIR}/\""
-    "/>\n"
-  "  <rewriteURI"
-    " uriStartString=\"http://www.boost.org/tools/boostbook/dtd/\""
-    " rewritePrefix=\"file://${BOOSTBOOK_DTD_DIR}/\""
-    "/>\n"
-  "  <rewriteURI"
-    " uriStartString=\"http://www.boost.org/tools/boostbook/xsl/\""
-    " rewritePrefix=\"file://${BOOSTBOOK_XSL_DIR}/\""
-    "/>\n"
-  "</catalog>\n"
-  )
 
 ##########################################################################
 
