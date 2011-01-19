@@ -19,12 +19,10 @@ endfunction(boost_project)
 
 
 function(boost_link_libraries target boost_libs link_libs)
-  # MAYBE TODO: on platforms that support auto linking, do NOT actually link
-#  foreach(lib ${boost_libs})
-#    list(APPEND link_libs lib_${lib}_shared) # TODO: proper variant
-#    # TODO: target properties depending on boost_libs (usage flags)
-#  endforeach(lib)
-  target_link_libraries(${target} ${boost_libs} ${link_libs})
+  foreach(lib ${boost_libs})
+    list(APPEND link_libs "${lib}-shared") # TODO: proper variant
+  endforeach(lib)
+  target_link_libraries(${target} ${link_libs})
 endfunction(boost_link_libraries)
 
 # Creates a Boost library target that generates a compiled library
@@ -161,15 +159,31 @@ function(boost_add_library name)
     # TODO: support precompiled headers
   endif(LIB_PCH)
 
-# add_library(${name} SHARED ${LIB_SOURCES})
-  add_library(${name} ${LIB_SOURCES})
-  boost_link_libraries(${name} "${LIB_LINK_BOOST_LIBRARIES}" "${LIB_LINK_LIBRARIES}")
-  set_target_properties(${name} PROPERTIES
-    #DEFINE_SYMBOL "${name}_EXPORT"
-    PREFIX libboost_ # or boost_ for dlls  # TODO: can we set this globally? 
-    )
+  set(targets)
+  
+  if(LIB_SHARED)
+    add_library(${name}-shared SHARED ${LIB_SOURCES})
+    boost_link_libraries(${name}-shared
+      "${LIB_LINK_BOOST_LIBRARIES}" "${LIB_LINK_LIBRARIES}")
+	set_property(TARGET ${name}-shared
+	  APPEND PROPERTY COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1")
+    list(APPEND targets ${name}-shared)
+  endif(LIB_SHARED)
 
-  install(TARGETS ${name}
+  if(LIB_STATIC)
+    add_library(${name}-static STATIC ${LIB_SOURCES})
+    # TODO: boost_link_libraries
+    list(APPEND targets ${name}-static)
+  endif(LIB_STATIC)
+
+# set_target_properties(${name} PROPERTIES
+#   #DEFINE_SYMBOL "${name}_EXPORT"
+#   PREFIX libboost_ # or boost_ for dlls  # TODO: can we set this globally?
+#   )
+
+  set_property(TARGET ${targets} PROPERTY FOLDER "${BOOST_PROJECT_NAME}")
+
+  install(TARGETS ${targets}
     ARCHIVE DESTINATION lib COMPONENT ${CMAKE_PROJECT_NAME}-dev
     LIBRARY DESTINATION lib COMPONENT ${CMAKE_PROJECT_NAME}-dev
     RUNTIME DESTINATION bin COMPONENT ${CMAKE_PROJECT_NAME}-lib
@@ -336,10 +350,10 @@ macro(boost_add_executable2 EXENAME)
       list(APPEND THIS_EXE_RELEASE_ACTUAL_DEPENDS "${LIB}${RELEASE_VARIANT_TARGET_NAME}")
       list(APPEND THIS_EXE_DEBUG_ACTUAL_DEPENDS "${LIB}${DEBUG_VARIANT_TARGET_NAME}")
       if(THIS_EXE_RELEASE_AND_DEBUG)
-	dependency_check("${LIB}${RELEASE_VARIANT_TARGET_NAME}")
-	dependency_check("${LIB}${DEBUG_VARIANT_TARGET_NAME}")
+    dependency_check("${LIB}${RELEASE_VARIANT_TARGET_NAME}")
+    dependency_check("${LIB}${DEBUG_VARIANT_TARGET_NAME}")
       else()
-	dependency_check("${LIB}${VARIANT_TARGET_NAME}")
+    dependency_check("${LIB}${VARIANT_TARGET_NAME}")
       endif()
     endif ()
   endforeach()
@@ -413,6 +427,7 @@ function(boost_add_executable name)
 
   add_executable(${name} ${EXE_SOURCES})
   boost_link_libraries(${name} "${EXE_LINK_BOOST_LIBRARIES}" "${EXE_LINK_LIBRARIES}")
+  set_property(TARGET ${name} PROPERTY FOLDER "${BOOST_PROJECT_NAME}")
 endfunction(boost_add_executable)
 
 

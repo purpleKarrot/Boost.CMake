@@ -77,24 +77,24 @@ set(BOOSTBOOK_CATALOG ${CMAKE_BINARY_DIR}/boostbook_catalog.xml)
 file(WRITE ${BOOSTBOOK_CATALOG}
   "<?xml version=\"1.0\"?>\n"
   "<!DOCTYPE catalog\n"
-  "  PUBLIC \"-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN\"\n"
-  "  \"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd\">\n"
+  " PUBLIC \"-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN\"\n"
+  " \"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd\">\n"
   "<catalog xmlns=\"urn:oasis:names:tc:entity:xmlns:xml:catalog\">\n"
-  "  <rewriteURI"
-    " uriStartString=\"http://www.oasis-open.org/docbook/xml/\""
-    " rewritePrefix=\"file://${DOCBOOK_DTD_DIR}/\""
+  " <rewriteURI"
+    " uriStartString=\"http://www.oasis-open.org/docbook/xml/4.2/\""
+    " rewritePrefix=\"${DOCBOOK_DTD_DIR}/\""
     "/>\n"
-  "  <rewriteURI"
+  " <rewriteURI"
     " uriStartString=\"http://docbook.sourceforge.net/release/xsl/current/\""
-    " rewritePrefix=\"file://${DOCBOOK_XSL_DIR}/\""
+    " rewritePrefix=\"${DOCBOOK_XSL_DIR}/\""
     "/>\n"
-  "  <rewriteURI"
+  " <rewriteURI"
     " uriStartString=\"http://www.boost.org/tools/boostbook/dtd/\""
-    " rewritePrefix=\"file://${BOOSTBOOK_DTD_DIR}/\""
+    " rewritePrefix=\"${BOOSTBOOK_DTD_DIR}/\""
     "/>\n"
-  "  <rewriteURI"
+  " <rewriteURI"
     " uriStartString=\"http://www.boost.org/tools/boostbook/xsl/\""
-    " rewritePrefix=\"file://${BOOSTBOOK_XSL_DIR}/\""
+    " rewritePrefix=\"${BOOSTBOOK_XSL_DIR}/\""
     "/>\n"
   "</catalog>\n"
   )
@@ -107,7 +107,8 @@ set(QUICKBOOK_EXECUTABLE quickbook)
 ##########################################################################
 
 function(boost_doxygen name)
-  cmake_parse_arguments(DOXY "" "FILE" "INPUT;OUTPUT;PARAMETERS" ${ARGN})
+  cmake_parse_arguments(DOXY ""
+    "FILE" "INPUT;OUTPUT;PARAMETERS;DEPENDS" ${ARGN})
   set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxyfile)
 
   if(DOXY_FILE)
@@ -116,7 +117,7 @@ function(boost_doxygen name)
     file(REMOVE ${doxyfile})
   endif()
 
-  foreach(param ${DOXY_PARAMETERS})
+  foreach(param "QUIET = YES" "WARN_IF_UNDOCUMENTED = NO" ${DOXY_PARAMETERS})
     file(APPEND ${doxyfile} "${param}\n")
   endforeach(param)
 
@@ -276,7 +277,7 @@ endfunction(boost_add_reference)
 function(boost_docbook input)
   set(output_html ${CMAKE_CURRENT_BINARY_DIR}/html/HTML.manifest)
   set(output_man  ${CMAKE_CURRENT_BINARY_DIR}/man/man.manifest)
-# set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_PROJECT_NAME}.fo)
+  set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_PROJECT_NAME}.fo)
   set(pdf_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_PROJECT_NAME}.pdf)
 
   boost_xsltproc(${output_html} ${BOOSTBOOK_XSL_DIR}/html.xsl ${input}
@@ -285,21 +286,24 @@ function(boost_docbook input)
   boost_xsltproc(${output_man} ${BOOSTBOOK_XSL_DIR}/manpages.xsl ${input}
     CATALOG ${BOOSTBOOK_CATALOG}
     )
-# boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
-#   CATALOG ${BOOSTBOOK_CATALOG}
-#   PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
-#   )
-# add_custom_command(OUTPUT ${pdf_file}
-#   COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} 2>/dev/null
-#   DEPENDS ${fop_file}
-#   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#   )
-  add_custom_command(OUTPUT ${pdf_file}
-    COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} 2>/dev/null
-    DEPENDS ${input}
+  boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
+    CATALOG ${BOOSTBOOK_CATALOG}
+    PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
     )
-  add_custom_target(pdf-${BOOST_PROJECT_NAME} DEPENDS ${pdf_file})
-  add_custom_target(html-${BOOST_PROJECT_NAME} DEPENDS ${output_html})
+  add_custom_command(OUTPUT ${pdf_file}
+    COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} 2>/dev/null
+    DEPENDS ${fop_file}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+# add_custom_command(OUTPUT ${pdf_file}
+#   COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} 2>/dev/null
+#   DEPENDS ${input}
+#   )
+  set(target "${BOOST_PROJECT_NAME}-doc")
+  add_custom_target(${target}
+    DEPENDS ${pdf_file} # ${output_html}
+    )
+  set_property(TARGET ${target} PROPERTY FOLDER "${BOOST_PROJECT_NAME}")
 endfunction(boost_docbook)
 
 ##########################################################################
@@ -343,11 +347,10 @@ function(boost_xml_doc input)
     DEPENDS ${input} ${ARGN}
     )
 
-  add_custom_target(db-${BOOST_PROJECT_NAME} DEPENDS ${output})
-
-  set(doc ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_PROJECT_NAME}-complete.xml)
-  boost_xsltproc(${doc} ${CMAKE_SOURCE_DIR}/doc/copy.xslt ${input})
-  add_custom_target(doc-${BOOST_PROJECT_NAME} DEPENDS ${doc})
+# add_custom_target(db-${BOOST_PROJECT_NAME} DEPENDS ${output})
+# set(doc ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_PROJECT_NAME}-complete.xml)
+# boost_xsltproc(${doc} ${CMAKE_SOURCE_DIR}/doc/copy.xslt ${input})
+# add_custom_target(doc-${BOOST_PROJECT_NAME} DEPENDS ${doc})
 
   boost_docbook(${output})
 endfunction(boost_xml_doc)
