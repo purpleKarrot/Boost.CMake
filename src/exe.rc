@@ -1,0 +1,40 @@
+//////////////////////////////////////////////////////////////////////////
+// Copyright (C) 2010-2011 Daniel Pfeifer <daniel@pfeifer-mail.de>      //
+//                                                                      //
+// Distributed under the Boost Software License, Version 1.0.           //
+// See accompanying file LICENSE_1_0.txt or copy at                     //
+//   http://www.boost.org/LICENSE_1_0.txt                               //
+//////////////////////////////////////////////////////////////////////////
+
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     1, 45, 0, 0
+PRODUCTVERSION  1, 45, 0, 0
+FILEFLAGSMASK   0x3fL
+#ifdef _DEBUG
+FILEFLAGS       VS_FF_DEBUG
+#else
+FILEFLAGS       0x0L
+#endif
+FILEOS          0x40004L
+FILETYPE        0x1L
+FILESUBTYPE     0x0L
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName",      "Boost.org\0"
+      VALUE "FileDescription",  "\0"
+      VALUE "FileVersion",      "1.45.0\0"
+      VALUE "ProductVersion",   "1.45.0\0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0, 1252
+  END
+END
+
+1 ICON "boost.ico"

@@ -7,89 +7,17 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-include(CMakeParseArguments)
-include(FindPackageHandleStandardArgs)
-
 set(DOXYGEN_SKIP_DOT ON)
-find_package(Doxygen)
-find_package(DBLATEX)
-find_package(XSLTPROC)
-
-##########################################################################
-# Documentation tools configuration                                      #
-##########################################################################
-
-# Find the DocBook DTD (version 4.2)
-find_path(DOCBOOK_DTD_DIR docbookx.dtd
-  PATHS
-    "/usr/share/xml/docbook/schema/dtd/4.2"
-    "${CMAKE_BINARY_DIR}/stable-source/src/docbook_xml/4.2"
-  DOC
-    "Path to the DocBook DTD"
-  )
-
-# Find the DocBook XSL stylesheets
-find_path(DOCBOOK_XSL_DIR html/html.xsl
-  PATHS
-    "/usr/share/xml/docbook/stylesheet/nwalsh"
-    "${CMAKE_BINARY_DIR}/stable-source/src/docbook_xsl"
-  DOC
-    "Path to the DocBook XSL stylesheets"
-  )
-
-# Find the BoostBook DTD (it should be in the distribution!)
-find_path(BOOSTBOOK_DTD_DIR boostbook.dtd
-  PATHS
-    "${CMAKE_BINARY_DIR}/stable-source/src/boostbook/dtd"
-  DOC
-    "Path to the BoostBook DTD"
-  )
-
-# Find the BoostBook XSL stylesheets (they should be in the distribution!)
-find_path(BOOSTBOOK_XSL_DIR docbook.xsl
-  PATHS
-    "${CMAKE_BINARY_DIR}/stable-source/src/boostbook/xsl"
-  DOC
-    "Path to the BoostBook XSL stylesheets"
-  )
-
-find_package_handle_standard_args(DOCBOOK_DTD DEFAULT_MSG DOCBOOK_DTD_DIR)
-find_package_handle_standard_args(DOCBOOK_XSL DEFAULT_MSG DOCBOOK_XSL_DIR)
-find_package_handle_standard_args(BOOSTBOOK_DTD DEFAULT_MSG BOOSTBOOK_DTD_DIR)
-find_package_handle_standard_args(BOOSTBOOK_XSL DEFAULT_MSG BOOSTBOOK_XSL_DIR)
-
-set(BOOSTBOOK_CATALOG ${CMAKE_BINARY_DIR}/boostbook_catalog.xml)
-file(WRITE ${BOOSTBOOK_CATALOG}
-  "<?xml version=\"1.0\"?>\n"
-  "<!DOCTYPE catalog\n"
-  " PUBLIC \"-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN\"\n"
-  " \"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd\">\n"
-  "<catalog xmlns=\"urn:oasis:names:tc:entity:xmlns:xml:catalog\">\n"
-  " <rewriteURI"
-    " uriStartString=\"http://www.oasis-open.org/docbook/xml/4.2/\""
-    " rewritePrefix=\"${DOCBOOK_DTD_DIR}/\""
-    "/>\n"
-  " <rewriteURI"
-    " uriStartString=\"http://docbook.sourceforge.net/release/xsl/current/\""
-    " rewritePrefix=\"${DOCBOOK_XSL_DIR}/\""
-    "/>\n"
-  " <rewriteURI"
-    " uriStartString=\"http://www.boost.org/tools/boostbook/dtd/\""
-    " rewritePrefix=\"${BOOSTBOOK_DTD_DIR}/\""
-    "/>\n"
-  " <rewriteURI"
-    " uriStartString=\"http://www.boost.org/tools/boostbook/xsl/\""
-    " rewritePrefix=\"${BOOSTBOOK_XSL_DIR}/\""
-    "/>\n"
-  "</catalog>\n"
-  )
-mark_as_advanced(BOOSTBOOK_DTD_DIR BOOSTBOOK_XSL_DIR BOOSTBOOK_CATALOG)
-
+find_package(Doxygen   REQUIRED)
+find_package(DBLATEX   REQUIRED)
+find_package(XSLTPROC  REQUIRED)
+find_package(BoostBook REQUIRED)
 
 set(QUICKBOOK_EXECUTABLE quickbook)
 
-
 ##########################################################################
+
+include(CMakeParseArguments)
 
 function(boost_doxygen name)
   cmake_parse_arguments(DOXY ""

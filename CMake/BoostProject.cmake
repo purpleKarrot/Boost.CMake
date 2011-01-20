@@ -88,6 +88,8 @@ function(boost_add_library name)
     ${ARGN}
     )
 
+  string(TOUPPER ${name} upper_name)
+
   if(NOT LIB_SOURCES)
     set(LIB_SOURCES ${LIB_UNPARSED_ARGUMENTS})
   endif(NOT LIB_SOURCES)
@@ -131,12 +133,15 @@ function(boost_add_library name)
 #   PREFIX libboost_ # or boost_ for dlls  # TODO: can we set this globally?
 #   )
 
-  set_property(TARGET ${targets} PROPERTY FOLDER "${BOOST_PROJECT_NAME}")
+  set_property(TARGET ${targets}
+    PROPERTY FOLDER "${BOOST_PROJECT_NAME}")
+  set_property(TARGET ${targets}
+    PROPERTY DEFINE_SYMBOL "BOOST_${upper_name}_SOURCE")
 
   install(TARGETS ${targets}
-    ARCHIVE DESTINATION lib COMPONENT ${CMAKE_PROJECT_NAME}-dev
-    LIBRARY DESTINATION lib COMPONENT ${CMAKE_PROJECT_NAME}-dev
-    RUNTIME DESTINATION bin COMPONENT ${CMAKE_PROJECT_NAME}-lib
+    ARCHIVE DESTINATION lib COMPONENT ${BOOST_PROJECT_NAME}_dev
+    LIBRARY DESTINATION lib COMPONENT ${BOOST_PROJECT_NAME}_dev
+    RUNTIME DESTINATION bin COMPONENT ${BOOST_PROJECT_NAME}_lib
     )
 endfunction(boost_add_library)
 
@@ -191,10 +196,16 @@ function(boost_add_executable name)
   cmake_parse_arguments(EXE "" ""
     "SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
 
-  add_executable(${name} ${EXE_SOURCES})
+  set(rc_file ${Boost_SOURCE_DIR}/src/exe.rc)
+
+  add_executable(${name} ${EXE_SOURCES} ${rc_file})
   boost_link_libraries(${name} ${EXE_LINK_BOOST_LIBRARIES})
   target_link_libraries(${name} ${EXE_LINK_LIBRARIES})
   set_property(TARGET ${name} PROPERTY FOLDER "${BOOST_PROJECT_NAME}")
+
+  install(TARGETS ${name}
+    RUNTIME DESTINATION bin COMPONENT ${BOOST_PROJECT_NAME}_tool
+    )
 endfunction(boost_add_executable)
 
 
