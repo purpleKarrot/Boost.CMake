@@ -27,7 +27,7 @@ endif()
 if(DBLATEX_EXECUTABLE)
   execute_process(COMMAND ${DBLATEX_EXECUTABLE} --version
     OUTPUT_VARIABLE DBLATEX_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-  string(REGEX REPLACE "^dblatex version ([.0-9]+)$" "\\1"
+  string(REGEX REPLACE "^dblatex version (.+)$" "\\1"
     DBLATEX_VERSION "${DBLATEX_VERSION}")
 endif(DBLATEX_EXECUTABLE)
 
