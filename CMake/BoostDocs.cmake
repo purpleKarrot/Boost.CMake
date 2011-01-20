@@ -12,27 +12,12 @@ include(FindPackageHandleStandardArgs)
 
 set(DOXYGEN_SKIP_DOT ON)
 find_package(Doxygen)
+find_package(DBLATEX)
+find_package(XSLTPROC)
 
 ##########################################################################
 # Documentation tools configuration                                      #
 ##########################################################################
-
-# Find xsltproc to transform XML documents via XSLT
-find_program(XSLTPROC_EXECUTABLE xsltproc
-  DOC "xsltproc transforms XML via XSLT"
-  )
-find_package_handle_standard_args(XSLTPROC DEFAULT_MSG XSLTPROC_EXECUTABLE)
-
-# Apache FO Processor
-find_program(FOP_EXECUTABLE fop
-   )
-find_package_handle_standard_args(FOP DEFAULT_MSG FOP_EXECUTABLE)
-
-# DocBook to LaTeX Publishing
-find_program(DBLATEX_EXECUTABLE dblatex
-  )
-find_package_handle_standard_args(DBLATEX DEFAULT_MSG DBLATEX_EXECUTABLE)
-# /usr/share/xml/docbook/stylesheet/dblatex/xsl/docbook.xsl
 
 # Find the DocBook DTD (version 4.2)
 find_path(DOCBOOK_DTD_DIR docbookx.dtd
@@ -286,19 +271,19 @@ function(boost_docbook input)
   boost_xsltproc(${output_man} ${BOOSTBOOK_XSL_DIR}/manpages.xsl ${input}
     CATALOG ${BOOSTBOOK_CATALOG}
     )
-  boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
-    CATALOG ${BOOSTBOOK_CATALOG}
-    PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
-    )
-  add_custom_command(OUTPUT ${pdf_file}
-    COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} 2>/dev/null
-    DEPENDS ${fop_file}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-# add_custom_command(OUTPUT ${pdf_file}
-#   COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} 2>/dev/null
-#   DEPENDS ${input}
+# boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
+#   CATALOG ${BOOSTBOOK_CATALOG}
+#   PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
 #   )
+# add_custom_command(OUTPUT ${pdf_file}
+#   COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} 2>/dev/null
+#   DEPENDS ${fop_file}
+#   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#   )
+  add_custom_command(OUTPUT ${pdf_file}
+    COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} #2>/dev/null
+    DEPENDS ${input}
+    )
   set(target "${BOOST_PROJECT_NAME}-doc")
   add_custom_target(${target}
     DEPENDS ${pdf_file} # ${output_html}
