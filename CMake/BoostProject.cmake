@@ -10,11 +10,43 @@
 
 include(CMakeParseArguments)
 
+# wrapper to set CPACK_COMPONENT_* globally
+function(set_cpack_component name value)
+  set(CPACK_COMPONENT_${name} ${value} CACHE INTERNAL "" FORCE)
+endfunction(set_cpack_component)
+
 # use this function as a replacement for 'project' in boost projects.
 function(boost_project name)
   cmake_parse_arguments(PROJ "" "" "AUTHORS;DESCRIPTION;DEPENDS" ${ARGN})
   set(BOOST_PROJECT_NAME ${name} PARENT_SCOPE)
   project(${name})
+
+  string(TOUPPER "${name}" uname)
+  string(REPLACE ";" " " description "${PROJ_DESCRIPTION}")
+
+  set_cpack_component(GROUP_${uname}_GROUP_DISPLAY_NAME "${name}")
+  set_cpack_component(GROUP_${uname}_GROUP_DESCRIPTION "${description}")
+
+  set_cpack_component(${uname}_DEV_GROUP "${uname}_GROUP")
+  set_cpack_component(${uname}_LIB_GROUP "${uname}_GROUP")
+
+  set(lib_depends)
+  set(dev_depends "${name}_lib")
+  foreach(dep ${PROJ_DEPENDS})
+#   list(APPEND lib_depends "${dep}_lib")
+#   list(APPEND dev_depends "${dep}_dev")
+  endforeach(dep)
+
+  set_cpack_component(${uname}_LIB_DEPENDS "${lib_depends}")
+  set_cpack_component(${uname}_DEV_DEPENDS "${dev_depends}")
+
+  set_cpack_component(${uname}_LIB_DISPLAY_NAME "Shared Libraries")
+  set_cpack_component(${uname}_DEV_DISPLAY_NAME "Static and import Libraries")
+
+  set_cpack_component(${uname}_LIB_DESCRIPTION "${description}")
+  set_cpack_component(${uname}_DEV_DESCRIPTION "${description}")
+
+# set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} "${name}_dev" CACHE INTERNAL "" FORCE)
 endfunction(boost_project)
 
 # this function is like 'target_link_libraries, except only for boost libs
@@ -109,7 +141,7 @@ function(boost_add_library name)
   endif(LIB_PCH)
 
   set(targets)
-  
+
   if(LIB_SHARED)
     set(target ${name}-shared)
     add_library(${target} SHARED ${LIB_SOURCES})
@@ -143,6 +175,12 @@ function(boost_add_library name)
     LIBRARY DESTINATION lib COMPONENT ${BOOST_PROJECT_NAME}_dev
     RUNTIME DESTINATION bin COMPONENT ${BOOST_PROJECT_NAME}_lib
     )
+  
+  set(components ${CPACK_COMPONENTS_ALL} ${BOOST_PROJECT_NAME}_dev)
+  if(LIB_SHARED)
+    list(APPEND components ${BOOST_PROJECT_NAME}_lib)
+  endif(LIB_SHARED)
+  set(CPACK_COMPONENTS_ALL ${components} CACHE INTERNAL "" FORCE)
 endfunction(boost_add_library)
 
 
