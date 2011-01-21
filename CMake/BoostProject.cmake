@@ -10,6 +10,32 @@
 
 include(CMakeParseArguments)
 
+# I might change the interface of this function (don't like the prefix param)...
+function(boost_add_headers prefix)
+  set(fwd_prefix "${BOOST_INCLUDE_DIR}/${prefix}")
+
+  foreach(header ${ARGN})
+    # create forwarding header
+    get_filename_component(absolute ${header} ABSOLUTE)
+    file(RELATIVE_PATH relative ${CMAKE_CURRENT_SOURCE_DIR} ${absolute})
+    set(fwdfile "${fwd_prefix}/${relative}")
+    if(NOT EXISTS "${fwdfile}")
+      get_filename_component(path ${relative} PATH)
+      get_filename_component(fwd_absolute "${fwd_prefix}/${path}" ABSOLUTE)
+      file(RELATIVE_PATH include "${fwd_absolute}" "${absolute}")
+      file(WRITE ${fwdfile} "#include \"${include}\"\n")
+    endif(NOT EXISTS "${fwdfile}")
+
+    # install definition
+    string(REGEX MATCH "(.*)[/\\]" directory ${relative})
+    install(FILES ${header}
+      DESTINATION include/${prefix}/${directory}
+      COMPONENT ${BOOST_PROJECT_NAME}_dev
+      )
+  endforeach(header)
+endfunction(boost_add_headers)
+
+
 # wrapper to set CPACK_COMPONENT_* globally
 function(set_cpack_component name value)
   set(CPACK_COMPONENT_${name} ${value} CACHE INTERNAL "" FORCE)
