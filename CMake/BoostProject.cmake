@@ -64,7 +64,7 @@ function(boost_project name)
   set_cpack_component(${uname}_LIB_GROUP "${uname}_GROUP")
 
   set(lib_depends)
-  set(dev_depends "${name}_lib")
+  set(dev_depends) # "${name}_lib")
   foreach(dep ${PROJ_DEPENDS})
 #   list(APPEND lib_depends "${dep}_lib")
 #   list(APPEND dev_depends "${dep}_dev")
@@ -180,8 +180,11 @@ function(boost_add_library name)
     add_library(${target} SHARED ${LIB_SOURCES})
     boost_link_libraries(${target} ${LIB_LINK_BOOST_LIBRARIES} SHARED)
     target_link_libraries(${target} ${LIB_LINK_LIBRARIES})
-	set_property(TARGET ${name}-shared
+	set_property(TARGET ${target}
 	  APPEND PROPERTY COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1")
+	set_target_properties(${target} PROPERTIES
+      PROJECT_LABEL "${name} (shared library)"
+      )
     list(APPEND targets ${target})
   endif(LIB_SHARED)
 
@@ -190,18 +193,18 @@ function(boost_add_library name)
     add_library(${name}-static STATIC ${LIB_SOURCES})
     boost_link_libraries(${target} ${LIB_LINK_BOOST_LIBRARIES} STATIC)
     target_link_libraries(${target} ${LIB_LINK_LIBRARIES})
+	set_target_properties(${target} PROPERTIES
+      PROJECT_LABEL "${name} (static library)"
+      PREFIX "lib"
+      )
     list(APPEND targets ${target})
   endif(LIB_STATIC)
 
-# set_target_properties(${name} PROPERTIES
-#   #DEFINE_SYMBOL "${name}_EXPORT"
-#   PREFIX libboost_ # or boost_ for dlls  # TODO: can we set this globally?
-#   )
-
-  set_property(TARGET ${targets}
-    PROPERTY FOLDER "${BOOST_PROJECT_NAME}")
-  set_property(TARGET ${targets}
-    PROPERTY DEFINE_SYMBOL "BOOST_${upper_name}_SOURCE")
+  set_target_properties(${targets} PROPERTIES
+    DEFINE_SYMBOL "BOOST_${upper_name}_SOURCE"
+    OUTPUT_NAME "boost_${name}"
+    FOLDER "${BOOST_PROJECT_NAME}"
+    )
 
   install(TARGETS ${targets}
     ARCHIVE DESTINATION lib COMPONENT ${BOOST_PROJECT_NAME}_dev
@@ -272,6 +275,7 @@ function(boost_add_executable name)
   boost_link_libraries(${name} ${EXE_LINK_BOOST_LIBRARIES})
   target_link_libraries(${name} ${EXE_LINK_LIBRARIES})
   set_property(TARGET ${name} PROPERTY FOLDER "${BOOST_PROJECT_NAME}")
+  set_property(TARGET ${name} PROPERTY PROJECT_LABEL "${name} (executable)")
 
   install(TARGETS ${name}
     RUNTIME DESTINATION bin COMPONENT ${BOOST_PROJECT_NAME}_tool
