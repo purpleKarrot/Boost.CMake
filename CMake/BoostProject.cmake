@@ -10,6 +10,11 @@
 
 include(CMakeParseArguments)
 
+function(boost_add_cpack_components)
+  set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} ${ARGN}
+    CACHE INTERNAL "" FORCE)
+endfunction(boost_add_cpack_components)
+
 # I might change the interface of this function (don't like the prefix param)...
 function(boost_add_headers prefix)
   set(fwd_prefix "${BOOST_INCLUDE_DIR}/${prefix}")
@@ -33,6 +38,8 @@ function(boost_add_headers prefix)
       COMPONENT ${BOOST_PROJECT_NAME}_dev
       )
   endforeach(header)
+
+  boost_add_cpack_components(${BOOST_PROJECT_NAME}_dev)
 endfunction(boost_add_headers)
 
 
@@ -201,12 +208,11 @@ function(boost_add_library name)
     LIBRARY DESTINATION lib COMPONENT ${BOOST_PROJECT_NAME}_dev
     RUNTIME DESTINATION bin COMPONENT ${BOOST_PROJECT_NAME}_lib
     )
-  
-  set(components ${CPACK_COMPONENTS_ALL} ${BOOST_PROJECT_NAME}_dev)
+
+  boost_add_cpack_components(${BOOST_PROJECT_NAME}_dev)
   if(LIB_SHARED)
-    list(APPEND components ${BOOST_PROJECT_NAME}_lib)
+    boost_add_cpack_components(${BOOST_PROJECT_NAME}_lib)
   endif(LIB_SHARED)
-  set(CPACK_COMPONENTS_ALL ${components} CACHE INTERNAL "" FORCE)
 endfunction(boost_add_library)
 
 
