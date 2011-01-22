@@ -10,10 +10,66 @@
 
 include(CMakeParseArguments)
 
-function(boost_add_cpack_components)
-  set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} ${ARGN}
-    CACHE INTERNAL "" FORCE)
-endfunction(boost_add_cpack_components)
+##########################################################################
+
+# wrapper to set CPACK_COMPONENT_* globally
+function(set_cpack_component name value)
+  string(TOUPPER "CPACK_COMPONENT_${name}" variable)
+  set(${variable} ${value} CACHE INTERNAL "" FORCE)
+endfunction(set_cpack_component)
+
+# wrapper to get a CPACK_COMPONENT_* value
+function(get_cpack_component destvar name)
+  string(TOUPPER "CPACK_COMPONENT_${name}" variable)
+  set(${destvar} ${${variable}} PARENT_SCOPE)
+endfunction(get_cpack_component)
+
+function(boost_add_cpack_component name)
+  set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL}
+    "${BOOST_PROJECT_NAME}_${name}"
+    CACHE INTERNAL "" FORCE
+    )
+endfunction(boost_add_cpack_component)
+
+##########################################################################
+
+# use this function as a replacement for 'project' in boost projects.
+function(boost_project name)
+  cmake_parse_arguments(PROJ "" "" "AUTHORS;DESCRIPTION;DEPENDS" ${ARGN})
+  
+  set(BOOST_PROJECT_DISPLAY_NAME "${name}" PARENT_SCOPE)
+
+  string(REPLACE " " "_" project_name "${name}")
+  string(TOLOWER "${project_name}" project_name)
+  set(BOOST_PROJECT_NAME "${project_name}" PARENT_SCOPE)
+  project(${project_name})
+
+  string(REPLACE ";" " " description "${PROJ_DESCRIPTION}")
+
+  set_cpack_component(GROUP_${project_name}_GROUP_DISPLAY_NAME "${name}")
+  set_cpack_component(GROUP_${project_name}_GROUP_DESCRIPTION "${description}")
+
+  set_cpack_component(${project_name}_DEV_GROUP "${project_name}_group")
+  set_cpack_component(${project_name}_LIB_GROUP "${project_name}_group")
+
+  set(lib_depends)
+  set(dev_depends) # "${project_name}_lib")
+  foreach(dep ${PROJ_DEPENDS})
+#   list(APPEND lib_depends "${project_name}_lib")
+#   list(APPEND dev_depends "${project_name}_dev")
+  endforeach(dep)
+
+  set_cpack_component(${project_name}_LIB_DEPENDS "${lib_depends}")
+  set_cpack_component(${project_name}_DEV_DEPENDS "${dev_depends}")
+
+  set_cpack_component(${project_name}_LIB_DISPLAY_NAME "${name}: Shared Libraries")
+  set_cpack_component(${project_name}_DEV_DISPLAY_NAME "${name}: Static and import Libraries")
+
+  set_cpack_component(${project_name}_LIB_DESCRIPTION "${description}")
+  set_cpack_component(${project_name}_DEV_DESCRIPTION "${description}")
+
+# set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} "${name}_dev" CACHE INTERNAL "" FORCE)
+endfunction(boost_project)
 
 # I might change the interface of this function (don't like the prefix param)...
 function(boost_add_headers prefix)
@@ -39,48 +95,8 @@ function(boost_add_headers prefix)
       )
   endforeach(header)
 
-  boost_add_cpack_components(${BOOST_PROJECT_NAME}_dev)
+  boost_add_cpack_component(dev)
 endfunction(boost_add_headers)
-
-
-# wrapper to set CPACK_COMPONENT_* globally
-function(set_cpack_component name value)
-  set(CPACK_COMPONENT_${name} ${value} CACHE INTERNAL "" FORCE)
-endfunction(set_cpack_component)
-
-# use this function as a replacement for 'project' in boost projects.
-function(boost_project name)
-  cmake_parse_arguments(PROJ "" "" "AUTHORS;DESCRIPTION;DEPENDS" ${ARGN})
-  set(BOOST_PROJECT_NAME ${name} PARENT_SCOPE)
-  project(${name})
-
-  string(TOUPPER "${name}" uname)
-  string(REPLACE ";" " " description "${PROJ_DESCRIPTION}")
-
-  set_cpack_component(GROUP_${uname}_GROUP_DISPLAY_NAME "${name}")
-  set_cpack_component(GROUP_${uname}_GROUP_DESCRIPTION "${description}")
-
-  set_cpack_component(${uname}_DEV_GROUP "${uname}_GROUP")
-  set_cpack_component(${uname}_LIB_GROUP "${uname}_GROUP")
-
-  set(lib_depends)
-  set(dev_depends) # "${name}_lib")
-  foreach(dep ${PROJ_DEPENDS})
-#   list(APPEND lib_depends "${dep}_lib")
-#   list(APPEND dev_depends "${dep}_dev")
-  endforeach(dep)
-
-  set_cpack_component(${uname}_LIB_DEPENDS "${lib_depends}")
-  set_cpack_component(${uname}_DEV_DEPENDS "${dev_depends}")
-
-  set_cpack_component(${uname}_LIB_DISPLAY_NAME "Shared Libraries")
-  set_cpack_component(${uname}_DEV_DISPLAY_NAME "Static and import Libraries")
-
-  set_cpack_component(${uname}_LIB_DESCRIPTION "${description}")
-  set_cpack_component(${uname}_DEV_DESCRIPTION "${description}")
-
-# set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} "${name}_dev" CACHE INTERNAL "" FORCE)
-endfunction(boost_project)
 
 # this function is like 'target_link_libraries, except only for boost libs
 function(boost_link_libraries target)
@@ -208,13 +224,13 @@ function(boost_add_library name)
 
   install(TARGETS ${targets}
     ARCHIVE DESTINATION lib COMPONENT ${BOOST_PROJECT_NAME}_dev
-    LIBRARY DESTINATION lib COMPONENT ${BOOST_PROJECT_NAME}_dev
+    LIBRARY DESTINATION lib COMPONENT ${BOOST_PROJECT_NAME}_lib
     RUNTIME DESTINATION bin COMPONENT ${BOOST_PROJECT_NAME}_lib
     )
 
-  boost_add_cpack_components(${BOOST_PROJECT_NAME}_dev)
+  boost_add_cpack_component(dev)
   if(LIB_SHARED)
-    boost_add_cpack_components(${BOOST_PROJECT_NAME}_lib)
+    boost_add_cpack_component(lib)
   endif(LIB_SHARED)
 endfunction(boost_add_library)
 
