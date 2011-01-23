@@ -51,6 +51,7 @@ function(boost_project name)
 
   set_cpack_component(${project_name}_DEV_GROUP "${project_name}_group")
   set_cpack_component(${project_name}_LIB_GROUP "${project_name}_group")
+  set_cpack_component(${project_name}_EXE_GROUP "${project_name}_group")
 
   set(lib_depends)
   set(dev_depends) # "${project_name}_lib")
@@ -64,11 +65,17 @@ function(boost_project name)
 
   set_cpack_component(${project_name}_LIB_DISPLAY_NAME "${name}: Shared Libraries")
   set_cpack_component(${project_name}_DEV_DISPLAY_NAME "${name}: Static and import Libraries")
+  set_cpack_component(${project_name}_EXE_DISPLAY_NAME "${name}: Tools")
 
   set_cpack_component(${project_name}_LIB_DESCRIPTION "${description}")
   set_cpack_component(${project_name}_DEV_DESCRIPTION "${description}")
+  set_cpack_component(${project_name}_EXE_DESCRIPTION "${description}")
 
-# set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} "${name}_dev" CACHE INTERNAL "" FORCE)
+  # Debian  
+  string(REPLACE "_" "-" debian_name "${project_name}")
+  set_cpack_component(${project_name}_LIB_DEB_PACKAGE "libboost-${debian_name}")
+  set_cpack_component(${project_name}_DEV_DEB_PACKAGE "libboost-${debian_name}-dev")
+  set_cpack_component(${project_name}_EXE_DEB_PACKAGE "boost-${debian_name}")
 endfunction(boost_project)
 
 # I might change the interface of this function (don't like the prefix param)...
@@ -294,8 +301,9 @@ function(boost_add_executable name)
   set_property(TARGET ${name} PROPERTY PROJECT_LABEL "${name} (executable)")
 
   install(TARGETS ${name}
-    RUNTIME DESTINATION bin COMPONENT ${BOOST_PROJECT_NAME}_tool
+    RUNTIME DESTINATION bin COMPONENT ${BOOST_PROJECT_NAME}_exe
     )
+  boost_add_cpack_component(exe)
 endfunction(boost_add_executable)
 
 
