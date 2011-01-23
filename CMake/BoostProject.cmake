@@ -226,7 +226,7 @@ function(boost_add_library name)
   set_target_properties(${targets} PROPERTIES
     DEFINE_SYMBOL "BOOST_${upper_name}_SOURCE"
     OUTPUT_NAME "boost_${name}"
-    FOLDER "${BOOST_PROJECT_NAME}"
+    FOLDER "${BOOST_PROJECT_DISPLAY_NAME}"
     )
 
   install(TARGETS ${targets}
@@ -297,7 +297,7 @@ function(boost_add_executable name)
   add_executable(${name} ${EXE_SOURCES} ${rc_file})
   boost_link_libraries(${name} ${EXE_LINK_BOOST_LIBRARIES})
   target_link_libraries(${name} ${EXE_LINK_LIBRARIES})
-  set_property(TARGET ${name} PROPERTY FOLDER "${BOOST_PROJECT_NAME}")
+  set_property(TARGET ${name} PROPERTY FOLDER "${BOOST_PROJECT_DISPLAY_NAME}")
   set_property(TARGET ${name} PROPERTY PROJECT_LABEL "${name} (executable)")
 
   install(TARGETS ${name}

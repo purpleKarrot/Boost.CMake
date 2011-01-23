@@ -216,7 +216,9 @@ function(boost_docbook input)
   add_custom_target(${target}
     DEPENDS ${pdf_file} # ${output_html}
     )
-  set_property(TARGET ${target} PROPERTY FOLDER "${BOOST_PROJECT_NAME}")
+  set_target_properties(${target} PROPERTIES
+    FOLDER "${BOOST_PROJECT_DISPLAY_NAME}"
+    )
 endfunction(boost_docbook)
 
 ##########################################################################
