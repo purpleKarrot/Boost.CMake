@@ -9,18 +9,20 @@
 
 set(BOOSTBOOK_CATALOG ${CMAKE_BINARY_DIR}/boostbook_catalog.xml)
 
-# Find the BoostBook DTD (it should be in the distribution!)
+# Find the BoostBook DTD
 find_path(BOOSTBOOK_DTD_DIR boostbook.dtd
   PATHS
-    "${CMAKE_BINARY_DIR}/stable-source/src/boostbook/dtd"
+    "/usr/share/boostbook/dtd"
+    "$ENV{ProgramFiles}/boost/share/boostbook/dtd"
   DOC
     "Path to the BoostBook DTD"
   )
 
-# Find the BoostBook XSL stylesheets (they should be in the distribution!)
+# Find the BoostBook XSL stylesheets
 find_path(BOOSTBOOK_XSL_DIR docbook.xsl
   PATHS
-    "${CMAKE_BINARY_DIR}/stable-source/src/boostbook/xsl"
+    "/usr/share/boostbook/xsl"
+    "$ENV{ProgramFiles}/boost/share/boostbook/xsl"
   DOC
     "Path to the BoostBook XSL stylesheets"
   )
@@ -42,7 +44,7 @@ find_path(DOCBOOK_XSL_DIR html/html.xsl
   )
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(BOOSTBOOK DEFAULT_MSG
+find_package_handle_standard_args(BoostBook DEFAULT_MSG
   BOOSTBOOK_CATALOG
   BOOSTBOOK_DTD_DIR
   BOOSTBOOK_XSL_DIR

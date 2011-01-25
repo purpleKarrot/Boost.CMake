@@ -12,8 +12,7 @@ find_package(Doxygen   REQUIRED)
 find_package(DBLATEX   REQUIRED)
 find_package(XSLTPROC  REQUIRED)
 find_package(BoostBook REQUIRED)
-
-set(QUICKBOOK_EXECUTABLE quickbook)
+find_package(QuickBook REQUIRED)
 
 ##########################################################################
 
