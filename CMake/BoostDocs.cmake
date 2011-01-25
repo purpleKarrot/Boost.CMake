@@ -190,8 +190,8 @@ endfunction(boost_add_reference)
 function(boost_docbook input)
   set(output_html ${CMAKE_CURRENT_BINARY_DIR}/html/HTML.manifest)
   set(output_man  ${CMAKE_CURRENT_BINARY_DIR}/man/man.manifest)
-  set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_PROJECT_NAME}.fo)
-  set(pdf_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_PROJECT_NAME}.pdf)
+  set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.fo)
+  set(pdf_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.pdf)
 
   boost_xsltproc(${output_html} ${BOOSTBOOK_XSL_DIR}/html.xsl ${input}
     CATALOG ${BOOSTBOOK_CATALOG}
@@ -212,12 +212,12 @@ function(boost_docbook input)
     COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} #2>/dev/null
     DEPENDS ${input}
     )
-  set(target "${BOOST_PROJECT_NAME}-doc")
+  set(target "${BOOST_CURRENT_PROJECT}-doc")
   add_custom_target(${target}
     DEPENDS ${pdf_file} # ${output_html}
     )
   set_target_properties(${target} PROPERTIES
-    FOLDER "${BOOST_PROJECT_DISPLAY_NAME}"
+    FOLDER "${BOOST_CURRENT_FOLDER}"
     )
 endfunction(boost_docbook)
 
@@ -245,7 +245,7 @@ endfunction(boost_docbook)
 
 # TODO: this function can be used for more than html...
 function(boost_html_doc input)
-  set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_PROJECT_NAME}.docbook)
+  set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.docbook)
   add_custom_command(OUTPUT ${output}
     COMMAND ${PANDOC_EXECUTABLE} -S -w docbook ${input} -o ${output}
     DEPENDS ${input}
@@ -256,16 +256,16 @@ endfunction(boost_html_doc)
 ##########################################################################
 
 function(boost_xml_doc input)
-  set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_PROJECT_NAME}.docbook)
+  set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.docbook)
   boost_xsltproc(${output} ${BOOSTBOOK_XSL_DIR}/docbook.xsl ${input}
     CATALOG ${BOOSTBOOK_CATALOG}
     DEPENDS ${input} ${ARGN}
     )
 
-# add_custom_target(db-${BOOST_PROJECT_NAME} DEPENDS ${output})
-# set(doc ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_PROJECT_NAME}-complete.xml)
+# add_custom_target(db-${BOOST_CURRENT_PROJECT} DEPENDS ${output})
+# set(doc ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}-complete.xml)
 # boost_xsltproc(${doc} ${CMAKE_SOURCE_DIR}/doc/copy.xslt ${input})
-# add_custom_target(doc-${BOOST_PROJECT_NAME} DEPENDS ${doc})
+# add_custom_target(doc-${BOOST_CURRENT_PROJECT} DEPENDS ${doc})
 
   boost_docbook(${output})
 endfunction(boost_xml_doc)
@@ -274,7 +274,7 @@ endfunction(boost_xml_doc)
 
 function(boost_qbk_doc input)
   get_filename_component(input_path ${input} PATH)
-  set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_PROJECT_NAME}.xml)
+  set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.xml)
   add_custom_command(OUTPUT ${output}
     COMMAND ${QUICKBOOK_EXECUTABLE}
             --input-file ${input}
@@ -320,6 +320,6 @@ function(boost_documentation input)
   elseif(input_ext STREQUAL ".html")
     boost_html_doc(${input_file} ${ARGN})
   else()
-    message(STATUS "${BOOST_PROJECT_NAME} has unknown doc format: ${input_ext}")
+    message(STATUS "${BOOST_CURRENT_PROJECT} has unknown doc format: ${input_ext}")
   endif()
 endfunction(boost_documentation)

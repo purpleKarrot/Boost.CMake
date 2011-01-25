@@ -12,71 +12,48 @@ include(CMakeParseArguments)
 
 ##########################################################################
 
-# wrapper to set CPACK_COMPONENT_* globally
-function(set_cpack_component name value)
-  string(TOUPPER "CPACK_COMPONENT_${name}" variable)
-  set(${variable} ${value} CACHE INTERNAL "" FORCE)
-endfunction(set_cpack_component)
-
-# wrapper to get a CPACK_COMPONENT_* value
-function(get_cpack_component destvar name)
-  string(TOUPPER "CPACK_COMPONENT_${name}" variable)
-  set(${destvar} ${${variable}} PARENT_SCOPE)
-endfunction(get_cpack_component)
-
-function(boost_add_cpack_component name)
-  set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL}
-    "${BOOST_PROJECT_NAME}_${name}"
-    CACHE INTERNAL "" FORCE
-    )
-endfunction(boost_add_cpack_component)
+# function to set global project variables
+function(set_boost_project name value)
+  set(BOOST_PROJECT_${name} "${value}" CACHE INTERNAL "" FORCE)
+endfunction(set_boost_project)
 
 ##########################################################################
 
 # use this function as a replacement for 'project' in boost projects.
 function(boost_project name)
-  cmake_parse_arguments(PROJ "" "" "AUTHORS;DESCRIPTION;DEPENDS" ${ARGN})
+  set(parameters "AUTHORS;DESCRIPTION;DEPENDS")
+  cmake_parse_arguments(PROJ "" "" "${parameters}" ${ARGN})
+
+  string(REPLACE " " "_" project "${name}")
+  string(TOLOWER "${project}" project)
+  set(BOOST_CURRENT_PROJECT "${project}" PARENT_SCOPE)
+  project("${project}")
   
-  set(BOOST_PROJECT_DISPLAY_NAME "${name}" PARENT_SCOPE)
+  list(APPEND BOOST_PROJECTS_ALL ${project})
+  set(BOOST_PROJECTS_ALL ${BOOST_PROJECTS_ALL} CACHE INTERNAL "" FORCE)
 
-  string(REPLACE " " "_" project_name "${name}")
-  string(TOLOWER "${project_name}" project_name)
-  set(BOOST_PROJECT_NAME "${project_name}" PARENT_SCOPE)
-  project(${project_name})
+  # join description to a single string
+  string(REPLACE ";" " " PROJ_DESCRIPTION "${PROJ_DESCRIPTION}")
 
-  string(REPLACE ";" " " description "${PROJ_DESCRIPTION}")
+  # set global variables
+  set_boost_project("${project}_NAME" "${name}")
+  foreach(param ${parameters})
+    set_boost_project("${project}_${param}" "${PROJ_${param}}")
+  endforeach(param)
 
-  set_cpack_component(GROUP_${project_name}_GROUP_DISPLAY_NAME "${name}")
-  set_cpack_component(GROUP_${project_name}_GROUP_DESCRIPTION "${description}")
+  #
+  foreach(component dev doc exe lib)
+    string(TOUPPER "${component}" upper)
+    set(BOOST_${upper}_COMPONENT "${project}_${component}" PARENT_SCOPE)
+    set(has_var "${project}_HAS_${upper}")
+    set_boost_project(${has_var} OFF)
+    set(BOOST_HAS_${upper}_VAR "${has_var}" PARENT_SCOPE)
+  endforeach(component)
 
-  set_cpack_component(${project_name}_DEV_GROUP "${project_name}_group")
-  set_cpack_component(${project_name}_LIB_GROUP "${project_name}_group")
-  set_cpack_component(${project_name}_EXE_GROUP "${project_name}_group")
-
-  set(lib_depends)
-  set(dev_depends) # "${project_name}_lib")
-  foreach(dep ${PROJ_DEPENDS})
-#   list(APPEND lib_depends "${project_name}_lib")
-#   list(APPEND dev_depends "${project_name}_dev")
-  endforeach(dep)
-
-  set_cpack_component(${project_name}_LIB_DEPENDS "${lib_depends}")
-  set_cpack_component(${project_name}_DEV_DEPENDS "${dev_depends}")
-
-  set_cpack_component(${project_name}_LIB_DISPLAY_NAME "${name}: Shared Libraries")
-  set_cpack_component(${project_name}_DEV_DISPLAY_NAME "${name}: Static and import Libraries")
-  set_cpack_component(${project_name}_EXE_DISPLAY_NAME "${name}: Tools")
-
-  set_cpack_component(${project_name}_LIB_DESCRIPTION "${description}")
-  set_cpack_component(${project_name}_DEV_DESCRIPTION "${description}")
-  set_cpack_component(${project_name}_EXE_DESCRIPTION "${description}")
-
-  # Debian  
-  string(REPLACE "_" "-" debian_name "${project_name}")
-  set_cpack_component(${project_name}_LIB_DEB_PACKAGE "libboost-${debian_name}")
-  set_cpack_component(${project_name}_DEV_DEB_PACKAGE "libboost-${debian_name}-dev")
-  set_cpack_component(${project_name}_EXE_DEB_PACKAGE "boost-${debian_name}")
+  # this will be obsolete once CMake supports the FOLDER property on directories
+  set(BOOST_CURRENT_FOLDER "${name}" PARENT_SCOPE)
 endfunction(boost_project)
+
 
 # I might change the interface of this function (don't like the prefix param)...
 function(boost_add_headers prefix)
@@ -98,12 +75,13 @@ function(boost_add_headers prefix)
     string(REGEX MATCH "(.*)[/\\]" directory ${relative})
     install(FILES ${header}
       DESTINATION include/${prefix}/${directory}
-      COMPONENT ${BOOST_PROJECT_NAME}_dev
+      COMPONENT "${BOOST_DEV_COMPONENT}"
       )
   endforeach(header)
 
-  boost_add_cpack_component(dev)
+  set_boost_project("${BOOST_HAS_DEV_VAR}" ON)
 endfunction(boost_add_headers)
+
 
 # this function is like 'target_link_libraries, except only for boost libs
 function(boost_link_libraries target)
@@ -120,6 +98,7 @@ function(boost_link_libraries target)
 
   target_link_libraries(${target} ${link_libs})
 endfunction(boost_link_libraries)
+
 
 # Creates a Boost library target that generates a compiled library
 # (.a, .lib, .dll, .so, etc) from source files.
@@ -226,18 +205,24 @@ function(boost_add_library name)
   set_target_properties(${targets} PROPERTIES
     DEFINE_SYMBOL "BOOST_${upper_name}_SOURCE"
     OUTPUT_NAME "boost_${name}"
-    FOLDER "${BOOST_PROJECT_DISPLAY_NAME}"
+    FOLDER "${BOOST_CURRENT_FOLDER}"
     )
 
   install(TARGETS ${targets}
-    ARCHIVE DESTINATION lib COMPONENT ${BOOST_PROJECT_NAME}_dev
-    LIBRARY DESTINATION lib COMPONENT ${BOOST_PROJECT_NAME}_lib
-    RUNTIME DESTINATION bin COMPONENT ${BOOST_PROJECT_NAME}_lib
+    ARCHIVE
+      DESTINATION lib
+      COMPONENT "${BOOST_DEV_COMPONENT}"
+    LIBRARY
+      DESTINATION lib
+      COMPONENT "${BOOST_LIB_COMPONENT}"
+    RUNTIME
+      DESTINATION bin
+      COMPONENT "${BOOST_LIB_COMPONENT}"
     )
 
-  boost_add_cpack_component(dev)
+  set_boost_project("${BOOST_HAS_DEV_VAR}" ON)
   if(LIB_SHARED)
-    boost_add_cpack_component(lib)
+    set_boost_project("${BOOST_HAS_LIB_VAR}" ON)
   endif(LIB_SHARED)
 endfunction(boost_add_library)
 
@@ -297,13 +282,14 @@ function(boost_add_executable name)
   add_executable(${name} ${EXE_SOURCES} ${rc_file})
   boost_link_libraries(${name} ${EXE_LINK_BOOST_LIBRARIES})
   target_link_libraries(${name} ${EXE_LINK_LIBRARIES})
-  set_property(TARGET ${name} PROPERTY FOLDER "${BOOST_PROJECT_DISPLAY_NAME}")
+  set_property(TARGET ${name} PROPERTY FOLDER "${BOOST_CURRENT_FOLDER}")
   set_property(TARGET ${name} PROPERTY PROJECT_LABEL "${name} (executable)")
 
   install(TARGETS ${name}
-    RUNTIME DESTINATION bin COMPONENT ${BOOST_PROJECT_NAME}_exe
+    DESTINATION bin
+    COMPONENT ${BOOST_CURRENT_PROJECT}_exe
     )
-  boost_add_cpack_component(exe)
+  set_boost_project("${BOOST_HAS_EXE_VAR}" ON)
 endfunction(boost_add_executable)
 
 

@@ -110,7 +110,7 @@ function(boost_add_test name)
     set(target run)
   endif()
 
-  set(testname "${BOOST_PROJECT_NAME}-${name}")
+  set(testname "${BOOST_CURRENT_PROJECT}-${name}")
 
   add_test(${testname} 
     ${CMAKE_CTEST_COMMAND}
@@ -135,7 +135,7 @@ function(boost_add_test name)
   endif(TEST_FAIL)
 
   set_tests_properties(${testname} PROPERTIES
-    LABELS "${BOOST_PROJECT_NAME};${fail_label}"
+    LABELS "${BOOST_CURRENT_PROJECT};${fail_label}"
     WILL_FAIL "${will_fail}"
     )
 endfunction(boost_add_test)
