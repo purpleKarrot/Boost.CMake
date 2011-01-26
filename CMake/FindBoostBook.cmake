@@ -7,8 +7,6 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-set(BOOSTBOOK_CATALOG ${CMAKE_BINARY_DIR}/boostbook_catalog.xml)
-
 # Find the BoostBook DTD
 find_path(BOOSTBOOK_DTD_DIR boostbook.dtd
   PATHS
@@ -31,6 +29,7 @@ find_path(BOOSTBOOK_XSL_DIR docbook.xsl
 find_path(DOCBOOK_DTD_DIR docbookx.dtd
   PATHS
     "/usr/share/xml/docbook/schema/dtd/4.2"
+    "$ENV{SystemDrive}/docbook/xml"
   DOC
     "Path to the DocBook DTD"
   )
@@ -39,9 +38,12 @@ find_path(DOCBOOK_DTD_DIR docbookx.dtd
 find_path(DOCBOOK_XSL_DIR html/html.xsl
   PATHS
     "/usr/share/xml/docbook/stylesheet/nwalsh"
+    "$ENV{SystemDrive}/docbook/xsl"
   DOC
     "Path to the DocBook XSL stylesheets"
   )
+
+set(BOOSTBOOK_CATALOG ${CMAKE_BINARY_DIR}/boostbook_catalog.xml)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(BoostBook DEFAULT_MSG
