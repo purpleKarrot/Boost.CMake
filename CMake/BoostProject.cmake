@@ -100,17 +100,28 @@ function(boost_link_libraries target)
 endfunction(boost_link_libraries)
 
 
-function(boost_add_pch name source_list header)
+function(boost_add_pch name source_list)
   if(NOT MSVC)
     return()
   endif(NOT MSVC)
 
   set(pch_header "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.hpp")
   set(pch_source "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.cpp")
-  set(pch_binary "$(IntDir)/${name}.pch")
+  set(pch_binary "${CMAKE_CURRENT_BINARY_DIR}/${name}.pch")
 
-  get_filename_component(absolute ${header} ABSOLUTE)
-  file(WRITE ${pch_header}.in "#include \"${absolute}\"\n")
+  if(MSVC_IDE)
+    set(pch_binary "$(IntDir)/${name}.pch")
+  endif(MSVC_IDE)
+
+  file(WRITE ${pch_header}.in "/* ${name} precompiled header file */\n\n")
+  foreach(header ${ARGN})
+    if(header MATCHES "^<.*>$")
+      file(APPEND ${pch_header}.in "#include ${header}\n")
+    else()
+      get_filename_component(header ${header} ABSOLUTE)
+      file(APPEND ${pch_header}.in "#include \"${header}\"\n")
+    endif()
+  endforeach(header)
   configure_file(${pch_header}.in ${pch_header} COPYONLY)
 
   file(WRITE ${pch_source}.in "#include \"${pch_header}\"\n")
@@ -180,8 +191,8 @@ endfunction(boost_add_pch)
 function(boost_add_library name)
   cmake_parse_arguments(LIB
     "SHARED;STATIC" #;SINGLE_THREAD;MULTI_THREAD"
-    "PCH"
-    "SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES"
+    ""
+    "PRECOMPILE;SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES"
     ${ARGN}
     )
 
@@ -201,9 +212,9 @@ function(boost_add_library name)
 #   set(LIB_MULTI_THREAD  ON)
 # endif(NOT LIB_SINGLE_THREAD AND NOT LIB_MULTI_THREAD)
 
-  if(LIB_PCH)
-    boost_add_pch(${name} LIB_SOURCES ${LIB_PCH})
-  endif(LIB_PCH)
+  if(LIB_PRECOMPILE)
+    boost_add_pch(${name} LIB_SOURCES ${LIB_PRECOMPILE})
+  endif(LIB_PRECOMPILE)
 
   set(targets)
 
@@ -307,9 +318,9 @@ function(boost_add_executable name)
   cmake_parse_arguments(EXE "" "PCH"
     "SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
 
-  if(EXE_PCH)
-    boost_add_pch(${name} EXE_SOURCES ${EXE_PCH})
-  endif(EXE_PCH)
+  if(EXE_PRECOMPILE)
+    boost_add_pch(${name} EXE_SOURCES ${EXE_PRECOMPILE})
+  endif(EXE_PRECOMPILE)
 
   set(rc_file ${Boost_SOURCE_DIR}/src/exe.rc)
 
