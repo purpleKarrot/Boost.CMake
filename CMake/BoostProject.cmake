@@ -100,6 +100,36 @@ function(boost_link_libraries target)
 endfunction(boost_link_libraries)
 
 
+function(boost_add_pch name source_list header)
+  if(NOT MSVC)
+    return()
+  endif(NOT MSVC)
+
+  set(pch_header "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.hpp")
+  set(pch_source "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.cpp")
+  set(pch_binary "$(IntDir)/${name}.pch")
+
+  get_filename_component(absolute ${header} ABSOLUTE)
+  file(WRITE ${pch_header}.in "#include \"${absolute}\"\n")
+  configure_file(${pch_header}.in ${pch_header} COPYONLY)
+
+  file(WRITE ${pch_source}.in "#include \"${pch_header}\"\n")
+  configure_file(${pch_source}.in ${pch_source} COPYONLY)
+
+  set_source_files_properties(${pch_source} PROPERTIES
+    COMPILE_FLAGS "/Yc\"${pch_header}\" /Fp\"${pch_binary}\""
+    OBJECT_OUTPUTS "${pch_binary}"
+    )
+
+  set_source_files_properties(${${source_list}} PROPERTIES
+    COMPILE_FLAGS "/Yu\"${pch_header}\" /FI\"${pch_header}\" /Fp\"${pch_binary}\""
+    OBJECT_DEPENDS "${pch_binary}"
+    )
+
+  set(${source_list} ${pch_source} ${${source_list}} PARENT_SCOPE)
+endfunction(boost_add_pch)
+
+
 # Creates a Boost library target that generates a compiled library
 # (.a, .lib, .dll, .so, etc) from source files.
 #
@@ -172,7 +202,7 @@ function(boost_add_library name)
 # endif(NOT LIB_SINGLE_THREAD AND NOT LIB_MULTI_THREAD)
 
   if(LIB_PCH)
-    # TODO: support precompiled headers
+    boost_add_pch(${name} LIB_SOURCES ${LIB_PCH})
   endif(LIB_PCH)
 
   set(targets)
@@ -274,8 +304,12 @@ endfunction(boost_add_library)
 #             boost_serialization
 #     )
 function(boost_add_executable name)
-  cmake_parse_arguments(EXE "" ""
+  cmake_parse_arguments(EXE "" "PCH"
     "SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
+
+  if(EXE_PCH)
+    boost_add_pch(${name} EXE_SOURCES ${EXE_PCH})
+  endif(EXE_PCH)
 
   set(rc_file ${Boost_SOURCE_DIR}/src/exe.rc)
 
