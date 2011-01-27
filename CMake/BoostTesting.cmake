@@ -88,7 +88,7 @@ function(boost_add_test name)
       file(APPEND ${listfile} "  ${lib}\n")
     endforeach(lib)
     foreach(lib ${TEST_LINK_BOOST_LIBRARIES})
-      file(APPEND ${listfile} "  boost_${lib}-d\n")
+      file(APPEND ${listfile} "  boost_${lib}.a\n")
       # set(target "lib_${boost_lib}_static")
       # get_target_property(DEPEND_TYPE ${target} TYPE)
       # get_target_property(DEPEND_LOCATION ${target} LOCATION)
@@ -121,7 +121,12 @@ function(boost_add_test name)
     --build-noclean
     --build-options
     "-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
+    "-DCMAKE_CXX_COMPILER_WORKS:INTERNAL=${CMAKE_CXX_COMPILER_WORKS}"
+    "-DCMAKE_DETERMINE_CXX_ABI_COMPILED:INTERNAL=${CMAKE_DETERMINE_CXX_ABI_COMPILED}"
     "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
+    "-DCMAKE_C_COMPILER_WORKS:INTERNAL=${CMAKE_C_COMPILER_WORKS}"
+    "-DCMAKE_DETERMINE_C_ABI_COMPILED:INTERNAL=${CMAKE_DETERMINE_C_ABI_COMPILED}"
+    "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
     )
 
   # TODO: RUN FAIL testcases should be tested to COMPILE and LINK too!
