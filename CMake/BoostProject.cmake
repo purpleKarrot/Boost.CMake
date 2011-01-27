@@ -141,6 +141,42 @@ function(boost_add_pch name source_list)
 endfunction(boost_add_pch)
 
 
+function(boost_parse_target_arguments name)
+  cmake_parse_arguments(TARGET
+    "SHARED;STATIC;SINGLE_THREADED;MULTI_THREADED"
+    ""
+    "PRECOMPILE;SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES"
+    ${ARGN}
+    )
+
+  set(TARGET_NAME ${name} PARENT_SCOPE)
+
+  string(TOUPPER "BOOST_${name}_SOURCE" define_symbol)
+  set(TARGET_DEFINE_SYMBOL ${define_symbol} PARENT_SCOPE)
+
+  if(NOT TARGET_SHARED AND NOT TARGET_STATIC)
+    set(TARGET_SHARED ON)
+    set(TARGET_STATIC ON)
+  endif(NOT TARGET_SHARED AND NOT TARGET_STATIC)
+  set(TARGET_SHARED ${TARGET_SHARED} PARENT_SCOPE)
+  set(TARGET_STATIC ${TARGET_STATIC} PARENT_SCOPE)
+
+# if(NOT LIB_SINGLE_THREAD AND NOT LIB_MULTI_THREAD)
+#   set(LIB_SINGLE_THREAD ON)
+#   set(LIB_MULTI_THREAD  ON)
+# endif(NOT LIB_SINGLE_THREAD AND NOT LIB_MULTI_THREAD)
+
+  set(sources ${TARGET_SOURCES} ${TARGET_UNPARSED_ARGUMENTS})
+  if(TARGET_PRECOMPILE)
+    boost_add_pch(${name} sources ${TARGET_PRECOMPILE})
+  endif(TARGET_PRECOMPILE)
+  set(TARGET_SOURCES ${sources} PARENT_SCOPE)
+
+  set(TARGET_LINK_BOOST_LIBRARIES ${TARGET_LINK_BOOST_LIBRARIES} PARENT_SCOPE)
+  set(TARGET_LINK_LIBRARIES ${TARGET_LINK_LIBRARIES} PARENT_SCOPE)
+endfunction(boost_parse_target_arguments)
+
+
 # Creates a Boost library target that generates a compiled library
 # (.a, .lib, .dll, .so, etc) from source files.
 #
@@ -188,64 +224,39 @@ endfunction(boost_add_pch)
 #   boost_python, multi-threaded variants of boost_mpi_python will
 #   link against multi-threaded variants of boost_python.
 #
-function(boost_add_library name)
-  cmake_parse_arguments(LIB
-    "SHARED;STATIC" #;SINGLE_THREAD;MULTI_THREAD"
-    ""
-    "PRECOMPILE;SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES"
-    ${ARGN}
-    )
-
-  string(TOUPPER ${name} upper_name)
-
-  if(NOT LIB_SOURCES)
-    set(LIB_SOURCES ${LIB_UNPARSED_ARGUMENTS})
-  endif(NOT LIB_SOURCES)
-
-  if(NOT LIB_SHARED AND NOT LIB_STATIC)
-    set(LIB_SHARED ON)
-    set(LIB_STATIC ON)
-  endif(NOT LIB_SHARED AND NOT LIB_STATIC)
-
-# if(NOT LIB_SINGLE_THREAD AND NOT LIB_MULTI_THREAD)
-#   set(LIB_SINGLE_THREAD ON)
-#   set(LIB_MULTI_THREAD  ON)
-# endif(NOT LIB_SINGLE_THREAD AND NOT LIB_MULTI_THREAD)
-
-  if(LIB_PRECOMPILE)
-    boost_add_pch(${name} LIB_SOURCES ${LIB_PRECOMPILE})
-  endif(LIB_PRECOMPILE)
+function(boost_add_library)
+  boost_parse_target_arguments(${ARGN})
 
   set(targets)
 
-  if(LIB_SHARED)
-    set(target ${name}-shared)
-    add_library(${target} SHARED ${LIB_SOURCES})
-    boost_link_libraries(${target} ${LIB_LINK_BOOST_LIBRARIES} SHARED)
-    target_link_libraries(${target} ${LIB_LINK_LIBRARIES})
+  if(TARGET_SHARED)
+    set(target ${TARGET_NAME}-shared)
+    add_library(${target} SHARED ${TARGET_SOURCES})
+    boost_link_libraries(${target} ${TARGET_LINK_BOOST_LIBRARIES} SHARED)
+    target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
 	set_property(TARGET ${target}
 	  APPEND PROPERTY COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1")
 	set_target_properties(${target} PROPERTIES
-      PROJECT_LABEL "${name} (shared library)"
+      PROJECT_LABEL "${TARGET_NAME} (shared library)"
       )
     list(APPEND targets ${target})
-  endif(LIB_SHARED)
+  endif(TARGET_SHARED)
 
-  if(LIB_STATIC)
-    set(target ${name}-static)
-    add_library(${name}-static STATIC ${LIB_SOURCES})
-    boost_link_libraries(${target} ${LIB_LINK_BOOST_LIBRARIES} STATIC)
-    target_link_libraries(${target} ${LIB_LINK_LIBRARIES})
+  if(TARGET_STATIC)
+    set(target ${TARGET_NAME}-static)
+    add_library(${target} STATIC ${TARGET_SOURCES})
+    boost_link_libraries(${target} ${TARGET_LINK_BOOST_LIBRARIES} STATIC)
+    target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
 	set_target_properties(${target} PROPERTIES
-      PROJECT_LABEL "${name} (static library)"
+      PROJECT_LABEL "${TARGET_NAME} (static library)"
       PREFIX "lib"
       )
     list(APPEND targets ${target})
-  endif(LIB_STATIC)
+  endif(TARGET_STATIC)
 
   set_target_properties(${targets} PROPERTIES
-    DEFINE_SYMBOL "BOOST_${upper_name}_SOURCE"
-    OUTPUT_NAME "boost_${name}"
+    DEFINE_SYMBOL "${TARGET_DEFINE_SYMBOL}"
+    OUTPUT_NAME "boost_${TARGET_NAME}"
     FOLDER "${BOOST_CURRENT_FOLDER}"
     VERSION "${BOOST_VERSION}"
     )
@@ -315,23 +326,18 @@ endfunction(boost_add_library)
 #     DEPENDS boost_wave boost_program_options boost_filesystem 
 #             boost_serialization
 #     )
-function(boost_add_executable name)
-  cmake_parse_arguments(EXE "" "PCH"
-    "SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
-
-  if(EXE_PRECOMPILE)
-    boost_add_pch(${name} EXE_SOURCES ${EXE_PRECOMPILE})
-  endif(EXE_PRECOMPILE)
+function(boost_add_executable)
+  boost_parse_target_arguments(${ARGN})
 
   set(rc_file ${Boost_SOURCE_DIR}/src/exe.rc)
 
-  add_executable(${name} ${EXE_SOURCES} ${rc_file})
-  boost_link_libraries(${name} ${EXE_LINK_BOOST_LIBRARIES})
-  target_link_libraries(${name} ${EXE_LINK_LIBRARIES})
-  set_property(TARGET ${name} PROPERTY FOLDER "${BOOST_CURRENT_FOLDER}")
-  set_property(TARGET ${name} PROPERTY PROJECT_LABEL "${name} (executable)")
+  add_executable(${TARGET_NAME} ${TARGET_SOURCES} ${rc_file})
+  boost_link_libraries(${TARGET_NAME} ${TARGET_LINK_BOOST_LIBRARIES})
+  target_link_libraries(${TARGET_NAME} ${TARGET_LINK_LIBRARIES})
+  set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "${BOOST_CURRENT_FOLDER}")
+  set_property(TARGET ${TARGET_NAME} PROPERTY PROJECT_LABEL "${TARGET_NAME} (executable)")
 
-  install(TARGETS ${name}
+  install(TARGETS ${TARGET_NAME}
     DESTINATION bin
     COMPONENT ${BOOST_CURRENT_PROJECT}_exe
     )
@@ -339,46 +345,34 @@ function(boost_add_executable name)
 endfunction(boost_add_executable)
 
 
-function(boost_add_python_extension name)
-  cmake_parse_arguments(LIB "" ""
-    "PRECOMPILE;SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES"
-    ${ARGN}
-    )
+function(boost_add_python_extension)
+  boost_parse_target_arguments(${ARGN})
 
-  string(TOUPPER ${name} upper_name)
+  set(target ${TARGET_NAME}_py)
+  add_library(${target} SHARED ${TARGET_SOURCES})
+  boost_link_libraries(${target} python ${TARGET_LINK_BOOST_LIBRARIES} SHARED)
+  target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
 
-  if(NOT LIB_SOURCES)
-    set(LIB_SOURCES ${LIB_UNPARSED_ARGUMENTS})
-  endif(NOT LIB_SOURCES)
-
-  if(LIB_PRECOMPILE)
-    boost_add_pch(${name} LIB_SOURCES ${LIB_PRECOMPILE})
-  endif(LIB_PRECOMPILE)
-
-  add_library(${name} SHARED ${LIB_SOURCES})
-  boost_link_libraries(${name} python ${LIB_LINK_BOOST_LIBRARIES} SHARED)
-  target_link_libraries(${name} ${LIB_LINK_LIBRARIES})
-
-  set_property(TARGET ${name}
+  set_property(TARGET ${target}
 	APPEND PROPERTY COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1")
 
-  set_target_properties(${name} PROPERTIES
-    DEFINE_SYMBOL "BOOST_${upper_name}_SOURCE"
-    OUTPUT_NAME "${name}"
+  set_target_properties(${target} PROPERTIES
+    DEFINE_SYMBOL "${TARGET_DEFINE_SYMBOL}"
+    OUTPUT_NAME "${TARGET_NAME}"
     PREFIX ""
     FOLDER "${BOOST_CURRENT_FOLDER}"
-    PROJECT_LABEL "${name} (python extension)"
+    PROJECT_LABEL "${TARGET_NAME} (python extension)"
 #   VERSION "${BOOST_VERSION}"
     )
 
   if(WIN32)
-    set_target_properties(${name} PROPERTIES
+    set_target_properties(${target} PROPERTIES
       SUFFIX .pyd
       IMPORT_SUFFIX .pyd
       )
   endif()
 
-  install(TARGETS ${name}
+  install(TARGETS ${target}
     ARCHIVE
       DESTINATION lib
       COMPONENT "${BOOST_DEV_COMPONENT}"
