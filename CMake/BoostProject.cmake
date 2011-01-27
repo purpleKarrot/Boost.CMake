@@ -339,41 +339,59 @@ function(boost_add_executable name)
 endfunction(boost_add_executable)
 
 
-#
-#  Macro for building boost.python extensions
-#
-macro(boost_python_extension MODULE_NAME)
-  parse_arguments(BPL_EXT  "" "" ${ARGN})
+function(boost_add_python_extension name)
+  cmake_parse_arguments(LIB "" ""
+    "PRECOMPILE;SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES"
+    ${ARGN}
+    )
 
-  if (WIN32)
-    set(extlibtype SHARED)
-  else()
-    set(extlibtype MODULE)
-  endif()
+  string(TOUPPER ${name} upper_name)
 
-  boost_add_single_library(${MODULE_NAME}
-    ${BPL_EXT_DEFAULT_ARGS}
-    ${extlibtype}
-    LINK_LIBS ${PYTHON_LIBRARIES}
-    DEPENDS boost_python
-    SHARED
-    MULTI_THREADED
+  if(NOT LIB_SOURCES)
+    set(LIB_SOURCES ${LIB_UNPARSED_ARGUMENTS})
+  endif(NOT LIB_SOURCES)
+
+  if(LIB_PRECOMPILE)
+    boost_add_pch(${name} LIB_SOURCES ${LIB_PRECOMPILE})
+  endif(LIB_PRECOMPILE)
+
+  add_library(${name} SHARED ${LIB_SOURCES})
+  boost_link_libraries(${name} python ${LIB_LINK_BOOST_LIBRARIES} SHARED)
+  target_link_libraries(${name} ${LIB_LINK_LIBRARIES})
+
+  set_property(TARGET ${name}
+	APPEND PROPERTY COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1")
+
+  set_target_properties(${name} PROPERTIES
+    DEFINE_SYMBOL "BOOST_${upper_name}_SOURCE"
+    OUTPUT_NAME "${name}"
+    PREFIX ""
+    FOLDER "${BOOST_CURRENT_FOLDER}"
+    PROJECT_LABEL "${name} (python extension)"
+#   VERSION "${BOOST_VERSION}"
     )
 
   if(WIN32)
-    set_target_properties(${VARIANT_LIBNAME} PROPERTIES
-      OUTPUT_NAME "${MODULE_NAME}"
-      PREFIX ""
+    set_target_properties(${name} PROPERTIES
       SUFFIX .pyd
       IMPORT_SUFFIX .pyd
       )
-  else()
-    set_target_properties(${VARIANT_LIBNAME} PROPERTIES
-      OUTPUT_NAME "${MODULE_NAME}"
-      PREFIX ""
-      )
   endif()
-endmacro(boost_python_extension)
 
-function(boost_add_python_extension)
+  install(TARGETS ${name}
+    ARCHIVE
+      DESTINATION lib
+      COMPONENT "${BOOST_DEV_COMPONENT}"
+    LIBRARY
+      DESTINATION lib
+      COMPONENT "${BOOST_LIB_COMPONENT}"
+    RUNTIME
+      DESTINATION bin
+      COMPONENT "${BOOST_LIB_COMPONENT}"
+    )
+
+  set_boost_project("${BOOST_HAS_DEV_VAR}" ON)
+  if(LIB_SHARED)
+    set_boost_project("${BOOST_HAS_LIB_VAR}" ON)
+  endif(LIB_SHARED)
 endfunction(boost_add_python_extension)
