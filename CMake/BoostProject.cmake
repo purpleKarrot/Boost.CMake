@@ -247,6 +247,7 @@ function(boost_add_library name)
     DEFINE_SYMBOL "BOOST_${upper_name}_SOURCE"
     OUTPUT_NAME "boost_${name}"
     FOLDER "${BOOST_CURRENT_FOLDER}"
+    VERSION "${BOOST_VERSION}"
     )
 
   install(TARGETS ${targets}
