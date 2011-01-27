@@ -6,6 +6,10 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+if(QUICKBOOK_FOUND)
+  return()
+endif(QUICKBOOK_FOUND)
+
 find_program(QUICKBOOK_EXECUTABLE quickbook)
 
 if(QUICKBOOK_EXECUTABLE)
@@ -21,4 +25,5 @@ find_package_handle_standard_args(QuickBook
   VERSION_VAR QUICKBOOK_VERSION
   )
 
-mark_as_advanced(QUICKBOOK_EXECUTABLE QUICKBOOK_VERSION)
+mark_as_advanced(QUICKBOOK_EXECUTABLE)
+set(QUICKBOOK_FOUND ${QUICKBOOK_FOUND} CACHE INTERNAL "")

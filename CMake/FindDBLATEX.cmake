@@ -8,6 +8,10 @@
 
 # Find DocBook to LaTeX Publishing (http://dblatex.sourceforge.net/)
 
+if(DBLATEX_FOUND)
+  return()
+endif(DBLATEX_FOUND)
+
 if(CMAKE_HOST_WIN32)
   include(FindPythonInterp)
   find_file(dblatex_py dblatex
@@ -37,4 +41,5 @@ find_package_handle_standard_args(DBLATEX
   VERSION_VAR DBLATEX_VERSION
   )
 
-mark_as_advanced(DBLATEX_EXECUTABLE DBLATEX_VERSION)
+mark_as_advanced(DBLATEX_EXECUTABLE)
+set(DBLATEX_FOUND ${DBLATEX_FOUND} CACHE INTERNAL "")
