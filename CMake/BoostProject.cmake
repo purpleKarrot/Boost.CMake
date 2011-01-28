@@ -177,6 +177,26 @@ function(boost_parse_target_arguments name)
 endfunction(boost_parse_target_arguments)
 
 
+function(boost_install_libraries shared static)
+  install(TARGETS ${ARGN}
+    ARCHIVE
+      DESTINATION lib
+      COMPONENT "${BOOST_DEV_COMPONENT}"
+    LIBRARY
+      DESTINATION lib
+      COMPONENT "${BOOST_LIB_COMPONENT}"
+    RUNTIME
+      DESTINATION bin
+      COMPONENT "${BOOST_LIB_COMPONENT}"
+    )
+
+  set_boost_project("${BOOST_HAS_DEV_VAR}" ON)
+  if(shared)
+    set_boost_project("${BOOST_HAS_LIB_VAR}" ON)
+  endif(shared)
+endfunction(boost_install_libraries)
+
+
 # Creates a Boost library target that generates a compiled library
 # (.a, .lib, .dll, .so, etc) from source files.
 #
@@ -234,8 +254,8 @@ function(boost_add_library)
     add_library(${target} SHARED ${TARGET_SOURCES})
     boost_link_libraries(${target} ${TARGET_LINK_BOOST_LIBRARIES} SHARED)
     target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
-	set_property(TARGET ${target}
-	  APPEND PROPERTY COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1")
+	set_property(TARGET ${target} APPEND PROPERTY
+	  COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1;BOOST_ALL_NO_LIB=1")
 	set_target_properties(${target} PROPERTIES
       PROJECT_LABEL "${TARGET_NAME} (shared library)"
       )
@@ -261,22 +281,7 @@ function(boost_add_library)
     VERSION "${BOOST_VERSION}"
     )
 
-  install(TARGETS ${targets}
-    ARCHIVE
-      DESTINATION lib
-      COMPONENT "${BOOST_DEV_COMPONENT}"
-    LIBRARY
-      DESTINATION lib
-      COMPONENT "${BOOST_LIB_COMPONENT}"
-    RUNTIME
-      DESTINATION bin
-      COMPONENT "${BOOST_LIB_COMPONENT}"
-    )
-
-  set_boost_project("${BOOST_HAS_DEV_VAR}" ON)
-  if(LIB_SHARED)
-    set_boost_project("${BOOST_HAS_LIB_VAR}" ON)
-  endif(LIB_SHARED)
+  boost_install_libraries(TARGET_SHARED TARGET_STATIC ${targets})
 endfunction(boost_add_library)
 
 
@@ -334,8 +339,14 @@ function(boost_add_executable)
   add_executable(${TARGET_NAME} ${TARGET_SOURCES} ${rc_file})
   boost_link_libraries(${TARGET_NAME} ${TARGET_LINK_BOOST_LIBRARIES})
   target_link_libraries(${TARGET_NAME} ${TARGET_LINK_LIBRARIES})
-  set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "${BOOST_CURRENT_FOLDER}")
-  set_property(TARGET ${TARGET_NAME} PROPERTY PROJECT_LABEL "${TARGET_NAME} (executable)")
+
+  set_target_properties(${TARGET_NAME} PROPERTIES
+    FOLDER "${BOOST_CURRENT_FOLDER}"
+    PROJECT_LABEL "${TARGET_NAME} (executable)"
+    )
+
+  set_property(TARGET ${TARGET_NAME} APPEND PROPERTY
+    COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1;BOOST_ALL_NO_LIB=1")
 
   install(TARGETS ${TARGET_NAME}
     DESTINATION bin
@@ -353,8 +364,8 @@ function(boost_add_python_extension)
   boost_link_libraries(${target} python ${TARGET_LINK_BOOST_LIBRARIES} SHARED)
   target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
 
-  set_property(TARGET ${target}
-	APPEND PROPERTY COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1")
+  set_property(TARGET ${target} APPEND PROPERTY
+    COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1;BOOST_ALL_NO_LIB=1")
 
   set_target_properties(${target} PROPERTIES
     DEFINE_SYMBOL "${TARGET_DEFINE_SYMBOL}"
@@ -372,20 +383,5 @@ function(boost_add_python_extension)
       )
   endif()
 
-  install(TARGETS ${target}
-    ARCHIVE
-      DESTINATION lib
-      COMPONENT "${BOOST_DEV_COMPONENT}"
-    LIBRARY
-      DESTINATION lib
-      COMPONENT "${BOOST_LIB_COMPONENT}"
-    RUNTIME
-      DESTINATION bin
-      COMPONENT "${BOOST_LIB_COMPONENT}"
-    )
-
-  set_boost_project("${BOOST_HAS_DEV_VAR}" ON)
-  if(LIB_SHARED)
-    set_boost_project("${BOOST_HAS_LIB_VAR}" ON)
-  endif(LIB_SHARED)
+  boost_install_libraries(ON OFF ${target})
 endfunction(boost_add_python_extension)
