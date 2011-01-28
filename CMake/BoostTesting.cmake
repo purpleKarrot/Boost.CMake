@@ -82,6 +82,10 @@ function(boost_add_test name)
     "add_executable(link \${sources})\n"
     )
 
+  if(MSVC)
+    unset(TEST_LINK_BOOST_LIBRARIES) # try to autolink
+  endif(MSVC)
+
   if(TEST_LINK_LIBRARIES OR TEST_LINK_BOOST_LIBRARIES)
     file(APPEND ${listfile} "target_link_libraries(link\n")
     foreach(lib ${TEST_LINK_LIBRARIES})
