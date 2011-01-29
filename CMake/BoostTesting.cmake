@@ -54,11 +54,8 @@ function(boost_add_test name)
   set(link_boost_directories)
   foreach(lib ${TEST_LINK_BOOST_LIBRARIES})
     set(target ${lib}-static)
-    if(MSVC) # use autolink
-      list(APPEND link_boost_directories "$<TARGET_LINKER_FILE_DIR:${target}>")
-    else()
-      list(APPEND link_boost_libraries "$<TARGET_LINKER_FILE:${target}>")
-    endif()
+    list(APPEND link_boost_directories "$<TARGET_LINKER_FILE_DIR:${target}>")
+    list(APPEND link_boost_libraries "$<TARGET_LINKER_FILE:${target}>")
   endforeach(lib)
 
   set(test_dir ${CMAKE_CURRENT_BINARY_DIR}/${name}) 
@@ -114,6 +111,12 @@ function(boost_add_test name)
     set(target run)
   endif()
 
+  if(MSVC) # use autolink
+    set(boost_libraries_arg "-DLINK_BOOST_DIRECTORIES=${link_boost_directories}")
+  else()
+    set(boost_libraries_arg "-DLINK_BOOST_LIBRARIES=${link_boost_libraries}")
+  endif()
+
   set(testname "${BOOST_CURRENT_PROJECT}-${name}")
 
   add_test(NAME ${testname} COMMAND ${CMAKE_CTEST_COMMAND}
@@ -130,8 +133,7 @@ function(boost_add_test name)
 #   "-DCMAKE_C_COMPILER_WORKS:INTERNAL=${CMAKE_C_COMPILER_WORKS}"
 #   "-DCMAKE_DETERMINE_C_ABI_COMPILED:INTERNAL=${CMAKE_DETERMINE_C_ABI_COMPILED}"
     "-DCMAKE_BUILD_TYPE:STRING=$<CONFIGURATION>"
-    "-DLINK_BOOST_DIRECTORIES=${link_boost_directories}"
-    "-DLINK_BOOST_LIBRARIES=${link_boost_libraries}"
+    "${boost_libraries_arg}"
     )
 
   # TODO: RUN FAIL testcases should be tested to COMPILE and LINK too!
