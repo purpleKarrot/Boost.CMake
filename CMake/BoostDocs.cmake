@@ -7,46 +7,11 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-set(DOXYGEN_SKIP_DOT ON)
-find_package(Doxygen   REQUIRED)
-find_package(DBLATEX   REQUIRED)
-find_package(XSLTPROC  REQUIRED)
-find_package(BoostBook REQUIRED)
-find_package(QuickBook REQUIRED)
 
-##########################################################################
-
-include(CMakeParseArguments)
-
+#
 function(boost_doxygen name)
-  cmake_parse_arguments(DOXY ""
-    "FILE" "INPUT;OUTPUT;PARAMETERS;DEPENDS" ${ARGN})
-  set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxyfile)
-
-  if(DOXY_FILE)
-    configure_file(${DOXY_FILE} ${doxyfile} COPYONLY)
-  else()
-    file(REMOVE ${doxyfile})
-  endif()
-
-  foreach(param "QUIET = YES" "WARN_IF_UNDOCUMENTED = NO" ${DOXY_PARAMETERS})
-    file(APPEND ${doxyfile} "${param}\n")
-  endforeach(param)
-
-  set(input)
-  foreach(file ${DOXY_INPUT})
-    get_filename_component(file ${file} ABSOLUTE)
-    set(input "${input} \\\n \"${file}\"")
-  endforeach(file)
-  file(APPEND ${doxyfile} "INPUT = ${input}\n")
-
-  add_custom_command(OUTPUT ${DOXY_OUTPUT}
-    COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
-    DEPENDS ${DOXY_INPUT}
-    )
 endfunction(boost_doxygen)
 
-##########################################################################
 
 # Transforms the source XML file by applying the given XSL stylesheet.
 #
@@ -91,6 +56,125 @@ endfunction(boost_doxygen)
 # CMake provides when running this XSL transformation. Otherwise, the
 # comment will be "Generating "output" via XSL transformation...".
 function(boost_xsltproc output stylesheet input)
+endfunction(boost_xsltproc)
+
+
+# Use Doxygen to parse header files and produce BoostBook output.
+#
+#   doxygen_to_boostbook(output header1 header2 ...
+#     [PARAMETERS param1=value1 param2=value2 ... ])
+#
+# This macro sets up rules to transform a set of C/C++ header files
+# into BoostBook reference documentation. The resulting BoostBook XML
+# file will be named by the "output" parameter, and the set of headers
+# is provided following the output file. The actual parsing of header
+# files is provided by Doxygen, and is transformed into XML through
+# various XSLT transformations.
+#
+# Doxygen has a variety of configuration parameters. One can supply
+# extra Doxygen configuration parameters by providing NAME=VALUE pairs
+# following the PARAMETERS argument. These parameters will be added to
+# the Doxygen configuration file.
+#
+function(boost_add_reference name)
+endfunction(boost_add_reference)
+
+
+# Adds documentation for the current library or tool project
+#
+#   boost_documentation(source1 source2 source3 ... )
+#
+# This macro describes the documentation for a library or tool, which
+# will be built and installed as part of the normal build
+# process. Documentation can be in a variety of formats, and the input
+# format will determine how that documentation is transformed. The
+# documentation's format is determined by its extension, and the
+# following input formats are supported:
+# 
+#   QuickBook
+#   BoostBook (.XML extension):
+function(boost_documentation input)
+endfunction(boost_documentation)
+
+##########################################################################
+
+if(NOT DEFINED BOOST_BUILD_DOCUMENTATION)
+  set(BOOST_BUILD_DOCUMENTATION ON)
+endif(NOT DEFINED BOOST_BUILD_DOCUMENTATION)
+
+if(NOT BOOST_BUILD_DOCUMENTATION)
+  return()
+endif(NOT BOOST_BUILD_DOCUMENTATION)
+
+set(DOXYGEN_SKIP_DOT ON)
+find_package(Doxygen)
+if(NOT DOXYGEN_FOUND)
+  set(BOOST_BUILD_DOCUMENTATION OFF)
+endif(NOT DOXYGEN_FOUND)
+
+find_package(XSLTPROC)
+if(NOT XSLTPROC_FOUND)
+  set(BOOST_BUILD_DOCUMENTATION OFF)
+endif(NOT XSLTPROC_FOUND)
+
+find_package(DBLATEX)
+if(NOT DBLATEX_FOUND)
+  set(BOOST_BUILD_DOCUMENTATION OFF)
+endif(NOT DBLATEX_FOUND)
+
+find_package(BoostBook)
+if(NOT BOOSTBOOK_FOUND)
+  set(BOOST_BUILD_DOCUMENTATION OFF)
+endif(NOT BOOSTBOOK_FOUND)
+
+find_package(QuickBook)
+if(NOT QUICKBOOK_FOUND)
+  set(BOOST_BUILD_DOCUMENTATION OFF)
+endif(NOT QUICKBOOK_FOUND)
+
+set(BOOST_BUILD_DOCUMENTATION ${BOOST_BUILD_DOCUMENTATION}
+  CACHE BOOL "Whether documentation should be built")
+
+if(NOT BOOST_BUILD_DOCUMENTATION)
+  message(STATUS "Documentation will not be built!")
+  return()
+endif(NOT BOOST_BUILD_DOCUMENTATION)
+
+include(CMakeParseArguments)
+
+##########################################################################
+
+function(boost_doxygen name)
+  cmake_parse_arguments(DOXY ""
+    "FILE" "INPUT;OUTPUT;PARAMETERS;DEPENDS" ${ARGN})
+  set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxyfile)
+
+  if(DOXY_FILE)
+    configure_file(${DOXY_FILE} ${doxyfile} COPYONLY)
+  else()
+    file(REMOVE ${doxyfile})
+  endif()
+
+  foreach(param "QUIET = YES" "WARN_IF_UNDOCUMENTED = NO" ${DOXY_PARAMETERS})
+    file(APPEND ${doxyfile} "${param}\n")
+  endforeach(param)
+
+  set(input)
+  foreach(file ${DOXY_INPUT})
+    get_filename_component(file ${file} ABSOLUTE)
+    set(input "${input} \\\n \"${file}\"")
+  endforeach(file)
+  file(APPEND ${doxyfile} "INPUT = ${input}\n")
+
+  add_custom_command(OUTPUT ${DOXY_OUTPUT}
+    COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
+    DEPENDS ${DOXY_INPUT}
+    )
+endfunction(boost_doxygen)
+
+##########################################################################
+
+function(boost_xsltproc output stylesheet input)
   cmake_parse_arguments(THIS_XSL "" "CATALOG" "PARAMETERS;DEPENDS" ${ARGN})
 
   set(catalog)
@@ -121,23 +205,6 @@ endfunction(boost_xsltproc)
 
 ##########################################################################
 
-# Use Doxygen to parse header files and produce BoostBook output.
-#
-#   doxygen_to_boostbook(output header1 header2 ...
-#     [PARAMETERS param1=value1 param2=value2 ... ])
-#
-# This macro sets up rules to transform a set of C/C++ header files
-# into BoostBook reference documentation. The resulting BoostBook XML
-# file will be named by the "output" parameter, and the set of headers
-# is provided following the output file. The actual parsing of header
-# files is provided by Doxygen, and is transformed into XML through
-# various XSLT transformations.
-#
-# Doxygen has a variety of configuration parameters. One can supply
-# extra Doxygen configuration parameters by providing NAME=VALUE pairs
-# following the PARAMETERS argument. These parameters will be added to
-# the Doxygen configuration file.
-#
 function(boost_add_reference name)
   cmake_parse_arguments(REF "" "ID;TITLE;DOXYFILE" "DOXYGEN_PARAMETERS;DEPENDS" ${ARGN})
   set(reference_dir ${CMAKE_CURRENT_BINARY_DIR}/${name}-xml)
