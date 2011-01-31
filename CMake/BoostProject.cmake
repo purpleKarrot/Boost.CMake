@@ -56,18 +56,18 @@ endfunction(boost_project)
 
 
 #
-function(boost_add_headers prefix)
+function(boost_add_headers)
   cmake_parse_arguments(HDR "" "PREFIX" "" ${ARGN})
 
   if(HDR_PREFIX)
-    set(prefix ${HDR_PREFIX})
+    set(prefix "${HDR_PREFIX}")
   else()
-    set prefix "")
+    set(prefix "")
   endif()
 
   set(fwd_prefix "${BOOST_INCLUDE_DIR}/${prefix}")
 
-  foreach(header ${ARGN})
+  foreach(header ${HDR_UNPARSED_ARGUMENTS})
     # create forwarding header
     get_filename_component(absolute ${header} ABSOLUTE)
     file(RELATIVE_PATH relative ${CMAKE_CURRENT_SOURCE_DIR} ${absolute})
