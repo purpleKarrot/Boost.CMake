@@ -55,8 +55,16 @@ function(boost_project name)
 endfunction(boost_project)
 
 
-# I might change the interface of this function (don't like the prefix param)...
+#
 function(boost_add_headers prefix)
+  cmake_parse_arguments(HDR "" "PREFIX" "" ${ARGN})
+
+  if(HDR_PREFIX)
+    set(prefix ${HDR_PREFIX})
+  else()
+    set prefix "")
+  endif()
+
   set(fwd_prefix "${BOOST_INCLUDE_DIR}/${prefix}")
 
   foreach(header ${ARGN})
