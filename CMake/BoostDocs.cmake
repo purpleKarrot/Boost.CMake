@@ -8,7 +8,7 @@
 ##########################################################################
 
 
-#
+##
 function(boost_doxygen name)
 endfunction(boost_doxygen)
 
@@ -309,7 +309,7 @@ endfunction(boost_docbook)
 #     </libraryinfo>
 #   </library>
 
-# TODO: this function can be used for more than html...
+## TODO: this function can be used for more than html...
 function(boost_html_doc input)
   set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.docbook)
   add_custom_command(OUTPUT ${output}
@@ -353,19 +353,6 @@ endfunction(boost_qbk_doc)
 
 ##########################################################################
 
-# Adds documentation for the current library or tool project
-#
-#   boost_documentation(source1 source2 source3 ... )
-#
-# This macro describes the documentation for a library or tool, which
-# will be built and installed as part of the normal build
-# process. Documentation can be in a variety of formats, and the input
-# format will determine how that documentation is transformed. The
-# documentation's format is determined by its extension, and the
-# following input formats are supported:
-# 
-#   QuickBook
-#   BoostBook (.XML extension):
 function(boost_documentation input)
   get_filename_component(input ${input} ABSOLUTE)
   get_filename_component(input_ext ${input} EXT)

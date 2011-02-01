@@ -12,7 +12,7 @@ include(CMakeParseArguments)
 
 ##########################################################################
 
-# function to set global project variables
+## function to set global project variables
 function(set_boost_project name value)
   set(BOOST_PROJECT_${name} "${value}" CACHE INTERNAL "" FORCE)
 endfunction(set_boost_project)
@@ -20,6 +20,13 @@ endfunction(set_boost_project)
 ##########################################################################
 
 # use this function as a replacement for 'project' in boost projects.
+#
+#   boost_project(<name>
+#     [AUTHORS <authors>]
+#     [DESCRIPTION <description>]
+#     [DEPENDS <depends>]
+#     )
+#
 function(boost_project name)
   set(parameters "AUTHORS;DESCRIPTION;DEPENDS")
   cmake_parse_arguments(PROJ "" "" "${parameters}" ${ARGN})
@@ -56,6 +63,11 @@ endfunction(boost_project)
 
 
 #
+#   boost_add_headers(
+#     <list of header files>
+#     [PREFIX <prefix>]
+#     )
+#
 function(boost_add_headers)
   cmake_parse_arguments(HDR "" "PREFIX" "" ${ARGN})
 
@@ -91,7 +103,7 @@ function(boost_add_headers)
 endfunction(boost_add_headers)
 
 
-# this function is like 'target_link_libraries, except only for boost libs
+## this function is like 'target_link_libraries, except only for boost libs
 function(boost_link_libraries target)
   cmake_parse_arguments(LIBS "SHARED;STATIC" "" "" ${ARGN})
   set(link_libs)
@@ -108,6 +120,7 @@ function(boost_link_libraries target)
 endfunction(boost_link_libraries)
 
 
+##
 function(boost_add_pch name source_list)
   if(NOT MSVC)
     return()
@@ -149,6 +162,7 @@ function(boost_add_pch name source_list)
 endfunction(boost_add_pch)
 
 
+##
 function(boost_parse_target_arguments name)
   cmake_parse_arguments(TARGET
     "SHARED;STATIC;SINGLE_THREADED;MULTI_THREADED"
@@ -185,6 +199,7 @@ function(boost_parse_target_arguments name)
 endfunction(boost_parse_target_arguments)
 
 
+##
 function(boost_install_libraries shared static)
   install(TARGETS ${ARGN}
     ARCHIVE
@@ -208,15 +223,15 @@ endfunction(boost_install_libraries)
 # Creates a Boost library target that generates a compiled library
 # (.a, .lib, .dll, .so, etc) from source files.
 #
-#   boost_add_library(name [SHARED|STATIC]
-#     SOURCES
-#       source1
-#       source2
-#       ...
-#     LINK_BOOST_LIBRARIES
-#       system
-#     LINK_LIBRARIES
-#       ...
+#   boost_add_library(<name> [SHARED|STATIC]
+#     <list of source files>
+#     )
+#
+#   boost_add_library(<name> [SHARED|STATIC]
+#     [PRECOMPILE  <list of headers to precompile>]
+#     [SOURCES <list of source files>]
+#     [LINK_BOOST_LIBRARIES <list of boost libraries to link>]
+#     [LINK_LIBRARIES <list of third party libraries to link>]
 #     )
 #
 # where "name" is the name of library (e.g. "regex", not "boost_regex")
@@ -295,11 +310,16 @@ endfunction(boost_add_library)
 
 # Creates a new executable from source files.
 #
-#   boost_add_executable(exename
-#                        source1 source2 ...
-#                        [LINK_LIBS linklibs]
-#                        [DEPENDS libdepend1 libdepend2 ...]
-#                       )
+#   boost_add_executable(<name> [SHARED|STATIC]
+#     <list of source files>
+#     )
+#
+#   boost_add_executable(<name> [SHARED|STATIC]
+#     [PRECOMPILE <list of headers to precompile>]
+#     [SOURCES <list of source files>]
+#     [LINK_BOOST_LIBRARIES <list of boost libraries to link>]
+#     [LINK_LIBRARIES <list of third party libraries to link>]
+#     )
 #
 # where exename is the name of the executable (e.g., "wave").  source1,
 # source2, etc. are the source files used to build the executable, e.g.,
@@ -365,6 +385,7 @@ function(boost_add_executable)
 endfunction(boost_add_executable)
 
 
+#
 function(boost_add_python_extension)
   boost_parse_target_arguments(${ARGN})
 

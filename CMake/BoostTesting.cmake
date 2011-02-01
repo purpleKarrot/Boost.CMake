@@ -15,11 +15,11 @@ include(CMakeParseArguments)
 # passed.
 #
 #   boost_add_test(name [COMPILE|LINK|RUN] [FAIL]
-#                  [source1 source2 ...]
-#                  [LINK_BOOST_LIBRARIES boostlib1 boostlib2 ...]
-#                  [LINK_LIBRARIES linklibs ...]
-#                  [ARGS arg1 arg2... ]
-#                 )
+#     [source1 source2 ...]
+#     [LINK_BOOST_LIBRARIES boostlib1 boostlib2 ...]
+#     [LINK_LIBRARIES linklibs ...]
+#     [ARGS arg1 arg2... ]
+#     )
 #
 # 'name' is the name of the test. source1, source2, etc. are the
 # source files that will be built and linked into the test
@@ -155,15 +155,16 @@ endfunction(boost_add_test)
 ################################################################################
 
 #
-# boost_test_suite(
-#   RUN
-#     ...
-#   COMPILE_FAIL
-#     ...
-#   LINK_BOOST_LIBRARIES
-#     unit_test_framework
-#     ...
-#   )
+#   boost_test_suite(
+#     [COMPILE <list of source files>]
+#     [COMPILE_FAIL <list of source files>]
+#     [LINK <list of source files>]
+#     [LINK_FAIL <list of source files>]
+#     [RUN <list of source files>]
+#     [RUN_FAIL <list of source files>]
+#     [LINK_BOOST_LIBRARIES <list of boost libraries to link>]
+#     [LINK_LIBRARIES <list of third party libraries to link>]
+#     )
 #
 function(boost_test_suite)
   set(args COMPILE COMPILE_FAIL LINK LINK_FAIL RUN RUN_FAIL

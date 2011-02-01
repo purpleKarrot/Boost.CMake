@@ -132,5 +132,7 @@ multiple tests at once.
 [endsect]
 
 [section Reference]
-[include reference.qbk]
+[include BoostProject.qbk]
+[include BoostTesting.qbk]
+[include BoostDocs.qbk]
 [endsect]
