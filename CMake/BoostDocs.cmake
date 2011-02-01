@@ -118,9 +118,10 @@ if(NOT XSLTPROC_FOUND)
 endif(NOT XSLTPROC_FOUND)
 
 find_package(DBLATEX)
-if(NOT DBLATEX_FOUND)
+find_package(FOP)
+if(NOT DBLATEX_FOUND AND NOT FOP_FOUND)
   set(BOOST_BUILD_DOCUMENTATION OFF)
-endif(NOT DBLATEX_FOUND)
+endif(NOT DBLATEX_FOUND AND NOT FOP_FOUND)
 
 find_package(BoostBook)
 if(NOT BOOSTBOOK_FOUND)
@@ -265,19 +266,24 @@ function(boost_docbook input)
   boost_xsltproc(${output_man} ${BOOSTBOOK_XSL_DIR}/manpages.xsl ${input}
     CATALOG ${BOOSTBOOK_CATALOG}
     )
-# boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
-#   CATALOG ${BOOSTBOOK_CATALOG}
-#   PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
-#   )
-# add_custom_command(OUTPUT ${pdf_file}
-#   COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} 2>/dev/null
-#   DEPENDS ${fop_file}
-#   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#   )
-  add_custom_command(OUTPUT ${pdf_file}
-    COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} #2>/dev/null
-    DEPENDS ${input}
-    )
+
+  if(FOP_FOUND)
+    boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
+      CATALOG ${BOOSTBOOK_CATALOG}
+      PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
+      )
+    add_custom_command(OUTPUT ${pdf_file}
+      COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} 2>/dev/null
+      DEPENDS ${fop_file}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+      )
+  else()
+    add_custom_command(OUTPUT ${pdf_file}
+      COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} 2>/dev/null
+      DEPENDS ${input}
+      )
+  endif()
+
   set(target "${BOOST_CURRENT_PROJECT}-doc")
   add_custom_target(${target}
     DEPENDS ${pdf_file} # ${output_html}
