@@ -21,4 +21,4 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/CMake
 set_boost_project("${BOOST_HAS_EXE_VAR}" ON)
 
 #
-boost_documentation(cmake.qbk)
+boost_documentation(cmake.qbk reference.xml reference.qbk)

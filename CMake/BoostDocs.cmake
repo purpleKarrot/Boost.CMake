@@ -379,12 +379,26 @@ function(boost_documentation input)
     DEPENDS ${input}
     )
 
+  # copy all dependencies that are not built
+  set(depends)
+  foreach(file ${ARGN})
+    set(srcfile ${CMAKE_CURRENT_SOURCE_DIR}/${file})
+    set(binfile ${CMAKE_CURRENT_BINARY_DIR}/${file})
+    if(EXISTS ${srcfile})
+      add_custom_command(OUTPUT ${binfile}
+        COMMAND ${CMAKE_COMMAND} -E copy ${srcfile} ${binfile}
+        DEPENDS ${srcfile}
+        )
+    endif(EXISTS ${srcfile})
+    list(APPEND depends ${binfile})
+  endforeach(file)
+
   if(input_ext STREQUAL ".qbk")
-    boost_qbk_doc(${input_file} ${ARGN})
+    boost_qbk_doc(${input_file} ${depends})
   elseif(input_ext STREQUAL ".xml")
-    boost_xml_doc(${input_file} ${ARGN})
+    boost_xml_doc(${input_file} ${depends})
   elseif(input_ext STREQUAL ".html")
-    boost_html_doc(${input_file} ${ARGN})
+    boost_html_doc(${input_file} ${depends})
   else()
     message(STATUS "${BOOST_CURRENT_PROJECT} has unknown doc format: ${input_ext}")
   endif()

@@ -1,0 +1,114 @@
+[section Function boost_project]
+
+[section Synopsis]
+  boost_project(<name>
+    [AUTHORS <authors>]
+    [DESCRIPTION <description>]
+    [DEPENDS <depends>]
+    )
+[endsect]
+
+[section Description]
+blub.
+[endsect]
+
+[endsect]
+
+
+[section Function boost_add_headers]
+
+[section Synopsis]
+  boost_add_headers(
+    <list of header files>
+    [PREFIX <prefix>]
+    )
+[endsect]
+
+[section Description]
+blub.
+[endsect]
+
+[endsect]
+
+
+[section Function boost_add_library]
+
+[section Synopsis]
+  boost_add_library(<name> [SHARED|STATIC]
+    <list of source files>
+    )
+
+  boost_add_library(<name> [SHARED|STATIC]
+    [PRECOMPILE <list of headers to precompile>]
+    [SOURCES <list of source files>]
+    [LINK_BOOST_LIBRARIES <list of boost libraries to link>]
+    [LINK_LIBRARIES <list of third party libraries to link>]
+    )
+[endsect]
+
+[section Description]
+blub.
+[endsect]
+
+[endsect]
+
+
+[section Function boost_add_executable]
+
+[section Synopsis]
+  boost_add_executable(<name> [SHARED|STATIC]
+    <list of source files>
+    )
+
+  boost_add_executable(<name> [SHARED|STATIC]
+    [PRECOMPILE <list of headers to precompile>]
+    [SOURCES <list of source files>]
+    [LINK_BOOST_LIBRARIES <list of boost libraries to link>]
+    [LINK_LIBRARIES <list of third party libraries to link>]
+    )
+[endsect]
+
+[section Description]
+blub.
+[endsect]
+
+[endsect]
+
+
+[section Function boost_add_test]
+
+[section Synopsis]
+  boost_add_test(<name> [COMPILE|LINK|RUN] [FAIL]
+    <list of source files>
+    [LINK_BOOST_LIBRARIES <list of boost libraries to link>]
+    [LINK_LIBRARIES <list of third party libraries to link>]
+    )
+[endsect]
+
+[section Description]
+blub.
+[endsect]
+
+[endsect]
+
+
+[section Function boost_test_suite]
+
+[section Synopsis]
+  boost_test_suite(
+    [COMPILE <list of source files>]
+    [COMPILE_FAIL <list of source files>]
+    [LINK <list of source files>]
+    [LINK_FAIL <list of source files>]
+    [RUN <list of source files>]
+    [RUN_FAIL <list of source files>]
+    [LINK_BOOST_LIBRARIES <list of boost libraries to link>]
+    [LINK_LIBRARIES <list of third party libraries to link>]
+    )
+[endsect]
+
+[section Description]
+blub.
+[endsect]
+
+[endsect]

@@ -1,4 +1,4 @@
-[article CMake
+[library CMake
   [quickbook 1.5]
   [authors [Pfeifer, Daniel]]
   [copyright 2010 2011 Daniel Pfeifer]
@@ -6,6 +6,10 @@
   [license Distributed under the
     [@http://www.boost.org/LICENSE_1_0.txt Boost Software License, Version 1.0].
   ]
+]
+
+[/ why doesnt this expand?]
+[/ template cmakeref[command] [@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:[command] [command]]
 ]
 
 Boost.CMake is an approach to a modularized build of the
@@ -44,3 +48,89 @@ Modules can be fetched from a number of different sources:
 * Clone the module's Git repository (requires git command line client).
 * Download and extract a compressed archive (No additional requirements: .tar.bz2, .tar.gz, .tgz and .zip are supported by CMake).
 * Copy from pristine Boost release (currently all modules use this one).
+
+[section Writing a new Boost library]
+
+In this section I will guide you through the required steps to create a Boost library.
+
+If you never worked with CMake before, you should familiarize yourself with the
+[@http://www.cmake.org/cmake/help/syntax.html Syntax] and have a look at this
+[@http://www.cmake.org/cmake/help/examples.html simple example]. There is also a 
+[@http://www.cmake.org/cmake/help/cmake_tutorial.html Turorial] which gives a good
+introduction. Reading the whole tutorial is not required; all important details are
+explained here too.
+
+Once you are ready to get started, create a directory and put all your header files,
+source files and documentation inside. It is recommended that you use subdirectories
+like 'include', 'source', 'doc', 'test' etc, but this is not strictly required.
+You should start the CMakeLists.txt file in the top-level directory like:
+
+  cmake_minimum_required(VERSION 2.8)
+  include(BoostProject)
+  boost_project(Tutorial)
+
+What is different from the CMake example? Boost projects use the `boost_project()`
+command instead [@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:project
+`project()`]. The `boost_project()` command is not a builtin command of CMake. Before you
+can use it, you must `include()` the file BoostProject.cmake. If the name of your project
+contains spaces, you should put the whole project's name in quotes. If your project depends
+on other Boost projects, these are listed here. You also should give the project a
+description. If you provide all this information, the call to `boost_project()` might look
+like this:
+
+  boost_project("Example Project"
+    AUTHORS
+      "John Doe <john@doe.com>"
+    DESCRIPTION
+      "This is an example project that does not serve any partcicular purpose."
+    DEPENDS
+      system
+    )
+
+Declare your public header files with the `boost_add_headers()` command. This command
+will make sure that the headers get installed and can be included by other Boost
+projects when doing a monolithic build.
+
+  file(GLOB_RECURSE headers ${CMAKE_CURRENT_SOURCE_DIR}/boost/*.?pp)
+  boost_add_headers(${headers})
+
+To add a compiled library, use the `boost_add_library()` command instead of
+[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library `add_library`].
+
+  boost_add_library(example example.cpp)
+
+If you need to link other boost libraries, list them after LINK_BOOST_LIBRARIES. To link
+third party libraries, list them after LINK_LIBRARIES.
+
+  find_package(ZLIB REQUIRED)
+  boost_add_library(example
+    SOURCE
+      example.cpp
+    LINK_BOOST_LIBRARIES
+      system
+    LINK_LIBRARIES
+      ${ZLIB_LIBRARIES}
+    )
+
+To add an executable, use the `boost_add_executable()` command instead of
+[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable `add_executable()`].
+This command supports the same arguments as the `boost_add_library()` command.
+
+  boost_add_library(example
+    SOURCE
+      exe.cpp
+    LINK_BOOST_LIBRARIES
+      example
+    )
+
+Generate documentation with the 'boost_documentation' command. Use 'boost_add_reference'
+if you want to include one or more reference sections in the documentation.
+
+Use the 'boost_add_test' command to ad a single test case. Use 'boost_test_suite' to add
+multiple tests at once.
+
+[endsect]
+
+[section Reference]
+[include reference.qbk]
+[endsect]
