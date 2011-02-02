@@ -61,6 +61,8 @@ endfunction(boost_xsltproc)
 #     )
 #
 function(boost_doxygen name)
+  set(${name}_tag "${name}_tag-NOTFOUND" PARENT_SCOPE)
+  set(${name}_xml "${name}_xml-NOTFOUND" PARENT_SCOPE)
 endfunction(boost_doxygen)
 
 
