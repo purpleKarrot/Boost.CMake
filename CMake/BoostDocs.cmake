@@ -8,11 +8,6 @@
 ##########################################################################
 
 
-##
-function(boost_doxygen name)
-endfunction(boost_doxygen)
-
-
 # Transforms the source XML file by applying the given XSL stylesheet.
 #
 #   xsl_transform(output input [input2 input3 ...]
@@ -57,6 +52,11 @@ endfunction(boost_doxygen)
 # comment will be "Generating "output" via XSL transformation...".
 function(boost_xsltproc output stylesheet input)
 endfunction(boost_xsltproc)
+
+
+##
+function(boost_doxygen name)
+endfunction(boost_doxygen)
 
 
 # Use Doxygen to parse header files and produce BoostBook output.
@@ -145,36 +145,6 @@ include(CMakeParseArguments)
 
 ##########################################################################
 
-function(boost_doxygen name)
-  cmake_parse_arguments(DOXY ""
-    "FILE" "INPUT;OUTPUT;PARAMETERS;DEPENDS" ${ARGN})
-  set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxyfile)
-
-  if(DOXY_FILE)
-    configure_file(${DOXY_FILE} ${doxyfile} COPYONLY)
-  else()
-    file(REMOVE ${doxyfile})
-  endif()
-
-  foreach(param "QUIET = YES" "WARN_IF_UNDOCUMENTED = NO" ${DOXY_PARAMETERS})
-    file(APPEND ${doxyfile} "${param}\n")
-  endforeach(param)
-
-  set(input)
-  foreach(file ${DOXY_INPUT})
-    get_filename_component(file ${file} ABSOLUTE)
-    set(input "${input} \\\n \"${file}\"")
-  endforeach(file)
-  file(APPEND ${doxyfile} "INPUT = ${input}\n")
-
-  add_custom_command(OUTPUT ${DOXY_OUTPUT}
-    COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
-    DEPENDS ${DOXY_INPUT}
-    )
-endfunction(boost_doxygen)
-
-##########################################################################
-
 function(boost_xsltproc output stylesheet input)
   cmake_parse_arguments(THIS_XSL "" "CATALOG" "PARAMETERS;DEPENDS" ${ARGN})
 
@@ -206,32 +176,88 @@ endfunction(boost_xsltproc)
 
 ##########################################################################
 
-function(boost_add_reference name)
-  cmake_parse_arguments(REF "" "ID;TITLE;DOXYFILE" "DOXYGEN_PARAMETERS;DEPENDS" ${ARGN})
-  set(reference_dir ${CMAKE_CURRENT_BINARY_DIR}/${name}-xml)
+function(boost_doxygen name)
+  cmake_parse_arguments(DOXY
+    "XML;TAG" "DOXYFILE" "INPUT;TAGFILES;PARAMETERS" ${ARGN})
 
-  boost_doxygen(${name}
-    INPUT
-      ${REF_UNPARSED_ARGUMENTS}
-    OUTPUT
-      ${reference_dir}/index.xml
-      ${reference_dir}/combine.xslt
-    FILE "${REF_DOXYFILE}"
-    PARAMETERS
-      "GENERATE_LATEX = NO"
-      "GENERATE_HTML = NO"
-      "GENERATE_XML = YES"
-      "XML_OUTPUT = ${reference_dir}"
-      "${REF_DOXYGEN_PARAMETERS}"
-    DEPENDS ${REF_DEPENDS}
+  set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxyfile)
+
+  if(DOXY_DOXYFILE)
+    configure_file(${DOXY_DOXYFILE} ${doxyfile} COPYONLY)
+  else()
+    file(REMOVE ${doxyfile})
+  endif()
+
+  set(default_parameters
+    "QUIET = YES"
+    "WARN_IF_UNDOCUMENTED = NO"
+    "GENERATE_LATEX = NO"
+    "GENERATE_HTML = NO"
+    "GENERATE_XML = NO"
     )
 
-  # Collect Doxygen XML into a single XML file
-  boost_xsltproc(
-    ${reference_dir}/all.xml
-    ${reference_dir}/combine.xslt
-    ${reference_dir}/index.xml
-    DEPENDS ${REF_DEPENDS}
+  foreach(param ${default_parameters} ${DOXY_PARAMETERS})
+    file(APPEND ${doxyfile} "${param}\n")
+  endforeach(param)
+
+  set(output)
+  if(DOXY_XML)
+    set(xml_dir ${CMAKE_CURRENT_BINARY_DIR}/${name}-xml)
+    list(APPEND output ${xml_dir}/index.xml ${xml_dir}/combine.xslt)
+    file(APPEND ${doxyfile}
+      "GENERATE_XML = YES\n"
+      "XML_OUTPUT = ${xml_dir}\n"
+      )
+  endif(DOXY_XML)
+
+  if(DOXY_TAG)
+    set(tagfile ${CMAKE_CURRENT_BINARY_DIR}/${name}.tag)
+    list(APPEND output ${tagfile})
+    file(APPEND ${doxyfile} "GENERATE_TAGFILE = ${tagfile}\n")
+    set(${name}_tag ${tagfile} PARENT_SCOPE)
+  endif(DOXY_TAG)
+
+  set(tagfiles)
+  foreach(file ${DOXY_TAGFILES})
+    get_filename_component(file ${file} ABSOLUTE)
+    set(tagfiles "${tagfiles} \\\n \"${file}\"")
+  endforeach(file)
+  file(APPEND ${doxyfile} "TAGFILES = ${tagfiles}\n")
+
+  set(input)
+  foreach(file ${DOXY_INPUT})
+    get_filename_component(file ${file} ABSOLUTE)
+    set(input "${input} \\\n \"${file}\"")
+  endforeach(file)
+  file(APPEND ${doxyfile} "INPUT = ${input}\n")
+
+  add_custom_command(OUTPUT ${output}
+    COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
+    DEPENDS ${DOXY_INPUT} ${DOXY_TAGFILES}
+    )
+
+  if(DOXY_XML)
+    # Collect Doxygen XML into a single XML file
+    boost_xsltproc(
+      ${xml_dir}/all.xml
+      ${xml_dir}/combine.xslt
+      ${xml_dir}/index.xml
+      )
+    set(${name}_xml ${xml_dir}/all.xml PARENT_SCOPE)
+  endif(DOXY_XML)
+endfunction(boost_doxygen)
+
+##########################################################################
+
+function(boost_add_reference name)
+  cmake_parse_arguments(REF ""
+    "ID;TITLE;DOXYFILE" "DOXYGEN_PARAMETERS;TAGFILES;DEPENDS" ${ARGN})
+
+  boost_doxygen(${name} XML
+    INPUT      ${REF_UNPARSED_ARGUMENTS}
+    DOXYFILE   "${REF_DOXYFILE}"
+    TAGFILES   "${REF_TAGFILES}"
+    PARAMETERS "${REF_DOXYGEN_PARAMETERS}"
     )
 
   set(parameters)
@@ -247,7 +273,7 @@ function(boost_add_reference name)
   boost_xsltproc(
     ${CMAKE_CURRENT_BINARY_DIR}/${name}.xml
     ${BOOSTBOOK_XSL_DIR}/doxygen/doxygen2boostbook.xsl
-    ${reference_dir}/all.xml
+    ${${name}_xml}
     PARAMETERS ${parameters}
     )
 endfunction(boost_add_reference)
@@ -273,13 +299,13 @@ function(boost_docbook input)
       PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
       )
     add_custom_command(OUTPUT ${pdf_file}
-      COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} 2>/dev/null
+      COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} #2>/dev/null
       DEPENDS ${fop_file}
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       )
   else()
     add_custom_command(OUTPUT ${pdf_file}
-      COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} 2>/dev/null
+      COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} #2>/dev/null
       DEPENDS ${input}
       )
   endif()
@@ -351,6 +377,7 @@ function(boost_qbk_doc input)
     COMMAND ${QUICKBOOK_EXECUTABLE}
             --input-file ${input}
             --include-path ${input_path}
+            --include-path ${CMAKE_CURRENT_SOURCE_DIR}
             --output-file ${output}
     DEPENDS ${input} ${ARGN}
     )
