@@ -29,17 +29,17 @@ include(CMakeParseArguments)
 # There are several optional arguments to control how the regression
 # test is built and executed:
 #
-#   LINK_BOOST_LIBRARIES: States that this test executable depends on and links
-#   against another Boost library.
+# LINK_BOOST_LIBRARIES: States that this test executable depends on and links
+# against another Boost library.
 #
-#   LINK_LIBRARIES: Provides additional libraries against which the test
-#   executable will be linked. For example, one might provide "expat"
-#   as options to LINK_LIBRARIES, to state that this executable should be
-#   linked against the external "expat" library. Use LINK_LIBRARIES for
-#   libraries external to Boost; for Boost libraries, use LINK_BOOST_LIBRARIES.
+# LINK_LIBRARIES: Provides additional libraries against which the test
+# executable will be linked. For example, one might provide "expat"
+# as options to LINK_LIBRARIES, to state that this executable should be
+# linked against the external "expat" library. Use LINK_LIBRARIES for
+# libraries external to Boost; for Boost libraries, use LINK_BOOST_LIBRARIES.
 #
-#   ARGS: Provides additional arguments that will be passed to the
-#   test executable when it is run.
+# ARGS: Provides additional arguments that will be passed to the
+# test executable when it is run.
 #
 function(boost_add_test name)
   cmake_parse_arguments(TEST "COMPILE;RUN;LINK;FAIL" ""

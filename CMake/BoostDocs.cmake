@@ -10,13 +10,11 @@
 
 # Transforms the source XML file by applying the given XSL stylesheet.
 #
-#   xsl_transform(output input [input2 input3 ...]
-#                 STYLESHEET stylesheet
-#                 [CATALOG catalog]
-#                 [DIRECTORY mainfile]
-#                 [PARAMETERS param1=value1 param2=value2 ...]
-#                 [[MAKE_ALL_TARGET | MAKE_TARGET] target]
-#                 [COMMENT comment])
+#   xsl_transform(<output> <stylesheet> <input>
+#     [CATALOG <catalog>]
+#     [PARAMETERS param1=value1 param2=value2 ...]
+#     [DEPENDS <dependancies>]
+#     )
 #
 # This macro builds a custom command that transforms an XML file
 # (input) via the given XSL stylesheet. The output will either be a
@@ -54,7 +52,14 @@ function(boost_xsltproc output stylesheet input)
 endfunction(boost_xsltproc)
 
 
-##
+#
+#   boost_doxygen(<name> [XML] [TAG]
+#     [DOXYFILE <doxyfile>]
+#     [INPUT <input files>]
+#     [TAGFILES <tagfiles>]
+#     [PARAMETERS" <parameters>]
+#     )
+#
 function(boost_doxygen name)
 endfunction(boost_doxygen)
 
@@ -91,8 +96,8 @@ endfunction(boost_add_reference)
 # documentation's format is determined by its extension, and the
 # following input formats are supported:
 # 
-#   QuickBook
-#   BoostBook (.XML extension):
+# QuickBook
+# BoostBook (.XML extension):
 function(boost_documentation input)
 endfunction(boost_documentation)
 

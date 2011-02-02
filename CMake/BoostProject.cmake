@@ -249,23 +249,23 @@ endfunction(boost_install_libraries)
 #
 # The options that affect this macro's behavior are:
 #
-#   LINK_LIBS: Provides additional libraries against which each of the
-#   library variants will be linked. For example, one might provide
-#   "expat" as options to LINK_LIBS, to state that each of the library
-#   variants will link against the expat library binary. Use LINK_LIBS
-#   for libraries external to Boost; for Boost libraries, use DEPENDS.
+# LINK_LIBS: Provides additional libraries against which each of the
+# library variants will be linked. For example, one might provide
+# "expat" as options to LINK_LIBS, to state that each of the library
+# variants will link against the expat library binary. Use LINK_LIBS
+# for libraries external to Boost; for Boost libraries, use DEPENDS.
 #
-#   DEPENDS: States that this Boost library depends on and links
-#   against another Boost library. The arguments to DEPENDS should be
-#   the unversioned name of the Boost library, such as
-#   "boost_filesystem". Like LINK_LIBS, this option states that all
-#   variants of the library being built will link against the stated
-#   libraries. Unlike LINK_LIBS, however, DEPENDS takes particular
-#   library variants into account, always linking the variant of one
-#   Boost library against the same variant of the other Boost
-#   library. For example, if the boost_mpi_python library DEPENDS on
-#   boost_python, multi-threaded variants of boost_mpi_python will
-#   link against multi-threaded variants of boost_python.
+# DEPENDS: States that this Boost library depends on and links
+# against another Boost library. The arguments to DEPENDS should be
+# the unversioned name of the Boost library, such as
+# "boost_filesystem". Like LINK_LIBS, this option states that all
+# variants of the library being built will link against the stated
+# libraries. Unlike LINK_LIBS, however, DEPENDS takes particular
+# library variants into account, always linking the variant of one
+# Boost library against the same variant of the other Boost
+# library. For example, if the boost_mpi_python library DEPENDS on
+# boost_python, multi-threaded variants of boost_mpi_python will
+# link against multi-threaded variants of boost_python.
 #
 function(boost_add_library)
   boost_parse_target_arguments(${ARGN})
@@ -337,22 +337,22 @@ endfunction(boost_add_library)
 #
 # The options that affect this macro's behavior are:
 #
-#   LINK_LIBS: Provides additional libraries against which the
-#   executable will be linked. For example, one might provide "expat"
-#   as options to LINK_LIBS, to state that the executable will link
-#   against the expat library binary. Use LINK_LIBS for libraries
-#   external to Boost; for Boost libraries, use DEPENDS.
+# LINK_LIBS: Provides additional libraries against which the
+# executable will be linked. For example, one might provide "expat"
+# as options to LINK_LIBS, to state that the executable will link
+# against the expat library binary. Use LINK_LIBS for libraries
+# external to Boost; for Boost libraries, use DEPENDS.
 #
-#   DEPENDS: States that this executable depends on and links against
-#   a Boostlibrary. The arguments to DEPENDS should be the unversioned
-#   name of the Boost library, such as "boost_filesystem". Like
-#   LINK_LIBS, this option states that the executable will link
-#   against the stated libraries. Unlike LINK_LIBS, however, DEPENDS
-#   takes particular library variants into account, always linking to
-#   the appropriate variant of a Boost library. For example, if the
-#   MULTI_THREADED feature was requested in the call to
-#   boost_add_executable, DEPENDS will ensure that we only link
-#   against multi-threaded libraries.
+# DEPENDS: States that this executable depends on and links against
+# a Boostlibrary. The arguments to DEPENDS should be the unversioned
+# name of the Boost library, such as "boost_filesystem". Like
+# LINK_LIBS, this option states that the executable will link
+# against the stated libraries. Unlike LINK_LIBS, however, DEPENDS
+# takes particular library variants into account, always linking to
+# the appropriate variant of a Boost library. For example, if the
+# MULTI_THREADED feature was requested in the call to
+# boost_add_executable, DEPENDS will ensure that we only link
+# against multi-threaded libraries.
 #
 # Example:
 #   boost_add_executable(wave cpp.cpp 
