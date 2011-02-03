@@ -165,7 +165,7 @@ endfunction(boost_add_pch)
 ##
 function(boost_parse_target_arguments name)
   cmake_parse_arguments(TARGET
-    "SHARED;STATIC;SINGLE_THREADED;MULTI_THREADED"
+    "SHARED;STATIC;SINGLE_THREADED;MULTI_THREADED;NO_SYMBOL"
     ""
     "PRECOMPILE;SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES"
     ${ARGN}
@@ -173,7 +173,11 @@ function(boost_parse_target_arguments name)
 
   set(TARGET_NAME ${name} PARENT_SCOPE)
 
-  string(TOUPPER "BOOST_${name}_SOURCE" define_symbol)
+  if(NOT TARGET_NO_SYMBOL)
+    string(TOUPPER "BOOST_${name}_SOURCE" define_symbol)
+  else()
+    set(define_symbol)
+  endif()
   set(TARGET_DEFINE_SYMBOL ${define_symbol} PARENT_SCOPE)
 
   if(NOT TARGET_SHARED AND NOT TARGET_STATIC)
