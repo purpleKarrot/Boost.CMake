@@ -106,17 +106,22 @@ endfunction(boost_add_headers)
 ## this function is like 'target_link_libraries, except only for boost libs
 function(boost_link_libraries target)
   cmake_parse_arguments(LIBS "SHARED;STATIC" "" "" ${ARGN})
-  set(link_libs)
+  set(compile_definitions)
+  set(link_libraries)
 
   foreach(lib ${LIBS_UNPARSED_ARGUMENTS})
     if(LIBS_STATIC)
-      list(APPEND link_libs "${lib}-static")
+      list(APPEND link_libraries "${lib}-static")
     else()
-      list(APPEND link_libs "${lib}-shared")
+      string(TOUPPER "BOOST_${lib}_DYN_LINK" def)
+      list(APPEND compile_definitions "${def}=1")
+      list(APPEND link_libraries "${lib}-shared")
     endif()
   endforeach(lib)
 
-  target_link_libraries(${target} ${link_libs})
+  set_property(TARGET ${target} APPEND
+    PROPERTY COMPILE_DEFINITIONS "${compile_definitions}")  
+  target_link_libraries(${target} ${link_libraries})
 endfunction(boost_link_libraries)
 
 
@@ -366,7 +371,7 @@ endfunction(boost_add_library)
 function(boost_add_executable)
   boost_parse_target_arguments(${ARGN})
 
-  set(rc_file ${Boost_SOURCE_DIR}/src/exe.rc)
+  set(rc_file ${Boost_SOURCE_DIR}/resources/exe.rc)
 
   add_executable(${TARGET_NAME} ${TARGET_SOURCES} ${rc_file})
   boost_link_libraries(${TARGET_NAME} ${TARGET_LINK_BOOST_LIBRARIES})
