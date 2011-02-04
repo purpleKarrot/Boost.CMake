@@ -21,7 +21,9 @@ if(CMAKE_HOST_WIN32)
     [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.4\\InstallPath]/Scripts
     )
   if(PYTHONINTERP_FOUND AND dblatex_py)
-    set(DBLATEX_EXECUTABLE ${PYTHON_EXECUTABLE} ${dblatex_py})
+    set(DBLATEX_EXECUTABLE ${PYTHON_EXECUTABLE} ${dblatex_py}
+      CACHE FILEPATH "dblatex executable"
+      )
   endif(PYTHONINTERP_FOUND AND dblatex_py)
   unset(dblatex_py CACHE)
 else()
