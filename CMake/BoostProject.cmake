@@ -62,6 +62,29 @@ function(boost_project name)
 endfunction(boost_project)
 
 
+## TODO: test the mklink command
+
+# make a header file available from another path.
+function(boost_forward_file file target)
+  if(EXISTS ${target})
+    return()
+  endif(EXISTS ${target})
+
+  get_filename_component(directory ${target} PATH)
+  file(MAKE_DIRECTORY ${directory})
+
+  if(NOT CMAKE_HOST_WIN32)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${file} ${target})
+  elseif(TRUE)
+    file(TO_NATIVE_PATH ${file} file)
+    file(TO_NATIVE_PATH ${target} target)
+    execute_process(COMMAND cmd /C mklink ${target} ${file})
+  else()
+    # create forwarding header
+    file(WRITE ${target} "#include \"${file}\"\n")
+  endif()
+endfunction(boost_forward_file)
+
 #
 #   boost_add_headers(
 #     <list of header files>
@@ -80,16 +103,30 @@ function(boost_add_headers)
   set(fwd_prefix "${BOOST_INCLUDE_DIR}/${prefix}")
 
   foreach(header ${HDR_UNPARSED_ARGUMENTS})
-    # create forwarding header
     get_filename_component(absolute ${header} ABSOLUTE)
     file(RELATIVE_PATH relative ${CMAKE_CURRENT_SOURCE_DIR} ${absolute})
-    set(fwdfile "${fwd_prefix}/${relative}")
-    if(NOT EXISTS "${fwdfile}")
-      get_filename_component(path ${relative} PATH)
-      get_filename_component(fwd_absolute "${fwd_prefix}/${path}" ABSOLUTE)
-      file(RELATIVE_PATH include "${fwd_absolute}" "${absolute}")
-      file(WRITE ${fwdfile} "#include \"${include}\"\n")
-    endif(NOT EXISTS "${fwdfile}")
+#   set(fwdfile "${fwd_prefix}/${relative}")
+
+    boost_forward_file("${absolute}" "${fwd_prefix}/${relative}")
+#    # create symlink
+#   if(NOT EXISTS "${fwdfile}")
+#     get_filename_component(directory ${fwdfile} PATH)
+#     file(MAKE_DIRECTORY ${directory})
+#     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${absolute} ${fwdfile})
+
+#     file(TO_NATIVE_PATH ${absolute} absolute)
+#     file(TO_NATIVE_PATH ${fwdfile} fwdfile)
+#     execute_process(COMMAND cmd /C mklink ${fwdfile} ${absolute})
+
+#   endif(NOT EXISTS "${fwdfile}")
+
+#   # create forwarding header
+#   if(NOT EXISTS "${fwdfile}")
+#     get_filename_component(path ${relative} PATH)
+#     get_filename_component(fwd_absolute "${fwd_prefix}/${path}" ABSOLUTE)
+#     file(RELATIVE_PATH include "${fwd_absolute}" "${absolute}")
+#     file(WRITE ${fwdfile} "#include \"${include}\"\n")
+#   endif(NOT EXISTS "${fwdfile}")
 
     # install definition
     string(REGEX MATCH "(.*)[/\\]" directory ${relative})
