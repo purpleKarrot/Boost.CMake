@@ -63,13 +63,16 @@ endfunction(boost_project)
 
 
 if(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
-  execute_process(COMMAND cmd /C mklink RESULT_VARIABLE result)
-  if(result EQUAL 0)
+  set(test_file ${CMAKE_CURRENT_BINARY_DIR}/symlinktest)
+  file(TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR} file)
+  file(TO_NATIVE_PATH ${test_file} target)
+  execute_process(COMMAND cmd /C mklink ${target} ${file})
+  if(EXISTS ${test_file})
     set(MKLINK_WORKING TRUE CACHE INTERNAL "")
-  else(result EQUAL 0)
+  else(EXISTS ${test_file})
     set(MKLINK_WORKING FALSE CACHE INTERNAL "")
     message(STATUS "Symlinks are NOT supported.")
-  endif(result EQUAL 0)
+  endif(EXISTS ${test_file})
 endif(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
 
 
