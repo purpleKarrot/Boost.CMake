@@ -392,7 +392,7 @@ endfunction(boost_add_library)
 function(boost_add_executable)
   boost_parse_target_arguments(${ARGN})
 
-  set(rc_file ${Boost_SOURCE_DIR}/resources/exe.rc)
+  set(rc_file ${CMAKE_CURRENT_LIST_DIR}/../resources/exe.rc)
 
   add_executable(${TARGET_NAME} ${TARGET_SOURCES} ${rc_file})
   boost_link_libraries(${TARGET_NAME} ${TARGET_LINK_BOOST_LIBRARIES})
