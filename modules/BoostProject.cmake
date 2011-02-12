@@ -346,6 +346,8 @@ function(boost_add_library)
 endfunction(boost_add_library)
 
 
+set(_exe_rc ${CMAKE_CURRENT_LIST_DIR}/../resources/exe.rc CACHE INTERNAL "")
+
 # Creates a new executable from source files.
 #
 #   boost_add_executable(<name> [SHARED|STATIC]
@@ -400,9 +402,7 @@ endfunction(boost_add_library)
 function(boost_add_executable)
   boost_parse_target_arguments(${ARGN})
 
-  set(rc_file ${CMAKE_CURRENT_LIST_DIR}/../resources/exe.rc)
-
-  add_executable(${TARGET_NAME} ${TARGET_SOURCES} ${rc_file})
+  add_executable(${TARGET_NAME} ${TARGET_SOURCES} ${_exe_rc})
   boost_link_libraries(${TARGET_NAME} ${TARGET_LINK_BOOST_LIBRARIES})
   target_link_libraries(${TARGET_NAME} ${TARGET_LINK_LIBRARIES})
 
