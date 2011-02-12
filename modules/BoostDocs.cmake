@@ -8,46 +8,30 @@
 ##########################################################################
 
 
-# Transforms the source XML file by applying the given XSL stylesheet.
+# Transforms the input XML file by applying the given XSL stylesheet.
 #
-#   xsl_transform(<output> <stylesheet> <input>
+#   boost_xsltproc(<output> <stylesheet> <input>
 #     [CATALOG <catalog>]
 #     [PARAMETERS param1=value1 param2=value2 ...]
 #     [DEPENDS <dependancies>]
 #     )
 #
-# This macro builds a custom command that transforms an XML file
-# (input) via the given XSL stylesheet. The output will either be a
-# single file (the default) or a directory (if the DIRECTION argument
-# is specified). The STYLESBEET stylesheet must be a valid XSL
-# stylesheet. Any extra input files will be used as additional
-# dependencies for the target. For example, these extra input files
-# might refer to other XML files that are included by the input file
-# through XInclude.
+# This function builds a custom command that transforms an XML file
+# (input) via the given XSL stylesheet. 
 #
-# When the XSL transform output is going to a directory, the mainfile
-# argument provides the name of a file that will be generated within
-# the output directory. This file will be used for dependency tracking.
-# 
 # XML catalogs can be used to remap parts of URIs within the
 # stylesheet to other (typically local) entities. To provide an XML
 # catalog file, specify the name of the XML catalog file via the
 # CATALOG argument. It will be provided to the XSL transform.
-# 
+#
 # The PARAMETERS argument is followed by param=value pairs that set
 # additional parameters to the XSL stylesheet. The parameter names
 # that can be used correspond to the <xsl:param> elements within the
 # stylesheet.
-# 
-# To associate a target name with the result of the XSL
-# transformation, use the MAKE_TARGET or MAKE_ALL_TARGET option and
-# provide the name of the target. The MAKE_ALL_TARGET option only
-# differs from MAKE_TARGET in that MAKE_ALL_TARGET will make the
-# resulting target a part of the default build.
 #
-# If a COMMENT argument is provided, it will be used as the comment
-# CMake provides when running this XSL transformation. Otherwise, the
-# comment will be "Generating "output" via XSL transformation...".
+# Additional dependancies may be passed via the DEPENDS argument.
+# For example, dependancies might refer to other XML files that are
+# included by the input file through XInclude.
 function(boost_xsltproc output stylesheet input)
 endfunction(boost_xsltproc)
 
@@ -57,7 +41,7 @@ endfunction(boost_xsltproc)
 #     [DOXYFILE <doxyfile>]
 #     [INPUT <input files>]
 #     [TAGFILES <tagfiles>]
-#     [PARAMETERS" <parameters>]
+#     [PARAMETERS <parameters>]
 #     )
 #
 function(boost_doxygen name)
@@ -69,7 +53,8 @@ endfunction(boost_doxygen)
 # Use Doxygen to parse header files and produce BoostBook output.
 #
 #   doxygen_to_boostbook(output header1 header2 ...
-#     [PARAMETERS param1=value1 param2=value2 ... ])
+#     [PARAMETERS param1=value1 param2=value2 ... ]
+#     )
 #
 # This macro sets up rules to transform a set of C/C++ header files
 # into BoostBook reference documentation. The resulting BoostBook XML
@@ -297,6 +282,7 @@ function(boost_docbook input)
     boost_xsltproc(${output_html} ${BOOSTBOOK_XSL_DIR}/html.xsl ${input}
       CATALOG ${BOOSTBOOK_CATALOG}
       )
+    list(APPEND doc_targets ${output_html})
   endif()
 
   if(OFF) # generate manpages
@@ -350,6 +336,12 @@ function(boost_docbook input)
   set_target_properties(${target} PROPERTIES
     FOLDER "${BOOST_CURRENT_FOLDER}"
     )
+  install(FILES ${doc_targets}
+    DESTINATION share/doc/Boost
+#   CONFIGURATIONS
+    COMPONENT "${BOOST_DOC_COMPONENT}"
+    )
+  set_boost_project("${BOOST_HAS_DOC_VAR}" ON)
 endfunction(boost_docbook)
 
 ##########################################################################

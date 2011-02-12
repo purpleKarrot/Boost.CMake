@@ -18,9 +18,9 @@ foreach(line ${lines})
   elseif(line MATCHES "^# ?(.*)")
     set(buffer "${buffer}${CMAKE_MATCH_1}\n")
   else()
-    if(buffer AND line MATCHES "^function\\(([^ )]+)")
+    if(buffer AND line MATCHES "^([^ (]+)\\(([^ )]+)")
       file(APPEND ${OUTPUT_FILE}
-        "[section ${CMAKE_MATCH_1}]\n"
+        "[section ${CMAKE_MATCH_1} ${CMAKE_MATCH_2}]\n"
         "${buffer}"
         "[endsect]\n\n"
         )

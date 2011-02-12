@@ -76,7 +76,15 @@ if(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
 endif(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
 
 
-# make a header file available from another path.
+# Make a header file available from another path.
+#
+#   boost_forward_file(<file> <target>)
+#
+# Where <file> is a path to an existing file that you want to include as if
+# it were located at <target>.
+#
+# This function creates symlinks where available. As a fallback it simply creates
+# a file at the target position that [c++] `#include`s the appropriate file.
 function(boost_forward_file file target)
   if(EXISTS ${target})
     return()
