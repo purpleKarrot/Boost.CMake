@@ -154,7 +154,11 @@ function(boost_add_pch name source_list)
 
   set(pch_header "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.hpp")
   set(pch_source "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.cpp")
-  set(pch_binary "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${name}.pch")
+  set(pch_binary "${CMAKE_CURRENT_BINARY_DIR}/${name}.pch")
+
+  if(MSVC_IDE)
+    set(pch_binary "$(IntDir)/${name}.pch")
+  endif(MSVC_IDE)
 
   file(WRITE ${pch_header}.in "/* ${name} precompiled header file */\n\n")
   foreach(header ${ARGN})
