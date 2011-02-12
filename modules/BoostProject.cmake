@@ -154,11 +154,7 @@ function(boost_add_pch name source_list)
 
   set(pch_header "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.hpp")
   set(pch_source "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.cpp")
-  set(pch_binary "${CMAKE_CURRENT_BINARY_DIR}/${name}.pch")
-
-  if(MSVC_IDE)
-    set(pch_binary "$(IntDir)/${name}.pch")
-  endif(MSVC_IDE)
+  set(pch_binary "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${name}.pch")
 
   file(WRITE ${pch_header}.in "/* ${name} precompiled header file */\n\n")
   foreach(header ${ARGN})
@@ -338,6 +334,8 @@ function(boost_add_library)
 endfunction(boost_add_library)
 
 
+set(_exe_rc ${CMAKE_CURRENT_LIST_DIR}/../resources/exe.rc)
+
 # Creates a new executable from source files.
 #
 #   boost_add_executable(<name> [SHARED|STATIC]
@@ -392,9 +390,7 @@ endfunction(boost_add_library)
 function(boost_add_executable)
   boost_parse_target_arguments(${ARGN})
 
-  set(rc_file ${CMAKE_CURRENT_LIST_DIR}/../resources/exe.rc)
-
-  add_executable(${TARGET_NAME} ${TARGET_SOURCES} ${rc_file})
+  add_executable(${TARGET_NAME} ${TARGET_SOURCES} ${_exe_rc})
   boost_link_libraries(${TARGET_NAME} ${TARGET_LINK_BOOST_LIBRARIES})
   target_link_libraries(${TARGET_NAME} ${TARGET_LINK_LIBRARIES})
 
