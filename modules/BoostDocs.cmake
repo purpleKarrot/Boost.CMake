@@ -331,15 +331,20 @@ function(boost_docbook input)
   if(HTML_HELP_COMPILER)
     set(hhp_output ${CMAKE_CURRENT_BINARY_DIR}/htmlhelp/htmlhelp.hhp)
     set(chm_output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm)
-    boost_xsltproc(${hhp_output} ${DOCBOOK_XSL_DIR}/htmlhelp/htmlhelp.xsl ${input}
+    boost_xsltproc(${hhp_output} ${BOOSTBOOK_XSL_DIR}/html-help.xsl ${input}
       CATALOG ${BOOSTBOOK_CATALOG}
       PARAMETERS
         "img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/"
         "htmlhelp.chm=../${BOOST_CURRENT_PROJECT}.chm"
       )
+    set(hhc_cmake ${CMAKE_CURRENT_BINARY_DIR}/hhc.cmake)
+    file(WRITE ${hhc_cmake}
+      "execute_process(COMMAND \"${HTML_HELP_COMPILER}\" htmlhelp.hhp"
+      " WORKING_DIRECTORY \"${CMAKE_CURRENT_BINARY_DIR}/htmlhelp\""
+      " OUTPUT_QUIET)"
+      )
     add_custom_command(OUTPUT ${chm_output}
-      COMMAND "${HTML_HELP_COMPILER}" htmlhelp.hhp
-      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/htmlhelp"
+      COMMAND "${CMAKE_COMMAND}" -P "${hhc_cmake}"
       DEPENDS ${hhp_output}
       )
     list(APPEND doc_targets ${chm_output})
@@ -349,6 +354,7 @@ function(boost_docbook input)
   add_custom_target(${target} DEPENDS ${doc_targets})
   set_target_properties(${target} PROPERTIES
     FOLDER "${BOOST_CURRENT_FOLDER}"
+    PROJECT_LABEL "${BOOST_CURRENT_PROJECT} (documentation)"
     )
 endfunction(boost_docbook)
 
@@ -376,12 +382,54 @@ endfunction(boost_docbook)
 
 ## TODO: this function can be used for more than html...
 function(boost_html_doc input)
-  set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.docbook)
-  add_custom_command(OUTPUT ${output}
-    COMMAND ${PANDOC_EXECUTABLE} -S -w docbook ${input} -o ${output}
-    DEPENDS ${input}
-    )
-  boost_docbook(${output})
+# set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.docbook)
+# add_custom_command(OUTPUT ${output}
+#   COMMAND ${PANDOC_EXECUTABLE} -S -w docbook ${input} -o ${output}
+#   DEPENDS ${input}
+#   )
+# boost_docbook(${output})
+
+  if(HTML_HELP_COMPILER)
+    set(hhp_file ${CMAKE_CURRENT_BINARY_DIR}/htmlhelp.hhp)
+    file(WRITE ${hhp_file}
+      "[OPTIONS]\n"
+      "Binary TOC=Yes\n"
+      "Auto TOC=9\n"
+      "Compatibility=1.1 or later\n"
+      "Compiled file=${BOOST_CURRENT_PROJECT}.chm\n"
+      "Contents file=toc.hhc\n"
+      "Default Window=Main\n"
+      "Default topic=index.html\n"
+      "Display compile progress=No\n"
+      "Full-text search=Yes\n"
+      "Language=0x0409 English (UNITED STATES)\n"
+      "Title=Boost.${BOOST_CURRENT_PROJECT}\n"
+      "Enhanced decompilation=No\n"
+      "[WINDOWS]\n"
+      "Main=\"Boost.${BOOST_CURRENT_PROJECT}\",\"toc.hhc\",,\"index.html\",\"index.html\",,,,,0x2520,,0x603006,,,,,,,,0\n"
+      "[FILES]\n"
+      )
+    foreach(file ${input} ${ARGN})
+      file(RELATIVE_PATH file "${CMAKE_CURRENT_BINARY_DIR}" "${file}")
+      file(APPEND ${hhp_file} "${file}\n")
+    endforeach(file)
+    set(hhc_cmake ${CMAKE_CURRENT_BINARY_DIR}/hhc.cmake)
+    file(WRITE ${hhc_cmake}
+      "execute_process(COMMAND \"${HTML_HELP_COMPILER}\" htmlhelp.hhp"
+      " WORKING_DIRECTORY \"${CMAKE_CURRENT_BINARY_DIR}\""
+      " OUTPUT_QUIET)"
+      )
+    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm
+      COMMAND "${CMAKE_COMMAND}" -P "${hhc_cmake}"
+      DEPENDS ${input} ${ARGN}
+      )
+    set(target "${BOOST_CURRENT_PROJECT}-doc")
+    add_custom_target(${target} DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm)
+    set_target_properties(${target} PROPERTIES
+      FOLDER "${BOOST_CURRENT_FOLDER}"
+      PROJECT_LABEL "${BOOST_CURRENT_PROJECT} (documentation)"
+      )
+  endif(HTML_HELP_COMPILER)
 endfunction(boost_html_doc)
 
 ##########################################################################

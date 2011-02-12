@@ -338,7 +338,7 @@ function(boost_add_library)
 endfunction(boost_add_library)
 
 
-set(_exe_rc ${CMAKE_CURRENT_LIST_DIR}/../resources/exe.rc)
+set(_exe_rc ${CMAKE_CURRENT_LIST_DIR}/../resources/exe.rc CACHE INTERNAL "")
 
 # Creates a new executable from source files.
 #
