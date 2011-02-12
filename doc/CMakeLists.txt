@@ -6,28 +6,11 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-include(BoostProject)
 include(BoostDocs)
-
-boost_project(CMake
-  AUTHORS
-    "Daniel Pfeifer <daniel -at- pfeifer-mail.de>"
-  DESCRIPTION
-    "An approach to a modularized build of the Boost C++ Libraries with CMake."
-  )
-
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/CMake
-  DESTINATION share/Boost
-# CONFIGURATIONS
-  COMPONENT cmake_exe
-  )
-
-#
-set_boost_project("${BOOST_HAS_EXE_VAR}" ON)
 
 set(reference)
 foreach(module BoostDocs BoostProject BoostTesting)
-  set(input "${CMAKE_SOURCE_DIR}/CMake/${module}.cmake")
+  set(input "${CMAKE_CURRENT_SOURCE_DIR}/../modules/${module}.cmake")
   set(output "${module}.qbk")
   add_custom_command(OUTPUT ${output}
     COMMAND ${CMAKE_COMMAND}
