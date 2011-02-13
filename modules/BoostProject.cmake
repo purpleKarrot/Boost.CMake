@@ -37,6 +37,7 @@ function(boost_project name)
     # libraries will provide a <boost/lib/lib.hpp> file.
     find_package(Boost)
     include_directories(${Boost_INCLUDE_DIRS})
+    link_directories(${Boost_LIBRARY_DIRS})
   endif(NOT _BOOST_MONOLITHIC_BUILD)
 
   string(REPLACE " " "_" project "${name}")
@@ -93,6 +94,8 @@ endif(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
 #
 # This function creates symlinks where available. As a fallback it simply creates
 # a file at the target position that [c++] `#include`s the appropriate file.
+# On Windows, symlinks are available since Vista, but they require the
+# /Create Symbolic Link/ privilege, which only administrators have by default.
 function(boost_forward_file file target)
   if(EXISTS ${target})
     return()
@@ -163,7 +166,9 @@ function(boost_link_libraries target)
     target_link_libraries(${target} ${link_libraries})
   else(_BOOST_MONOLITHIC_BUILD)
     find_package(Boost REQUIRED COMPONENTS ${LIBS_UNPARSED_ARGUMENTS})
-    target_link_libraries(${target} ${Boost_LIBRARIES})
+    if(NOT MSVC) #AUTOLINK
+      target_link_libraries(${target} ${Boost_LIBRARIES})
+    endif(NOT MSVC) #AUTOLINK
   endif(_BOOST_MONOLITHIC_BUILD)
 endfunction(boost_link_libraries)
 
@@ -265,6 +270,17 @@ function(boost_install_libraries shared static)
       COMPONENT "${BOOST_LIB_COMPONENT}"
     )
 
+  foreach(target ${ARGN})
+    get_target_property(location ${target} LOCATION)
+    string(REGEX REPLACE "[.]...$" ".pdb" pdb_file "${location}")
+    string(REPLACE "${CMAKE_CFG_INTDIR}" "\${CMAKE_INSTALL_CONFIG_NAME}" pdb_file "${pdb_file}")
+    install(FILES "${pdb_file}"
+      DESTINATION bin
+      COMPONENT "${BOOST_LIB_COMPONENT}"
+      OPTIONAL
+      )
+  endforeach(target ${ARGN})
+
   set_boost_project("${BOOST_HAS_DEV_VAR}" ON)
   if(shared)
     set_boost_project("${BOOST_HAS_LIB_VAR}" ON)
@@ -329,9 +345,10 @@ function(boost_add_library)
     add_library(${target} SHARED ${TARGET_SOURCES})
     boost_link_libraries(${target} ${TARGET_LINK_BOOST_LIBRARIES} SHARED)
     target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
-	set_property(TARGET ${target} APPEND PROPERTY
-	  COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1;BOOST_ALL_NO_LIB=1")
-	set_target_properties(${target} PROPERTIES
+    string(TOUPPER "BOOST_${TARGET_NAME}_DYN_LINK" shared_definition)
+    set_property(TARGET ${target} APPEND PROPERTY
+      COMPILE_DEFINITIONS "${shared_definition}")
+    set_target_properties(${target} PROPERTIES
       PROJECT_LABEL "${TARGET_NAME} (shared library)"
       )
     list(APPEND targets ${target})
@@ -342,7 +359,7 @@ function(boost_add_library)
     add_library(${target} STATIC ${TARGET_SOURCES})
     boost_link_libraries(${target} ${TARGET_LINK_BOOST_LIBRARIES} STATIC)
     target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
-	set_target_properties(${target} PROPERTIES
+    set_target_properties(${target} PROPERTIES
       PROJECT_LABEL "${TARGET_NAME} (static library)"
       PREFIX "lib"
       )
@@ -425,9 +442,11 @@ function(boost_add_executable)
     PROJECT_LABEL "${TARGET_NAME} (executable)"
     )
 
-  set_property(TARGET ${TARGET_NAME} APPEND PROPERTY
-#   COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1;BOOST_ALL_NO_LIB=1")
-    COMPILE_DEFINITIONS "BOOST_ALL_NO_LIB=1")
+  if(_BOOST_MONOLITHIC_BUILD)
+    set_property(TARGET ${TARGET_NAME} APPEND PROPERTY
+      COMPILE_DEFINITIONS "BOOST_ALL_NO_LIB=1"
+      )
+  endif(_BOOST_MONOLITHIC_BUILD)
 
   install(TARGETS ${TARGET_NAME}
     DESTINATION bin
