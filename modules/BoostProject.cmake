@@ -31,6 +31,14 @@ function(boost_project name)
   set(parameters "AUTHORS;DESCRIPTION;DEPENDS")
   cmake_parse_arguments(PROJ "" "" "${parameters}" ${ARGN})
 
+  if(NOT _BOOST_MONOLITHIC_BUILD)
+    # TODO: check for existence of DEPENDS header files.
+    # Currently this is impossible. It will be possible once all
+    # libraries will provide a <boost/lib/lib.hpp> file.
+    find_package(Boost)
+    include_directories(${Boost_INCLUDE_DIRS})
+  endif(NOT _BOOST_MONOLITHIC_BUILD)
+
   string(REPLACE " " "_" project "${name}")
   string(TOLOWER "${project}" project)
   set(BOOST_CURRENT_PROJECT "${project}" PARENT_SCOPE)
@@ -149,8 +157,14 @@ function(boost_link_libraries target)
   endforeach(lib)
 
   set_property(TARGET ${target} APPEND
-    PROPERTY COMPILE_DEFINITIONS "${compile_definitions}")  
-  target_link_libraries(${target} ${link_libraries})
+    PROPERTY COMPILE_DEFINITIONS "${compile_definitions}")
+
+  if(_BOOST_MONOLITHIC_BUILD)
+    target_link_libraries(${target} ${link_libraries})
+  else(_BOOST_MONOLITHIC_BUILD)
+    find_package(Boost REQUIRED COMPONENTS ${LIBS_UNPARSED_ARGUMENTS})
+    target_link_libraries(${target} ${Boost_LIBRARIES})
+  endif(_BOOST_MONOLITHIC_BUILD)
 endfunction(boost_link_libraries)
 
 
