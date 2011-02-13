@@ -345,9 +345,11 @@ function(boost_add_library)
     add_library(${target} SHARED ${TARGET_SOURCES})
     boost_link_libraries(${target} ${TARGET_LINK_BOOST_LIBRARIES} SHARED)
     target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
-    string(TOUPPER "BOOST_${TARGET_NAME}_DYN_LINK" shared_definition)
+#   string(TOUPPER "BOOST_${TARGET_NAME}_DYN_LINK=1" shared_definition)
     set_property(TARGET ${target} APPEND PROPERTY
-      COMPILE_DEFINITIONS "${shared_definition}")
+#     COMPILE_DEFINITIONS "${shared_definition};BOOST_ALL_NO_LIB=1"
+      COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1;BOOST_ALL_NO_LIB=1"
+      )
     set_target_properties(${target} PROPERTIES
       PROJECT_LABEL "${TARGET_NAME} (shared library)"
       )
