@@ -216,6 +216,20 @@ endfunction(boost_add_pch)
 
 
 ##
+function(boost_install_pdb target)
+  if(MSVC)
+    get_target_property(location "${target}" LOCATION)
+    if(NOT CMAKE_CFG_INTDIR STREQUAL ".")	
+      string(REPLACE "${CMAKE_CFG_INTDIR}" "\${CMAKE_INSTALL_CONFIG_NAME}" location "${location}")
+    endif()
+    get_filename_component(extension "${location}" EXT)
+    string(REGEX REPLACE "${extension}$" ".pdb" pdb_file "${location}")
+    install(FILES "${pdb_file}" CONFIGURATIONS Debug RelWithDebInfo ${ARGN})
+  endif(MSVC)
+endfunction(boost_install_pdb)
+
+
+##
 function(boost_parse_target_arguments name)
   cmake_parse_arguments(TARGET
     "SHARED;STATIC;SINGLE_THREADED;MULTI_THREADED;NO_SYMBOL"
@@ -271,10 +285,7 @@ function(boost_install_libraries shared static)
     )
 
   foreach(target ${ARGN})
-    get_target_property(location ${target} LOCATION)
-    string(REGEX REPLACE "[.]...$" ".pdb" pdb_file "${location}")
-    string(REPLACE "${CMAKE_CFG_INTDIR}" "\${CMAKE_INSTALL_CONFIG_NAME}" pdb_file "${pdb_file}")
-    install(FILES "${pdb_file}"
+    boost_install_pdb(${target}
       DESTINATION bin
       COMPONENT "${BOOST_LIB_COMPONENT}"
       OPTIONAL
@@ -452,7 +463,8 @@ function(boost_add_executable)
 
   install(TARGETS ${TARGET_NAME}
     DESTINATION bin
-    COMPONENT ${BOOST_CURRENT_PROJECT}_exe
+    COMPONENT "${BOOST_EXE_COMPONENT}"
+    CONFIGURATIONS Release
     )
   set_boost_project("${BOOST_HAS_EXE_VAR}" ON)
 endfunction(boost_add_executable)
