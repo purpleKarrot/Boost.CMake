@@ -342,12 +342,12 @@ function(boost_docbook input)
     FOLDER "${BOOST_CURRENT_FOLDER}"
     PROJECT_LABEL "${BOOST_CURRENT_PROJECT} (documentation)"
     )
-  install(FILES ${doc_targets}
-    DESTINATION share/doc/Boost
+# install(FILES ${doc_targets}
+#   DESTINATION share/doc/Boost
 #   CONFIGURATIONS
-    COMPONENT "${BOOST_DOC_COMPONENT}"
-    )
-  set_boost_project("${BOOST_HAS_DOC_VAR}" ON)
+#   COMPONENT "${BOOST_DOC_COMPONENT}"
+#   )
+# set_boost_project("${BOOST_HAS_DOC_VAR}" ON)
 endfunction(boost_docbook)
 
 ##########################################################################

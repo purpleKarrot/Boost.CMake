@@ -17,17 +17,34 @@ boost_project(CMake
     "A collection of CMake modules to simplify the development of Boost libraries."
   )
 
+add_subdirectory(doc)
+
+set(BOOST_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
+set(BOOST_LIB_DIR      "${CMAKE_INSTALL_PREFIX}/lib")
+if(WIN32)
+  set(BOOST_CMAKE_DIR  "${CMAKE_INSTALL_PREFIX}/CMake")
+else(WIN32)
+  set(BOOST_CMAKE_DIR  "${CMAKE_INSTALL_PREFIX}/share/Boost/CMake")
+endif(WIN32)
+
+set(config_file ${PROJECT_BINARY_DIR}/InstallFiles/BoostConfig.cmake)
+set(version_file ${PROJECT_BINARY_DIR}/InstallFiles/BoostVersion.cmake)
+
+configure_file(BoostConfig.cmake ${config_file} @ONLY)
+configure_file(BoostVersion.cmake ${version_file} @ONLY)
+
+install(FILES ${config_file} ${version_file}
+  DESTINATION "${BOOST_CMAKE_DIR}"
+  COMPONENT cmake_exe
+  )
+
 install(DIRECTORY modules resources
-  DESTINATION share/Boost/CMake
-# CONFIGURATIONS
+  DESTINATION "${BOOST_CMAKE_DIR}"
   COMPONENT cmake_exe
   )
 
 #
 set_boost_project("${BOOST_HAS_EXE_VAR}" ON)
-
-add_subdirectory(doc)
-
 
 #
 if(APPLE)

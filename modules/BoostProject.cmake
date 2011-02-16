@@ -272,7 +272,7 @@ endfunction(boost_parse_target_arguments)
 
 ##
 function(boost_install_libraries shared static)
-  install(TARGETS ${ARGN}
+  install(TARGETS ${ARGN} #EXPORT ${TARGET_NAME}
     ARCHIVE
       DESTINATION lib
       COMPONENT "${BOOST_DEV_COMPONENT}"
@@ -283,6 +283,11 @@ function(boost_install_libraries shared static)
       DESTINATION bin
       COMPONENT "${BOOST_LIB_COMPONENT}"
     )
+
+# install(EXPORT ${TARGET_NAME}
+#   DESTINATION "share/Boost/CMake"
+#   COMPONENT "${BOOST_DEV_COMPONENT}"
+#   )
 
   foreach(target ${ARGN})
     boost_install_pdb(${target}
@@ -390,6 +395,9 @@ function(boost_add_library)
 endfunction(boost_add_library)
 
 
+if(NOT CMAKE_CURRENT_LIST_DIR)
+  get_filename_component(CMAKE_CURRENT_LIST_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+endif(NOT CMAKE_CURRENT_LIST_DIR)
 set(_exe_rc ${CMAKE_CURRENT_LIST_DIR}/../resources/exe.rc CACHE INTERNAL "")
 
 # Creates a new executable from source files.
