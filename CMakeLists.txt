@@ -36,12 +36,12 @@ configure_file(BoostConfig.cmake ${config_file} @ONLY)
 configure_file(BoostVersion.cmake ${version_file} @ONLY)
 
 install(FILES ${config_file} ${version_file}
-  DESTINATION "${BOOST_CMAKE_DIR}"
+  DESTINATION "${cmake_install_dir}"
   COMPONENT cmake_exe
   )
 
 install(DIRECTORY modules resources
-  DESTINATION "${BOOST_CMAKE_DIR}"
+  DESTINATION "${cmake_install_dir}"
   COMPONENT cmake_exe
   )
 
