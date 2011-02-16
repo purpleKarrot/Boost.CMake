@@ -19,13 +19,15 @@ boost_project(CMake
 
 add_subdirectory(doc)
 
+if(WIN32)
+  set(cmake_install_dir "CMake")
+else(WIN32)
+  set(cmake_install_dir "share/Boost/CMake")
+endif(WIN32)
+
 set(BOOST_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
 set(BOOST_LIB_DIR      "${CMAKE_INSTALL_PREFIX}/lib")
-if(WIN32)
-  set(BOOST_CMAKE_DIR  "${CMAKE_INSTALL_PREFIX}/CMake")
-else(WIN32)
-  set(BOOST_CMAKE_DIR  "${CMAKE_INSTALL_PREFIX}/share/Boost/CMake")
-endif(WIN32)
+set(BOOST_CMAKE_DIR    "${CMAKE_INSTALL_PREFIX}/${cmake_install_dir}")
 
 set(config_file ${PROJECT_BINARY_DIR}/InstallFiles/BoostConfig.cmake)
 set(version_file ${PROJECT_BINARY_DIR}/InstallFiles/BoostVersion.cmake)
