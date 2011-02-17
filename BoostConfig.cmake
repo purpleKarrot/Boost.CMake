@@ -13,12 +13,13 @@
 #  BOOST_LIBRARIES    - libraries to link against
 #  BOOST_USE_FILE     -
 
-set(BOOST_INCLUDE_DIRS "@BOOST_INCLUDE_DIRS@")
-set(BOOST_LIBRARY_DIRS "@BOOST_LIB_DIR@")
+set(Boost_FOUND TRUE)
+set(Boost_INCLUDE_DIRS "@BOOST_INCLUDE_DIRS@")
+set(Boost_LIBRARY_DIRS "@BOOST_LIB_DIR@")
 
 foreach(component ${Boost_FIND_COMPONENTS})
   message(STATUS "Looking for Boost component: ${component}")
-  set(component_file "@BOOST_CMAKE_DIR@/${component}.cmake")
+  set(component_file "@BOOST_CMAKE_DIR@/components/${component}.cmake")
   if(EXISTS "${component_file}")
     include("${component_file}")
     set(Boost_${component}_FOUND TRUE)
@@ -26,4 +27,4 @@ foreach(component ${Boost_FIND_COMPONENTS})
     set(Boost_${component}_FOUND FALSE)
     set(Boost_FOUND FALSE)
   endif()
-foreach(component)
+endforeach(component)

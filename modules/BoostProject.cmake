@@ -272,7 +272,7 @@ endfunction(boost_parse_target_arguments)
 
 ##
 function(boost_install_libraries shared static)
-  install(TARGETS ${ARGN} #EXPORT ${TARGET_NAME}
+  install(TARGETS ${ARGN} EXPORT ${TARGET_NAME}
     ARCHIVE
       DESTINATION lib
       COMPONENT "${BOOST_DEV_COMPONENT}"
@@ -284,10 +284,10 @@ function(boost_install_libraries shared static)
       COMPONENT "${BOOST_LIB_COMPONENT}"
     )
 
-# install(EXPORT ${TARGET_NAME}
-#   DESTINATION "share/Boost/CMake"
-#   COMPONENT "${BOOST_DEV_COMPONENT}"
-#   )
+  install(EXPORT ${TARGET_NAME}
+    DESTINATION "share/Boost/CMake/components"
+    COMPONENT "${BOOST_DEV_COMPONENT}"
+    )
 
   foreach(target ${ARGN})
     boost_install_pdb(${target}
@@ -469,10 +469,14 @@ function(boost_add_executable)
       )
   endif(_BOOST_MONOLITHIC_BUILD)
 
-  install(TARGETS ${TARGET_NAME}
+  install(TARGETS ${TARGET_NAME} EXPORT ${TARGET_NAME}
     DESTINATION bin
     COMPONENT "${BOOST_EXE_COMPONENT}"
     CONFIGURATIONS Release
+    )
+  install(EXPORT ${TARGET_NAME}
+    DESTINATION "share/Boost/CMake/components"
+    COMPONENT "${BOOST_EXE_COMPONENT}"
     )
   set_boost_project("${BOOST_HAS_EXE_VAR}" ON)
 endfunction(boost_add_executable)
