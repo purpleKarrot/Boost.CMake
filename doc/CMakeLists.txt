@@ -9,15 +9,16 @@
 include(BoostDocs)
 
 set(reference)
-foreach(module BoostDocs BoostProject BoostTesting)
-  set(input "${CMAKE_CURRENT_SOURCE_DIR}/../modules/${module}.cmake")
-  set(output "${module}.qbk")
+file(GLOB boost_modules "${PROJECT_SOURCE_DIR}/modules/Boost*.cmake")
+foreach(module ${boost_modules})
+  get_filename_component(name ${module} NAME_WE)
+  set(output "${name}.qbk")
   add_custom_command(OUTPUT ${output}
     COMMAND ${CMAKE_COMMAND}
-            -DINPUT_FILE=${input}
+            -DINPUT_FILE=${module}
             -DOUTPUT_FILE=${output}
             -P ${CMAKE_CURRENT_SOURCE_DIR}/reference.cmake
-    DEPENDS ${input} reference.cmake
+    DEPENDS ${module} reference.cmake
     )
 
   list(APPEND reference ${output})

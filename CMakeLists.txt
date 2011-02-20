@@ -8,7 +8,8 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-include(BoostProject)
+find_package(Boost 1.45.99 REQUIRED COMPONENTS quickbook NO_MODULE)
+include("${Boost_USE_FILE}")
 
 boost_project(CMake
   AUTHORS
@@ -18,6 +19,10 @@ boost_project(CMake
   )
 
 add_subdirectory(doc)
+
+if(NOT Boost_SOURCE_DIR)
+  return()
+endif(NOT Boost_SOURCE_DIR)
 
 if(WIN32)
   set(cmake_install_dir "CMake")
@@ -29,16 +34,15 @@ set(BOOST_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
 set(BOOST_LIB_DIR      "${CMAKE_INSTALL_PREFIX}/lib")
 set(BOOST_CMAKE_DIR    "${CMAKE_INSTALL_PREFIX}/${cmake_install_dir}")
 
-set(config_file ${PROJECT_BINARY_DIR}/InstallFiles/BoostConfig.cmake)
-set(version_file ${PROJECT_BINARY_DIR}/InstallFiles/BoostVersion.cmake)
-
-configure_file(BoostConfig.cmake ${config_file} @ONLY)
-configure_file(BoostVersion.cmake ${version_file} @ONLY)
-
-install(FILES ${config_file} ${version_file}
-  DESTINATION "${cmake_install_dir}"
-  COMPONENT cmake_exe
-  )
+foreach(config Config ConfigVersion)
+  set(source_file "${Boost_SOURCE_DIR}/Boost${config}.cmake")
+  set(binary_file "${PROJECT_BINARY_DIR}/InstallFiles/Boost${config}.cmake")
+  configure_file("${source_file}" "${binary_file}" @ONLY)
+  install(FILES "${binary_file}"
+    DESTINATION "${cmake_install_dir}"
+    COMPONENT cmake_exe
+    )
+endforeach(config)
 
 install(DIRECTORY modules resources
   DESTINATION "${cmake_install_dir}"
