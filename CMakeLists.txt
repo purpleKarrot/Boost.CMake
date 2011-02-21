@@ -31,8 +31,8 @@ set(BOOST_LIB_DIR      "${CMAKE_INSTALL_PREFIX}/lib")
 set(BOOST_CMAKE_DIR    "${CMAKE_INSTALL_PREFIX}/${cmake_install_dir}")
 
 foreach(config Config ConfigVersion)
-  set(source_file "${PROJECT_SOURCE_DIR}/Boost${config}.cmake")
-  set(binary_file "${PROJECT_BINARY_DIR}/InstallFiles/Boost${config}.cmake")
+  set(source_file "${CMAKE_CURRENT_SOURCE_DIR}/Boost${config}.cmake.in")
+  set(binary_file "${CMAKE_CURRENT_BINARY_DIR}/Boost${config}.cmake")
   configure_file("${source_file}" "${binary_file}" @ONLY)
   install(FILES "${binary_file}"
     DESTINATION "${cmake_install_dir}"

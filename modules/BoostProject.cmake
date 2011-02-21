@@ -58,10 +58,12 @@ function(boost_project name)
   # this will be obsolete once CMake supports the FOLDER property on directories
   set(BOOST_CURRENT_FOLDER "${name}" PARENT_SCOPE)
 
-  # write component config file
-  set(config_file "${CMAKE_CURRENT_BINARY_DIR}/${project}")
-  set(include_guard "_boost_${project}_config_included")
-  file(WRITE "${config_file}.config"
+  # write component file
+  set(config_file_prefix "${CMAKE_CURRENT_BINARY_DIR}/${project}")
+  set(component_file "${config_file_prefix}.cmake")
+  set(BOOST_COMPONENT_FILE "${component_file}.in" PARENT_SCOPE)
+  set(include_guard "_boost_${project}_component_included")
+  file(WRITE "${component_file}.in"
     "#\n\n"
     "if(${include_guard})\n"
     "  return()\n"
@@ -70,20 +72,39 @@ function(boost_project name)
     "get_filename_component(_DIR \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)\n\n"
     )
   foreach(depend ${PROJ_DEPENDS})
-    file(APPEND ${config_file} "include(\${_DIR}/${depend}.cmake)\n")
+    file(APPEND "${component_file}.in" "include(\${_DIR}/${depend}.cmake)\n")
   endforeach(depend)
-  set(BOOST_CONFIG_FILE "${config_file}.config" PARENT_SCOPE)
 
-  install(CODE "configure_file(${config_file}.config ${config_file}.cmake COPYONLY)")
-  install(CODE "file(APPEND ${config_file}.cmake \"
-file(GLOB config_files \\\${_DIR}/${project}-*.cmake)
+  install(CODE
+  "configure_file(\"${component_file}.in\" \"${component_file}\" COPYONLY)
+  file(APPEND \"${component_file}\" \"
+file(GLOB config_files \\\"\\\${_DIR}/${project}-*.cmake\\\")
 foreach(file \\\${config_files})
-  include(\\\${file})
+  include(\"\\\${file}\")
 endforeach(file)
-\")")
+  \")"
+  COMPONENT "${project}_dev"
+  )
 
-  install(FILES ${config_file}.cmake
-    DESTINATION share/Boost/cmake/components
-#   COMPONENT <component
+  install(FILES "${component_file}"
+    DESTINATION "share/Boost/CMake/components"
+    COMPONENT "${project}_dev"
     )
+
+  # write config file
+  set(config_file "${config_file_prefix}-config.cmake.in")
+  set(BOOST_CONFIG_FILE "${config_file}" PARENT_SCOPE)
+
+  file(WRITE "${config_file}"
+    "#\n"
+    )
+
+  install(CODE
+  "string(TOLOWER \"\${CMAKE_INSTALL_CONFIG_NAME}\" config)
+  string(TOUPPER \"\${CMAKE_INSTALL_CONFIG_NAME}\" CONFIG)
+  set(config_file \"${config_file_prefix}-\${config}.cmake\")
+  configure_file(\"${config_file}\" \"\${config_file}\" @ONLY)
+  file(INSTALL DESTINATION \"\${CMAKE_INSTALL_PREFIX}/share/Boost/CMake/components\" TYPE FILE FILES \"\${config_file}\")"
+  COMPONENT "${project}_dev"
+  )
 endfunction(boost_project)

@@ -84,8 +84,13 @@ function(boost_add_executable)
       )
 # endif(_BOOST_MONOLITHIC_BUILD)
 
-  file(APPEND ${BOOST_CONFIG_FILE} "\n"
+  file(APPEND ${BOOST_COMPONENT_FILE} "\n"
     "add_executable(boost_${TARGET_NAME} IMPORTED)\n"
+    )
+  file(APPEND ${BOOST_CONFIG_FILE} "\n"
+    "set_property(TARGET boost_${TARGET_NAME} APPEND PROPERTY IMPORTED_CONFIGURATIONS @CONFIG@)\n"
+    "set_property(TARGET boost_${TARGET_NAME} PROPERTY IMPORTED_LOCATION_@CONFIG@"
+    " \"${CMAKE_INSTALL_PREFIX}/bin/${TARGET_NAME}\")\n"
     )
 
   install(TARGETS ${TARGET_NAME}
