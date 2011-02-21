@@ -6,15 +6,4 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-list(APPEND CMAKE_MODULE_PATH "${Boost_MODULE_PATH}")
-include_directories("${Boost_INCLUDE_DIRS}")
-
-include(BoostProject)
-include(BoostForwardFile)
-include(BoostAddHeaders)
-include(BoostParseTargetArguments)
-include(BoostLinkLibraries)
-include(BoostPrecompileHeader)
-include(BoostAddLibrary)
-include(BoostAddExecutable)
-include(BoostAddPythonExtension)
+include("${Boost_USE_FILE}")

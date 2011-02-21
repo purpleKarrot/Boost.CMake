@@ -29,15 +29,6 @@ function(boost_project name)
   set(parameters "AUTHORS;DESCRIPTION;DEPENDS")
   cmake_parse_arguments(PROJ "" "" "${parameters}" ${ARGN})
 
-# if(NOT _BOOST_MONOLITHIC_BUILD)
-#   # TODO: check for existence of DEPENDS header files.
-#   # Currently this is impossible. It will be possible once all
-#   # libraries will provide a <boost/lib/lib.hpp> file.
-#   find_package(Boost)
-#   include_directories(${Boost_INCLUDE_DIRS})
-#   link_directories(${Boost_LIBRARY_DIRS})
-# endif(NOT _BOOST_MONOLITHIC_BUILD)
-
   string(REPLACE " " "_" project "${name}")
   string(TOLOWER "${project}" project)
   set(BOOST_CURRENT_PROJECT "${project}" PARENT_SCOPE)
@@ -66,4 +57,33 @@ function(boost_project name)
 
   # this will be obsolete once CMake supports the FOLDER property on directories
   set(BOOST_CURRENT_FOLDER "${name}" PARENT_SCOPE)
+
+  # write component config file
+  set(config_file "${CMAKE_CURRENT_BINARY_DIR}/${project}")
+  set(include_guard "_boost_${project}_config_included")
+  file(WRITE "${config_file}.config"
+    "#\n\n"
+    "if(${include_guard})\n"
+    "  return()\n"
+    "endif(${include_guard})\n"
+    "set(${include_guard} TRUE)\n\n"
+    "get_filename_component(_DIR \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)\n\n"
+    )
+  foreach(depend ${PROJ_DEPENDS})
+    file(APPEND ${config_file} "include(\${_DIR}/${depend}.cmake)\n")
+  endforeach(depend)
+  set(BOOST_CONFIG_FILE "${config_file}.config" PARENT_SCOPE)
+
+  install(CODE "configure_file(${config_file}.config ${config_file}.cmake COPYONLY)")
+  install(CODE "file(APPEND ${config_file}.cmake \"
+file(GLOB config_files \\\${_DIR}/${project}-*.cmake)
+foreach(file \\\${config_files})
+  include(\\\${file})
+endforeach(file)
+\")")
+
+  install(FILES ${config_file}.cmake
+    DESTINATION share/Boost/cmake/components
+#   COMPONENT <component
+    )
 endfunction(boost_project)

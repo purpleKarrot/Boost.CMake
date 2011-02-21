@@ -74,6 +74,17 @@ function(boost_add_library)
     set_target_properties(${target} PROPERTIES
       PROJECT_LABEL "${TARGET_NAME} (shared library)"
       )
+    set(interface_libraries)
+    foreach(lib ${TARGET_LINK_BOOST_LIBRARIES})
+      list(APPEND interface_libraries "boost_${lib}-shared")
+    endforeach(lib)
+    file(APPEND ${BOOST_CONFIG_FILE} "\n"
+      "add_library(boost_${target} SHARED IMPORTED)\n"
+      "set_target_properties(boost_${target} PROPERTIES\n"
+      "  IMPORTED_LINK_INTERFACE_LANGUAGES \"CXX\"\n"
+      "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${interface_libraries}\"\n"
+      "  )\n"
+      )
     list(APPEND targets ${target})
   endif(TARGET_SHARED)
 
@@ -85,6 +96,17 @@ function(boost_add_library)
     set_target_properties(${target} PROPERTIES
       PROJECT_LABEL "${TARGET_NAME} (static library)"
       PREFIX "lib"
+      )
+    set(interface_libraries)
+    foreach(lib ${TARGET_LINK_BOOST_LIBRARIES})
+      list(APPEND interface_libraries "boost_${lib}-static")
+    endforeach(lib)
+    file(APPEND ${BOOST_CONFIG_FILE}
+      "\nadd_library(boost_${target} STATIC IMPORTED)\n"
+      "set_target_properties(boost_${target} PROPERTIES\n"
+      "  IMPORTED_LINK_INTERFACE_LANGUAGES \"CXX\"\n"
+      "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${interface_libraries}\"\n"
+      "  )\n"
       )
     list(APPEND targets ${target})
   endif(TARGET_STATIC)
@@ -102,7 +124,7 @@ endfunction(boost_add_library)
 
 ##
 function(boost_install_libraries shared static)
-  install(TARGETS ${ARGN} # EXPORT ${TARGET_NAME}
+  install(TARGETS ${ARGN}
     ARCHIVE
       DESTINATION lib
       COMPONENT "${BOOST_DEV_COMPONENT}"
@@ -113,11 +135,6 @@ function(boost_install_libraries shared static)
       DESTINATION bin
       COMPONENT "${BOOST_LIB_COMPONENT}"
     )
-
-# install(EXPORT ${TARGET_NAME}
-#   DESTINATION "share/Boost/CMake/components"
-#   COMPONENT "${BOOST_DEV_COMPONENT}"
-#   )
 
   foreach(target ${ARGN})
     boost_install_pdb(${target}

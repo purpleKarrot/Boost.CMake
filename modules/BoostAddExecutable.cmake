@@ -84,14 +84,14 @@ function(boost_add_executable)
       )
 # endif(_BOOST_MONOLITHIC_BUILD)
 
-  install(TARGETS ${TARGET_NAME} EXPORT ${TARGET_NAME}
+  file(APPEND ${BOOST_CONFIG_FILE} "\n"
+    "add_executable(boost_${TARGET_NAME} IMPORTED)\n"
+    )
+
+  install(TARGETS ${TARGET_NAME}
     DESTINATION bin
     COMPONENT "${BOOST_EXE_COMPONENT}"
     CONFIGURATIONS Release
-    )
-  install(EXPORT ${TARGET_NAME}
-    DESTINATION "share/Boost/CMake/components"
-    COMPONENT "${BOOST_EXE_COMPONENT}"
     )
   set_boost_project("${BOOST_HAS_EXE_VAR}" ON)
 endfunction(boost_add_executable)

@@ -20,10 +20,6 @@ boost_project(CMake
 
 add_subdirectory(doc)
 
-if(NOT Boost_SOURCE_DIR)
-  return()
-endif(NOT Boost_SOURCE_DIR)
-
 if(WIN32)
   set(cmake_install_dir "CMake")
 else(WIN32)
@@ -35,7 +31,7 @@ set(BOOST_LIB_DIR      "${CMAKE_INSTALL_PREFIX}/lib")
 set(BOOST_CMAKE_DIR    "${CMAKE_INSTALL_PREFIX}/${cmake_install_dir}")
 
 foreach(config Config ConfigVersion)
-  set(source_file "${Boost_SOURCE_DIR}/Boost${config}.cmake")
+  set(source_file "${PROJECT_SOURCE_DIR}/Boost${config}.cmake")
   set(binary_file "${PROJECT_BINARY_DIR}/InstallFiles/Boost${config}.cmake")
   configure_file("${source_file}" "${binary_file}" @ONLY)
   install(FILES "${binary_file}"
