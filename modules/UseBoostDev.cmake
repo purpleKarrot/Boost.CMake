@@ -7,3 +7,22 @@
 ##########################################################################
 
 include("${Boost_USE_FILE}")
+
+include(BoostProject)
+include(BoostForwardFile)
+include(BoostAddHeaders)
+include(BoostParseTargetArguments)
+include(BoostPrecompileHeader)
+include(BoostAddLibrary)
+include(BoostAddExecutable)
+include(BoostAddPythonExtension)
+
+#
+if(APPLE)
+  set(CPACK_PACKAGE_ICON "${Boost_RESOURCE_PATH}/boost.icns")
+else(APPLE)
+  set(CPACK_PACKAGE_ICON "${Boost_RESOURCE_PATH}\\\\boost.bmp")
+endif(APPLE)
+
+set(CPACK_NSIS_MUI_ICON    "${Boost_RESOURCE_PATH}/boost.ico")
+set(CPACK_NSIS_MUI_UNIICON "${Boost_RESOURCE_PATH}/boost.ico")

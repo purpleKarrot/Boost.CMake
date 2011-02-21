@@ -14,9 +14,10 @@
 #  BOOST_USE_FILE     -
 
 set(Boost_FOUND TRUE)
-set(Boost_INCLUDE_DIRS "@BOOST_INCLUDE_DIRS@")
-set(Boost_LIBRARY_DIRS "@BOOST_LIB_DIR@")
-set(Boost_MODULE_PATH "@BOOST_CMAKE_DIR@")
+set(Boost_INCLUDE_DIRS "@BOOST_INCLUDE@")
+set(Boost_LIBRARY_DIRS "@BOOST_LIBRARIES@")
+set(Boost_RESOURCE_PATH "@BOOST_RESOURCES@")
+set(Boost_MODULE_PATH "@BOOST_MODULES@")
 set(Boost_USE_FILE "${Boost_MODULE_PATH}/UseBoost.cmake")
 set(Boost_DEV_FILE "${Boost_MODULE_PATH}/UseBoostDev.cmake")
 

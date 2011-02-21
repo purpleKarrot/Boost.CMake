@@ -9,12 +9,6 @@
 ##########################################################################
 
 
-if(NOT CMAKE_CURRENT_LIST_DIR)
-  get_filename_component(CMAKE_CURRENT_LIST_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-endif(NOT CMAKE_CURRENT_LIST_DIR)
-set(_exe_rc ${CMAKE_CURRENT_LIST_DIR}/../resources/exe.rc CACHE INTERNAL "")
-
-
 # Creates a new executable from source files.
 #
 #   boost_add_executable(<name> [SHARED|STATIC]
@@ -69,9 +63,16 @@ set(_exe_rc ${CMAKE_CURRENT_LIST_DIR}/../resources/exe.rc CACHE INTERNAL "")
 function(boost_add_executable)
   boost_parse_target_arguments(${ARGN})
 
-  add_executable(${TARGET_NAME} ${TARGET_SOURCES} ${_exe_rc})
-  boost_link_libraries(${TARGET_NAME} ${TARGET_LINK_BOOST_LIBRARIES})
-  target_link_libraries(${TARGET_NAME} ${TARGET_LINK_LIBRARIES})
+  add_executable(${TARGET_NAME}
+    ${TARGET_SOURCES}
+    ${Boost_RESOURCE_PATH}/exe.rc
+    )
+  boost_link_libraries(${TARGET_NAME}
+    ${TARGET_LINK_BOOST_LIBRARIES}
+    )
+  target_link_libraries(${TARGET_NAME}
+    ${TARGET_LINK_LIBRARIES}
+    )
 
   set_target_properties(${TARGET_NAME} PROPERTIES
     FOLDER "${BOOST_CURRENT_FOLDER}"
