@@ -8,14 +8,14 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-find_package(Boost 1.45.99 REQUIRED COMPONENTS quickbook NO_MODULE)
-include("${Boost_USE_FILE}")
+find_package(Boost 1.45 REQUIRED COMPONENTS quickbook NO_MODULE)
+include("${Boost_DEV_FILE}")
 
 boost_project(CMake
   AUTHORS
     "Daniel Pfeifer <daniel -at- pfeifer-mail.de>"
   DESCRIPTION
-    "A collection of CMake modules to simplify the development of Boost libraries."
+    "A collection of CMake modules to simplify the use and development of Boost libraries."
   )
 
 add_subdirectory(doc)
@@ -28,7 +28,7 @@ endif(WIN32)
 
 set(BOOST_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
 set(BOOST_LIB_DIR      "${CMAKE_INSTALL_PREFIX}/lib")
-set(BOOST_CMAKE_DIR    "${CMAKE_INSTALL_PREFIX}/${cmake_install_dir}")
+set(BOOST_CMAKE_DIR    "${CMAKE_INSTALL_PREFIX}/${cmake_install_dir}/modules")
 
 foreach(config Config ConfigVersion)
   set(source_file "${CMAKE_CURRENT_SOURCE_DIR}/Boost${config}.cmake.in")

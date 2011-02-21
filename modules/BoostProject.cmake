@@ -82,7 +82,7 @@ file(GLOB config_files \\\"\\\${_DIR}/${project}-*.cmake\\\")
 foreach(file \\\${config_files})
   include(\"\\\${file}\")
 endforeach(file)
-  \")"
+\")"
   COMPONENT "${project}_dev"
   )
 
