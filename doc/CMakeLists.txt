@@ -6,7 +6,9 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-include(BoostDocs)
+set(Boost_RESOURCE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../resources)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../modules/BoostDocs.cmake)
+#include(BoostDocs)
 
 set(reference)
 file(GLOB boost_modules "${PROJECT_SOURCE_DIR}/modules/Boost*.cmake")

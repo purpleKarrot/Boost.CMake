@@ -109,12 +109,6 @@ if(NOT XSLTPROC_FOUND)
   set(BOOST_BUILD_DOCUMENTATION OFF)
 endif(NOT XSLTPROC_FOUND)
 
-find_package(DBLATEX)
-find_package(FOP)
-if(NOT DBLATEX_FOUND AND NOT FOP_FOUND)
-  set(BOOST_BUILD_DOCUMENTATION OFF)
-endif(NOT DBLATEX_FOUND AND NOT FOP_FOUND)
-
 find_package(BoostBook)
 if(NOT BOOSTBOOK_FOUND)
   set(BOOST_BUILD_DOCUMENTATION OFF)
@@ -126,6 +120,8 @@ if(NOT QUICKBOOK_FOUND)
 endif(NOT QUICKBOOK_FOUND)
 
 find_package(HTMLHelp)
+find_package(DBLATEX)
+find_package(FOP)
 
 set(BOOST_BUILD_DOCUMENTATION ${BOOST_BUILD_DOCUMENTATION}
   CACHE BOOL "Whether documentation should be built")
@@ -277,47 +273,11 @@ endfunction(boost_add_reference)
 function(boost_docbook input)
   set(doc_targets)
 
-  if(OFF) # generate HTML
-    set(output_html ${CMAKE_CURRENT_BINARY_DIR}/html/HTML.manifest)
-    boost_xsltproc(${output_html} ${BOOSTBOOK_XSL_DIR}/html.xsl ${input}
-      CATALOG ${BOOSTBOOK_CATALOG}
-      )
-    list(APPEND doc_targets ${output_html})
-  endif()
-
-  if(OFF) # generate manpages
-    set(output_man  ${CMAKE_CURRENT_BINARY_DIR}/man/man.manifest)
-    boost_xsltproc(${output_man} ${BOOSTBOOK_XSL_DIR}/manpages.xsl ${input}
-      CATALOG ${BOOSTBOOK_CATALOG}
-      )
-  endif()
-
-  if(FOP_FOUND)
-    set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.fo)
-    set(pdf_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.pdf)
-    boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
-      CATALOG ${BOOSTBOOK_CATALOG}
-      PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
-      )
-    add_custom_command(OUTPUT ${pdf_file}
-      COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} #2>/dev/null
-      DEPENDS ${fop_file}
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-      )
-    list(APPEND doc_targets ${pdf_file})
-  elseif(DBLATEX_FOUND)
-    set(pdf_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.pdf)
-    add_custom_command(OUTPUT ${pdf_file}
-      COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} #2>/dev/null
-      DEPENDS ${input}
-      )
-    list(APPEND doc_targets ${pdf_file})
-  endif()
-
   if(HTML_HELP_COMPILER)
-    set(hhp_output ${CMAKE_CURRENT_BINARY_DIR}/htmlhelp/htmlhelp.hhp)
-    set(chm_output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm)
-    boost_xsltproc(${hhp_output} ${BOOSTBOOK_XSL_DIR}/html-help.xsl ${input}
+    set(hhp_output "${CMAKE_CURRENT_BINARY_DIR}/htmlhelp/htmlhelp.hhp")
+    set(chm_output "${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm")
+    set(stylesheet "${Boost_RESOURCE_PATH}/docbook-xsl/htmlhelp.xsl")
+    boost_xsltproc("${hhp_output}" "${stylesheet}" "${input}"
       CATALOG ${BOOSTBOOK_CATALOG}
       PARAMETERS
         "img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/"
@@ -334,7 +294,41 @@ function(boost_docbook input)
       DEPENDS ${hhp_output}
       )
     list(APPEND doc_targets ${chm_output})
-  endif(HTML_HELP_COMPILER)
+  else() # generate HTML and manpages
+    set(output_html ${CMAKE_CURRENT_BINARY_DIR}/html/index.html)
+    set(stylesheet "${Boost_RESOURCE_PATH}/docbook-xsl/xhtml.xsl")
+    boost_xsltproc("${output_html}" "${stylesheet}" "${input}"
+      CATALOG ${BOOSTBOOK_CATALOG}
+      )
+    list(APPEND doc_targets ${output_html})
+#   set(output_man  ${CMAKE_CURRENT_BINARY_DIR}/man/man.manifest)
+#   boost_xsltproc(${output_man} ${BOOSTBOOK_XSL_DIR}/manpages.xsl ${input}
+#     CATALOG ${BOOSTBOOK_CATALOG}
+#     )
+#   list(APPEND doc_targets ${output_man})
+  endif()
+
+  if(DBLATEX_FOUND)
+    set(pdf_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.pdf)
+    add_custom_command(OUTPUT ${pdf_file}
+      COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} 2>/dev/null
+      DEPENDS ${input}
+      )
+    list(APPEND doc_targets ${pdf_file})
+  elseif(FOP_FOUND)
+    set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.fo)
+    set(pdf_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.pdf)
+    boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
+      CATALOG ${BOOSTBOOK_CATALOG}
+      PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
+      )
+    add_custom_command(OUTPUT ${pdf_file}
+      COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} #2>/dev/null
+      DEPENDS ${fop_file}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+      )
+    list(APPEND doc_targets ${pdf_file})
+  endif()
 
   set(target "${BOOST_CURRENT_PROJECT}-doc")
   add_custom_target(${target} DEPENDS ${doc_targets})
