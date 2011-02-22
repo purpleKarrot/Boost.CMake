@@ -7,108 +7,70 @@
 
 body
 {
-  font-family:sans-serif;
-  background-color:#FFF;
-  color:#000;
-  margin:1em 5%;
+  font-family: sans-serif;
+  margin: 1em 5%;
+}
+
+h1, h2, h3, h4, h5, h6, div.toc p b
+{
+  color: steelblue;
 }
 
 p
 {
-  font-size:10pt;
-  text-align:left;
-  line-height:1.15;
+  text-align: justify;
 }
 
-p tt.computeroutput
+pre
 {
-  font-size:9pt;
+  font-family: monospace;
+  font-size: normal;
+  border: 1px solid silver;
+  background: whitesmoke;
+  padding: 0.5em;
 }
 
-pre.synopsis
+code
 {
-  font-size:9pt;
-  border:1px solid #DCDCDC;
-  margin:1pc 4% 0;
-  padding:.5pc;
+  font-family: monospace;
+  font-size: normal;
 }
 
-.programlisting,.screen
+code:before, code:after
 {
-  display:block;
-  font-size:9pt;
-  border:1px solid #DCDCDC;
-  margin:1pc 4% 0;
-  padding:.5pc;
+  content: "'";
 }
 
-td .programlisting,td .screen
+td .programlisting, td .screen
 {
-  border:0 solid #DCDCDC;
-  margin:0;
-  padding:0;
+  border: 0 solid #DCDCDC;
+  margin: 0;
+  padding: 0;
 }
 
-h1,h2,h3,h4,h5,h6
+h1, h2, h3, h4, h5, h6
 {
-  color:#527bbd;
-  font-family:sans-serif;
-  margin-top:1.2em;
-  margin-bottom:.5em;
-  line-height:1.3;
+  margin: 1.2em 0 .5em;
+  line-height: 1.3;
 }
 
-h1,h2,h3
+h1, h2, h3
 {
-  border-bottom:2px solid silver;
+  border-bottom: 2px solid silver;
 }
 
-h1
+hr
 {
-  font:140%;
-}
-
-h2
-{
-  font:bold 140%;
-}
-
-h3
-{
-  font:bold 130%;
-}
-
-h4
-{
-  font:bold 120%;
-}
-
-h5
-{
-  font:italic 110%;
-}
-
-h6
-{
-  font:italic 100%;
-}
-
-title,h1.title,h2.title
-h3.title,h4.title,h5.title,h6.title,.refentrytitle
-{
-  margin-bottom:1pc;
-  font-weight:700;
+  border: 1px solid silver;
 }
 
 .section h1
 {
-  font-size:140%;
   margin:0 0 .5em;
 }
 
 li
 {
-  font-size:10pt;
   line-height:1.3;
 }
 
@@ -118,80 +80,82 @@ a
   nowhitespace:afterproperty;
 }
 
-.spirit-nav
+.navigation
 {
-  text-align:right;
+  margin: 4px 0;
+  float: right;
+  text-align: right;
 }
 
-.spirit-nav img
+.navigation a
 {
-  border-width:0;
+  display: inline-block;
+  height: 19px;
+  width: 19px;
+  overflow: hidden;
+  text-indent: 9999px;
+  margin-left: 5px;
 }
 
-.spirit-nav a
+.navigation .prev
 {
-  padding-left:.5em;
-  color:#FFF;
+  background-image: url(images/prev.png);
 }
 
-.copyright-footer
+.navigation .up
 {
-  font-size:70%;
-  text-align:right;
-  color:#8F8F8F;
+  background-image: url(images/up.png);
 }
 
-.copyright-footer p
+.navigation .home
 {
-  font-size:80%;
-  text-align:right;
+  background-image: url(images/home.png);
 }
 
-.toc
+.navigation .next
 {
-  font-size:80%;
-  line-height:1.15;
-  border:1px solid #DCDCDC;
-  margin:1pc 4% 0;
-  padding:.1pc 1pc;
+  background-image: url(images/next.png);
 }
 
-.boost-toc
+.copyright
 {
-  float:right;
-  padding:.5pc;
+  font-size: small;
+  color: #555;
 }
 
-.table-title,div.table p.title
+.copyright p
+{
+  margin: 0;
+}
+
+.table-title, div.table p.title
 {
   margin-left:4%;
   padding-left:.5em;
   padding-right:.5em;
 }
 
-.informaltable table,.table table
+.informaltable table, .table table
 {
   width:92%;
   margin-left:4%;
   margin-right:4%;
 }
 
-div.informaltable table,div.table table
+div.informaltable table, div.table table
 {
   padding:4px;
 }
 
-div.informaltable table tr td,div.table table tr td
+div.informaltable table tr td, div.table table tr td
 {
-  font-size:9pt;
   text-align:left;
   border:1px solid #DCDCDC;
   padding:.5em;
 }
 
-div.informaltable table tr th,div.table table tr th
+div.informaltable table tr th, div.table table tr th
 {
-  font-size:80%;
   background-color:#F0F0F0;
   border:1px solid #DCDCDC;
   padding:.5em;
@@ -207,17 +171,15 @@ table.simplelist
 
 table.simplelist td
 {
-  font-size:9pt!important;
   text-align:left!important;
   border:none!important;
   margin:0!important;
   padding:0!important;
 }
 
-div.note,div.tip,div.important,div.caution,div.warning,p.blurb
+div.note, div.tip, div.important, div.caution, div.warning, p.blurb
 {
   display:block;
-  font-size:9pt;
   line-height:1.2;
   nowhitespace:afterproperty;
   border:1px solid #DCDCDC;
@@ -237,7 +199,6 @@ div.variablelist
 
 div.variablelist table tbody tr td
 {
-  font-size:10pt;
   text-align:left;
   line-height:1;
   vertical-align:top;
@@ -245,7 +206,7 @@ div.variablelist table tbody tr td
   padding:0 2em 0 0;
 }
 
-div.variablelist table tbody tr td p,div.variablelist dl dd p
+div.variablelist table tbody tr td p, div.variablelist dl dd p
 {
   line-height:1;
   margin:0 0 .5em;
@@ -253,13 +214,11 @@ div.variablelist table tbody tr td p,div.variablelist dl dd p
 
 div.variablelist dl dd
 {
-  font-size:10pt;
   margin:0 0 .5em 2em;
 }
 
-div.variablelist dl dt,span.term
+div.variablelist dl dt, span.term
 {
-  font-size:10pt;
   font-weight:700;
 }
 
@@ -319,27 +278,21 @@ div div.legalnotice p
   background-color:#999;
 }
 
-a,a .keyword,a .identifier,a .special,a .preprocessor
-a .char,a .comment,a .string,a .number
+a, a .keyword, a .identifier, a .special, a .preprocessor
+a .char, a .comment, a .string, a .number
 {
   color:#005a9c;
 }
 
-a:visited,a:visited .keyword,a:visited .identifier,a:visited .special,a:visited .preprocessor a:visited .char,a:visited .comment,a:visited .string,a:visited .number
+a:visited, a:visited .keyword, a:visited .identifier, a:visited .special, a:visited .preprocessor a:visited .char, a:visited .comment, a:visited .string, a:visited .number
 {
   color:#9c5a9c;
 }
 
-h1 a,h2 a,h3 a,h4 a,h5 a,h6 a,h1 a:hover,h2 a:hover,h3 a:hover,h4 a:hover,h5 a:hover,h6 a:hover,h1 a:visited,h2 a:visited,h3 a:visited,h4 a:visited,h5 a:visited,h6 a:visited
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a, h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover, h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited, h6 a:visited
 {
-  color:#527bbd;
+  color: steelblue;
   text-decoration:none;
-}
-
-.copyright
-{
-  color:#666;
-  font-size:small;
 }
 
 span.highlight
@@ -352,7 +305,7 @@ span.inlinemediaobject img
   vertical-align:middle;
 }
 
-sup,sub
+sup, sub
 {
   position:relative;
   height:0;
@@ -371,42 +324,17 @@ sub
   top:.5ex;
 }
 
-h2 tt.computeroutput,h1 tt.computeroutput,h1.title,h2.title,.section h2
-{
-  font-size:140%;
-}
-
-h6 tt.computeroutput,h3 tt.computeroutput,h5 tt.computeroutput,h4 tt.computeroutput,h3.title,.section h3
-{
-  font-size:130%;
-}
-
-h4.title,.section h4,.toc .computeroutput
-{
-  font-size:120%;
-}
-
-h5.title,.section h5
-{
-  font-size:110%;
-}
-
-h6.title,.section h6,h3.author
-{
-  font-size:100%;
-}
-
-ul,ol
+ul, ol
 {
   text-align:left;
 }
 
-a:hover,span.underline
+a:hover, span.underline
 {
   text-decoration:underline;
 }
 
-.char,.string,.number
+.char, .string, .number
 {
   color:teal;
 }

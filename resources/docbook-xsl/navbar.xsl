@@ -6,7 +6,10 @@
    (See accompanying file LICENSE_1_0.txt or copy at
    http://www.boost.org/LICENSE_1_0.txt)
   -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision"
+                version="1.0">
 
   <xsl:template name="header.navigation">
     <xsl:param name="prev" select="/foo" />
@@ -32,6 +35,27 @@
       <xsl:with-param name="next" select="$next" />
       <xsl:with-param name="nav.context" select="$nav.context" />
     </xsl:call-template>
+
+    <div class="copyright">
+      <xsl:apply-templates select="ancestor-or-self::*/*/copyright" mode="boost.footer" />
+      <xsl:apply-templates select="ancestor-or-self::*/*/legalnotice" mode="boost.footer" />
+
+      <xsl:variable name="revision-nodes" select="ancestor-or-self::*[not (attribute::rev:last-revision='')]" />
+      <xsl:if test="count($revision-nodes) &gt; 0">
+        <xsl:variable name="revision-node" select="$revision-nodes[last()]" />
+        <xsl:variable name="revision-text">
+          <xsl:value-of select="normalize-space($revision-node/attribute::rev:last-revision)" />
+        </xsl:variable>
+        <xsl:if test="string-length($revision-text) &gt; 0">
+          <p>
+            <xsl:text>Last revised: </xsl:text>
+            <xsl:call-template name="format.revision">
+              <xsl:with-param name="text" select="$revision-text" />
+            </xsl:call-template>
+          </p>
+        </xsl:if>
+      </xsl:if>
+    </div>
   </xsl:template>
 
 
@@ -43,70 +67,60 @@
     <xsl:variable name="home" select="/*[1]" />
     <xsl:variable name="up" select="parent::*" />
 
-    <div class="spirit-nav">
+    <div class="navigation">
       <!-- prev -->
       <xsl:if test="count($prev) > 0">
-        <a accesskey="p">
+        <a class="prev" accesskey="p">
+          <xsl:attribute name="title">
+            <xsl:apply-templates select="$prev" mode="object.title.markup" />
+          </xsl:attribute>
           <xsl:attribute name="href">
             <xsl:call-template name="href.target">
               <xsl:with-param name="object" select="$prev" />
-            </xsl:call-template></xsl:attribute>
-          <xsl:call-template name="navig.content">
-            <xsl:with-param name="direction" select="'prev'" />
-          </xsl:call-template>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:text>Prev</xsl:text>
         </a>
       </xsl:if>
       <!-- up -->
       <xsl:if test="count($up) > 0">
-        <a accesskey="u">
+        <a class="up" accesskey="u">
+          <xsl:attribute name="title">
+            <xsl:apply-templates select="$up" mode="object.title.markup" />
+          </xsl:attribute>
           <xsl:attribute name="href">
             <xsl:call-template name="href.target">
               <xsl:with-param name="object" select="$up" />
             </xsl:call-template>
           </xsl:attribute>
-          <xsl:call-template name="navig.content">
-            <xsl:with-param name="direction" select="'up'" />
-          </xsl:call-template>
+          <xsl:text>Up</xsl:text>
         </a>
       </xsl:if>
       <!-- home -->
       <xsl:if test="$home != . or $nav.context = 'toc'">
-        <a accesskey="h">
+        <a class="home" accesskey="h">
+          <xsl:attribute name="title">
+            <xsl:apply-templates select="$home" mode="object.title.markup" />
+          </xsl:attribute>
           <xsl:attribute name="href">
             <xsl:call-template name="href.target">
               <xsl:with-param name="object" select="$home" />
             </xsl:call-template>
           </xsl:attribute>
-          <xsl:call-template name="navig.content">
-            <xsl:with-param name="direction" select="'home'" />
-          </xsl:call-template>
-        </a>
-        <xsl:if test="$chunk.tocs.and.lots != 0 and $nav.context != 'toc'">
-          <xsl:text>|</xsl:text>
-        </xsl:if>
-      </xsl:if>
-      <xsl:if test="$chunk.tocs.and.lots != 0 and $nav.context != 'toc'">
-        <a accesskey="t">
-          <xsl:attribute name="href">
-            <xsl:apply-templates select="/*[1]" mode="recursive-chunk-filename" />
-            <xsl:text>-toc</xsl:text>
-            <xsl:value-of select="$html.ext" />
-          </xsl:attribute>
-          <xsl:call-template name="gentext">
-            <xsl:with-param name="key" select="'nav-toc'" />
-          </xsl:call-template>
+          <xsl:text>Home</xsl:text>
         </a>
       </xsl:if>
       <!-- next -->
       <xsl:if test="count($next) > 0">
-        <a accesskey="n">
+        <a class="next" accesskey="n">
+          <xsl:attribute name="title">
+            <xsl:apply-templates select="$next" mode="object.title.markup"/>
+          </xsl:attribute>
           <xsl:attribute name="href">
             <xsl:call-template name="href.target">
               <xsl:with-param name="object" select="$next" />
             </xsl:call-template></xsl:attribute>
-          <xsl:call-template name="navig.content">
-            <xsl:with-param name="direction" select="'next'" />
-          </xsl:call-template>
+          <xsl:text>Next</xsl:text>
         </a>
       </xsl:if>
     </div>
