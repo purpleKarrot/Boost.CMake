@@ -45,7 +45,9 @@ find_path(DOCBOOK_XSL_DIR html/html.xsl
     "Path to the DocBook XSL stylesheets"
   )
 
-set(BOOSTBOOK_CATALOG ${CMAKE_BINARY_DIR}/boostbook_catalog.xml)
+set(BOOSTBOOK_CATALOG ${CMAKE_BINARY_DIR}/boostbook_catalog.xml
+  CACHE INTERNAL "" FORCE
+  )
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(BoostBook DEFAULT_MSG
@@ -59,7 +61,7 @@ find_package_handle_standard_args(BoostBook DEFAULT_MSG
 mark_as_advanced(BOOSTBOOK_DTD_DIR BOOSTBOOK_XSL_DIR BOOSTBOOK_CATALOG)
 
 if(NOT BOOSTBOOK_FOUND)
-  set(BOOSTBOOK_CATALOG BOOSTBOOK_CATALOG-NOTFOUND)
+  set(BOOSTBOOK_CATALOG BOOSTBOOK_CATALOG-NOTFOUND CACHE INTERNAL "" FORCE)
   return()
 endif(NOT BOOSTBOOK_FOUND)
 
