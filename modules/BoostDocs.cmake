@@ -7,6 +7,11 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+if(CMAKE_HOST_WIN32)
+  set(dev_null NUL)
+else()
+  set(dev_null /dev/null)
+endif()
 
 # Transforms the input XML file by applying the given XSL stylesheet.
 #
@@ -273,8 +278,12 @@ endfunction(boost_add_reference)
 function(boost_docbook input)
   set(doc_targets)
 
+  file(COPY "${Boost_RESOURCE_PATH}/boost.css"
+    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/html"
+    )
+
   if(HTML_HELP_COMPILER)
-    set(hhp_output "${CMAKE_CURRENT_BINARY_DIR}/htmlhelp/htmlhelp.hhp")
+    set(hhp_output "${CMAKE_CURRENT_BINARY_DIR}/html/htmlhelp.hhp")
     set(chm_output "${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm")
     set(stylesheet "${Boost_RESOURCE_PATH}/docbook-xsl/htmlhelp.xsl")
     boost_xsltproc("${hhp_output}" "${stylesheet}" "${input}"
@@ -286,7 +295,7 @@ function(boost_docbook input)
     set(hhc_cmake ${CMAKE_CURRENT_BINARY_DIR}/hhc.cmake)
     file(WRITE ${hhc_cmake}
       "execute_process(COMMAND \"${HTML_HELP_COMPILER}\" htmlhelp.hhp"
-      " WORKING_DIRECTORY \"${CMAKE_CURRENT_BINARY_DIR}/htmlhelp\""
+      " WORKING_DIRECTORY \"${CMAKE_CURRENT_BINARY_DIR}/html\""
       " OUTPUT_QUIET)"
       )
     add_custom_command(OUTPUT ${chm_output}
@@ -311,7 +320,7 @@ function(boost_docbook input)
   if(DBLATEX_FOUND)
     set(pdf_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.pdf)
     add_custom_command(OUTPUT ${pdf_file}
-      COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} 2>/dev/null
+      COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} 2>${dev_null}
       DEPENDS ${input}
       )
     list(APPEND doc_targets ${pdf_file})
@@ -323,7 +332,7 @@ function(boost_docbook input)
       PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
       )
     add_custom_command(OUTPUT ${pdf_file}
-      COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} #2>/dev/null
+      COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} 2>${dev_null}
       DEPENDS ${fop_file}
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       )

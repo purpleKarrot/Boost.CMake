@@ -8,7 +8,6 @@
   -->
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision"
                 version="1.0">
 
   <xsl:template name="header.navigation">
@@ -29,33 +28,11 @@
     <xsl:param name="next" select="/foo" />
     <xsl:param name="nav.context" />
 
-    <hr />
     <xsl:call-template name="navbar.spirit">
       <xsl:with-param name="prev" select="$prev" />
       <xsl:with-param name="next" select="$next" />
       <xsl:with-param name="nav.context" select="$nav.context" />
     </xsl:call-template>
-
-    <div class="copyright">
-      <xsl:apply-templates select="ancestor-or-self::*/*/copyright" mode="boost.footer" />
-      <xsl:apply-templates select="ancestor-or-self::*/*/legalnotice" mode="boost.footer" />
-
-      <xsl:variable name="revision-nodes" select="ancestor-or-self::*[not (attribute::rev:last-revision='')]" />
-      <xsl:if test="count($revision-nodes) &gt; 0">
-        <xsl:variable name="revision-node" select="$revision-nodes[last()]" />
-        <xsl:variable name="revision-text">
-          <xsl:value-of select="normalize-space($revision-node/attribute::rev:last-revision)" />
-        </xsl:variable>
-        <xsl:if test="string-length($revision-text) &gt; 0">
-          <p>
-            <xsl:text>Last revised: </xsl:text>
-            <xsl:call-template name="format.revision">
-              <xsl:with-param name="text" select="$revision-text" />
-            </xsl:call-template>
-          </p>
-        </xsl:if>
-      </xsl:if>
-    </div>
   </xsl:template>
 
 
