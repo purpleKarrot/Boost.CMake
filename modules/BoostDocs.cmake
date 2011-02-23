@@ -67,29 +67,27 @@ include(CMakeParseArguments)
 
 function(boost_docbook input)
   set(doc_targets)
+  set(html_dir "${CMAKE_CURRENT_BINARY_DIR}/html/${BOOST_CURRENT_PROJECT}")
 
   file(COPY
       "${Boost_RESOURCE_PATH}/images"
       "${Boost_RESOURCE_PATH}/boost.css"
     DESTINATION
-      "${CMAKE_CURRENT_BINARY_DIR}/html"
+      "${html_dir}"
     )
 
   if(HTML_HELP_COMPILER)
-    set(hhp_output "${CMAKE_CURRENT_BINARY_DIR}/html/htmlhelp.hhp")
+    set(hhp_output "${html_dir}/htmlhelp.hhp")
     set(chm_output "${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm")
     set(stylesheet "${Boost_RESOURCE_PATH}/docbook-xsl/htmlhelp.xsl")
     boost_xsltproc("${hhp_output}" "${stylesheet}" "${input}"
       CATALOG ${BOOSTBOOK_CATALOG}
-      PARAMETERS
-        "img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/"
-        "htmlhelp.chm=../${BOOST_CURRENT_PROJECT}.chm"
+      PARAMETERS "htmlhelp.chm=../${BOOST_CURRENT_PROJECT}.chm"
       )
     set(hhc_cmake ${CMAKE_CURRENT_BINARY_DIR}/hhc.cmake)
     file(WRITE ${hhc_cmake}
       "execute_process(COMMAND \"${HTML_HELP_COMPILER}\" htmlhelp.hhp"
-      " WORKING_DIRECTORY \"${CMAKE_CURRENT_BINARY_DIR}/html\""
-      " OUTPUT_QUIET)"
+      " WORKING_DIRECTORY \"${html_dir}\" OUTPUT_QUIET)"
       )
     add_custom_command(OUTPUT ${chm_output}
       COMMAND "${CMAKE_COMMAND}" -P "${hhc_cmake}"
@@ -101,7 +99,7 @@ function(boost_docbook input)
       COMPONENT "${BOOST_DOC_COMPONENT}"
       )
   else() # generate HTML and manpages
-    set(output_html ${CMAKE_CURRENT_BINARY_DIR}/html/index.html)
+    set(output_html "${html_dir}/index.html")
     set(stylesheet "${Boost_RESOURCE_PATH}/docbook-xsl/xhtml.xsl")
     boost_xsltproc("${output_html}" "${stylesheet}" "${input}"
       CATALOG ${BOOSTBOOK_CATALOG}
@@ -112,8 +110,8 @@ function(boost_docbook input)
 #     CATALOG ${BOOSTBOOK_CATALOG}
 #     )
 #   list(APPEND doc_targets ${output_man})
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html"
-      DESTINATION "share/doc/Boost/${BOOST_CURRENT_PROJECT}"
+    install(DIRECTORY "${html_dir}"
+      DESTINATION "share/doc/boost/"
       COMPONENT "${BOOST_DOC_COMPONENT}"
       )
   endif()
