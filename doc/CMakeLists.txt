@@ -8,17 +8,27 @@
 
 include(BoostDocs)
 
+set(boost_modules
+  BoostProject
+  BoostAddHeaders
+  BoostAddLibrary
+  BoostAddExecutable
+  BoostAddPythonExtension
+  BoostAddReference
+  BoostDocumentation
+  BoostTesting
+  )
+
 set(reference)
-file(GLOB boost_modules "${Boost_MODULE_PATH}/Boost*.cmake")
 foreach(module ${boost_modules})
-  get_filename_component(name ${module} NAME_WE)
-  set(output "${name}.qbk")
+  set(input "${Boost_MODULE_PATH}/${module}.cmake")
+  set(output "${module}.qbk")
   add_custom_command(OUTPUT ${output}
     COMMAND ${CMAKE_COMMAND}
-            -DINPUT_FILE=${module}
+            -DINPUT_FILE=${input}
             -DOUTPUT_FILE=${output}
             -P ${CMAKE_CURRENT_SOURCE_DIR}/reference.cmake
-    DEPENDS ${module} reference.cmake
+    DEPENDS ${input} reference.cmake
     )
 
   list(APPEND reference ${output})
