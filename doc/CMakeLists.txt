@@ -6,13 +6,10 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-set(Boost_RESOURCE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../resources)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../modules")
-include(${CMAKE_CURRENT_SOURCE_DIR}/../modules/BoostDocs.cmake)
-#include(BoostDocs)
+include(BoostDocs)
 
 set(reference)
-file(GLOB boost_modules "${PROJECT_SOURCE_DIR}/modules/Boost*.cmake")
+file(GLOB boost_modules "${Boost_MODULE_PATH}/Boost*.cmake")
 foreach(module ${boost_modules})
   get_filename_component(name ${module} NAME_WE)
   set(output "${name}.qbk")
