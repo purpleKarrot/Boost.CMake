@@ -7,6 +7,7 @@
 ##########################################################################
 
 set(Boost_RESOURCE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../resources)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../modules")
 include(${CMAKE_CURRENT_SOURCE_DIR}/../modules/BoostDocs.cmake)
 #include(BoostDocs)
 
