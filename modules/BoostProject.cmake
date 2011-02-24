@@ -26,7 +26,7 @@ endfunction(set_boost_project)
 #     )
 #
 function(boost_project name)
-  set(parameters "AUTHORS;DESCRIPTION;DEPENDS")
+  set(parameters "AUTHORS;DESCRIPTION;DEPENDS;DEBIAN_DEPENDS")
   cmake_parse_arguments(PROJ "" "" "${parameters}" ${ARGN})
 
   string(REPLACE " " "_" project "${name}")

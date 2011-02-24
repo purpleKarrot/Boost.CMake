@@ -16,6 +16,12 @@ boost_project(CMake
     "Daniel Pfeifer <daniel -at- pfeifer-mail.de>"
   DESCRIPTION
     "A collection of CMake modules to simplify the use and development of Boost libraries."
+  DEPENDS
+    boostbook
+    quickbook
+  DEBIAN_DEPENDS
+    doxygen
+    xsltproc
   )
 
 add_subdirectory(doc)
