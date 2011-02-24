@@ -14,8 +14,45 @@
 
 [section Introduction]
 [:["You can tell a craftsman by his tools.] -- ['Sokrates]]
-Boost.CMake is a collection of CMake modules to simplify the use and development of Boost libraries.
-It is [*not] a CMake-ified collection of the Boost libraries.
+Boost.CMake is a collection of CMake modules to simplify the use and development
+of Boost libraries. It is [*not] a CMake-ified collection of the Boost
+libraries.
+
+[section Motivation]
+If you want to use a library that is proposed for Boost, you might find the
+following instructions in the install section of its documentation:
+
+* download the sources from Boost Vault
+* extract the archive into the boost-source directory
+* run bjam
+
+Easy, three simple steps and your library is built. [*If] you are used to build
+Boost from source. If you usually install Boost prebuilt via an installer or
+package management system, you might ask yourself: ["The easiest way to install
+this library is to deinstall Boost and then recompile everything? What is this
+bjam thing anyway, can't I use Visual Studio?]
+
+With Boost.CMake, the install instruction might look like this:
+
+* download and extract the sources from Boost Vault
+* run CMake to generate project files or makefiles
+* open the generated project with your IDE
+* use your IDE to build and install the library
+
+This instruction is longer and far more ambiguous. It is unclear what is meant
+by ['project files], ['makefiles], ['generated project] and ['IDE].
+This ambiguity is intended. Unlike bjam, CMake is not a build-system; it is a
+meta-build-system, or build-system generator. CMake supports multiple native
+build systems on certain platforms. Supported build-systems are specified in
+the [@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#section_Generators
+Generators section] of the CMake manual.
+
+With Boost.CMake, it is not required to have the Boost source code to build
+one individual library. The only requirement is that all its dependencies are
+installed. It is still possible to build the whole Boost distribution at once.
+In that case, the dependencies of each library do not have to be installed.
+[endsect]
+
 [endsect]
 
 [section Getting Started]
@@ -27,7 +64,8 @@ To use Boost.CMake you need:
 * [@http://www.cmake.org/ CMake]
 * your favorite compiler and IDE
 
-Depending on the documentation format you want to create, you will also need some of those:
+Depending on the documentation format you want to create, you will also need
+some of those:
 
 * BoostBook
 * DocBook
@@ -40,7 +78,8 @@ Depending on the documentation format you want to create, you will also need som
 [endsect]
 
 [section Install on Ubuntu]
-On Ubuntu, Boost.CMake can be installed from [@https://launchpad.net/~purplekarrot/+archive/ppa my PPA].
+On Ubuntu, Boost.CMake can be installed from
+[@https://launchpad.net/~purplekarrot/+archive/ppa my PPA].
 This will automatically install all dependancies. 
 
 Open a console window and type in the following:[teletype]
@@ -56,20 +95,22 @@ Open a console window and type in the following:[teletype]
 [endsect]
 
 [section Install on Other Platforms]
-If you figured out how to install all the required tools on any other platform, please let me know.
+If you figured out how to install all the required tools on any other platform,
+please let me know.
 [endsect]
 
 [section Use the Boost Package in CMake]
 If you never worked with CMake before, you should familiarize yourself with the
 [@http://www.cmake.org/cmake/help/syntax.html Syntax] and have a look at this
 [@http://www.cmake.org/cmake/help/examples.html simple example]. There is also a 
-[@http://www.cmake.org/cmake/help/cmake_tutorial.html Turorial] which gives a good
-introduction.
+[@http://www.cmake.org/cmake/help/cmake_tutorial.html Turorial] which gives a
+good introduction.
 
-If you already used Boost with CMake, then you probably used the FindBoost module
-that ships with CMake. When Boost is installed as a CMake package, you should tell
-the `find_package()` command to skip this module and search for a Boost package in
-["Config] mode. This is achieved with the `NO_MODULE` keyword: [c++]
+If you already used Boost with CMake, then you probably used the FindBoost
+module that ships with CMake. When Boost is installed as a CMake package, you
+should tell the `find_package()` command to skip this module and search for a
+Boost package in ["Config] mode. This is achieved with the `NO_MODULE` keyword:
+[c++]
 
   find_package(Boost "1.46" REQUIRED COMPONENTS filesystem ``[*NO_MODULE]``)
   include("${Boost_USE_FILE}")
@@ -89,8 +130,8 @@ libraries when autolinking is not supported.
 
 [section Boost.CMake for Boost projects]
 
-In this section I will guide you through the required steps to create a new Boost library or port
-an existing Boost library to the CMake build system.
+In this section I will guide you through the required steps to create a new
+Boost library or port an existing Boost library to the CMake build system.
 
 [section Handling Dependencies]
 If your project depends on other Boost components, these components should be
@@ -103,12 +144,13 @@ these components are header only or not. Dependencies are transitive, that means
 if your project depends on Boost.Filesystem and Boost.System you only have to
 check for Boost.Filesystem.
 
-Next, include `Boost_DEV_FILE`. This will enable all the commands documented below.
+Next, include `Boost_DEV_FILE`. This will enable all the commands documented
+below.
 
 [note
-  The `Boost_USE_FILE` variable is intended for projects that are built with CMake
-  and depend on Boost. Projects that are part of Boost should use `Boost_DEV_FILE`
-  instead.
+  The `Boost_USE_FILE` variable is intended for projects that are built with
+  CMake and depend on Boost. Projects that are part of Boost should use
+  `Boost_DEV_FILE` instead.
 ]
 
 Your CMakeLists.txt file will look something like this: [python]
@@ -140,9 +182,9 @@ name in quotes.
 
 You see that you have to list dependencies again! But there is a difference:
 The `COMPONENTS` in the `find_package()` command checks that all the required
-components are available when CMake is run, i.e. when someone builds the project.
-The `DEPENDS` argument in the `boost_project()` command defines dependencies for
-the generated package.
+components are available when CMake is run, i.e. when someone builds the
+project. The `DEPENDS` argument in the `boost_project()` command defines
+dependencies for the generated package.
 
 In the shown example that means that everybody who installs our project, should
 also install Boost.Filesystem and all its dependencies. To build the project,
@@ -165,8 +207,8 @@ To add a compiled library, use the `boost_add_library()` command instead of
 
   boost_add_library(example example.cpp)
 
-If you need to link other boost libraries, list them after LINK_BOOST_LIBRARIES. To link
-third party libraries, list them after LINK_LIBRARIES.
+If you need to link other boost libraries, list them after LINK_BOOST_LIBRARIES.
+To link third party libraries, list them after LINK_LIBRARIES.
 
   find_package(ZLIB REQUIRED)
 
@@ -193,15 +235,15 @@ This command supports the same arguments as the `boost_add_library()` command.
 [endsect]
 
 [section Precompiling Headers]
-Precompiling header files can speed up compilation by creating a partially processed
-version of some header files, and then using that version during compilations rather
-than repeatedly parsing the original headers.
+Precompiling header files can speed up compilation by creating a partially
+processed version of some header files, and then using that version during
+compilations rather than repeatedly parsing the original headers.
 
 To precompile headers, list them after the `PRECOMPILE` keyword in the
-`boost_add_library()` or `boost_add_executable()` command. If precompiled headers are
-supported, these headers are included in all source files. It is therefore not required
-to explicitely include these headers in your source. It is also not required to guard
-the inclusion with a PCH_ENABLED macro.
+`boost_add_library()` or `boost_add_executable()` command. If precompiled
+headers are supported, these headers are included in all source files. It is
+therefore not required to explicitely include these headers in your source. It
+is also not required to guard the inclusion with a PCH_ENABLED macro.
 
   boost_add_library(example
     SOURCE
@@ -218,13 +260,14 @@ the inclusion with a PCH_ENABLED macro.
 [endsect]
 
 [section Documentation]
-Generate documentation with the 'boost_documentation' command. Use 'boost_add_reference'
-if you want to include one or more reference sections in the documentation.
+Generate documentation with the 'boost_documentation' command. Use
+'boost_add_reference' if you want to include one or more reference sections in
+the documentation.
 [endsect]
 
 [section Tests]
-Use the 'boost_add_test' command to ad a single test case. Use 'boost_test_suite' to add
-multiple tests at once.
+Use the 'boost_add_test' command to ad a single test case. Use
+'boost_test_suite' to add multiple tests at once.
 [endsect]
 
 [endsect]
