@@ -54,3 +54,7 @@ install(DIRECTORY modules resources
 
 #
 set_boost_project("${BOOST_HAS_EXE_VAR}" ON)
+
+if(WIN32)
+  add_subdirectory(xsltproc)
+endif(WIN32)
