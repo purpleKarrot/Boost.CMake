@@ -27,7 +27,7 @@ function(boost_add_python_extension)
     PREFIX ""
     FOLDER "${BOOST_CURRENT_FOLDER}"
     PROJECT_LABEL "${TARGET_NAME} (python extension)"
-#   VERSION "${BOOST_VERSION}"
+#   VERSION "${Boost_VERSION}"
     )
 
   if(WIN32)

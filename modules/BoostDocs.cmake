@@ -44,9 +44,9 @@ if(NOT QUICKBOOK_FOUND)
   set(BOOST_BUILD_DOCUMENTATION OFF)
 endif(NOT QUICKBOOK_FOUND)
 
-find_package(HTMLHelp)
-find_package(DBLATEX)
-find_package(FOP)
+find_package(HTMLHelp QUIET)
+find_package(DBLATEX QUIET)
+find_package(FOP QUIET)
 
 set(BOOST_BUILD_DOCUMENTATION ${BOOST_BUILD_DOCUMENTATION}
   CACHE BOOL "Whether documentation should be built")

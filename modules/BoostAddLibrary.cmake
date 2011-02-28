@@ -125,7 +125,7 @@ function(boost_add_library)
     DEFINE_SYMBOL "${TARGET_DEFINE_SYMBOL}"
     OUTPUT_NAME "boost_${TARGET_NAME}"
     FOLDER "${BOOST_CURRENT_FOLDER}"
-    VERSION "${BOOST_VERSION}"
+    VERSION "${Boost_VERSION}"
     )
 
   boost_install_libraries(TARGET_SHARED TARGET_STATIC ${targets})

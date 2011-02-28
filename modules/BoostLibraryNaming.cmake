@@ -66,10 +66,10 @@ endif (NOT BOOST_TOOLSET)
 
 
 # Append the Boost version number to the versioned name
-set(boost_version "${BOOST_VERSION_MAJOR}_${BOOST_VERSION_MINOR}")
-if(BOOST_VERSION_SUBMINOR GREATER 0)
-  set(boost_version "${boost_version}_${BOOST_VERSION_SUBMINOR}")
-endif(BOOST_VERSION_SUBMINOR GREATER 0)
+set(boost_version "${Boost_VERSION_MAJOR}_${Boost_VERSION_MINOR}")
+if(Boost_VERSION_PATCH GREATER 0)
+  set(boost_version "${boost_version}_${Boost_VERSION_PATCH}")
+endif(Boost_VERSION_PATCH GREATER 0)
 
 # The versioned name starts with the full Boost toolset
 if(WIN32)
