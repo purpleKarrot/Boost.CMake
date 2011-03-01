@@ -96,8 +96,8 @@ function(boost_add_executable)
 
   install(TARGETS ${TARGET_NAME}
     DESTINATION bin
-    COMPONENT "${BOOST_EXE_COMPONENT}"
+    COMPONENT "${BOOST_RUNTIME_COMPONENT}"
     CONFIGURATIONS Release
     )
-  set_boost_project("${BOOST_HAS_EXE_VAR}" ON)
+  set_boost_project("${BOOST_HAS_RUNTIME_VAR}" ON)
 endfunction(boost_add_executable)

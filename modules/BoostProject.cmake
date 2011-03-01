@@ -26,8 +26,8 @@ endfunction(set_boost_project)
 #     )
 #
 function(boost_project name)
-  set(parameters "AUTHORS;DESCRIPTION;DEPENDS;DEBIAN_DEPENDS")
-  cmake_parse_arguments(PROJ "" "" "${parameters}" ${ARGN})
+  set(parameters "AUTHORS;DESCRIPTION;DEPENDS;DEB_DEPENDS;RPM_DEPENDS")
+  cmake_parse_arguments(PROJ "TOOL" "" "${parameters}" ${ARGN})
 
   string(REPLACE " " "_" project "${name}")
   string(TOLOWER "${project}" project)
@@ -42,12 +42,13 @@ function(boost_project name)
 
   # set global variables
   set_boost_project("${project}_NAME" "${name}")
+  set_boost_project("${project}_TOOL" "${PROJ_TOOL}")
   foreach(param ${parameters})
     set_boost_project("${project}_${param}" "${PROJ_${param}}")
   endforeach(param)
 
   #
-  foreach(component dev doc exe lib)
+  foreach(component doc develop runtime)
     string(TOUPPER "${component}" upper)
     set(BOOST_${upper}_COMPONENT "${project}_${component}" PARENT_SCOPE)
     set(has_var "${project}_HAS_${upper}")
@@ -83,12 +84,12 @@ foreach(file \\\${config_files})
   include(\"\\\${file}\")
 endforeach(file)
 \")"
-  COMPONENT "${project}_dev"
-  )
+    COMPONENT "${project}_develop"
+    )
 
   install(FILES "${component_file}"
-    DESTINATION "share/Boost/CMake/components"
-    COMPONENT "${project}_dev"
+    DESTINATION "share/boost/CMake/components"
+    COMPONENT "${project}_develop"
     )
 
   # write config file
@@ -104,7 +105,7 @@ endforeach(file)
   string(TOUPPER \"\${CMAKE_INSTALL_CONFIG_NAME}\" CONFIG)
   set(config_file \"${config_file_prefix}-\${config}.cmake\")
   configure_file(\"${config_file}\" \"\${config_file}\" @ONLY)
-  file(INSTALL DESTINATION \"\${CMAKE_INSTALL_PREFIX}/share/Boost/CMake/components\" TYPE FILE FILES \"\${config_file}\")"
-  COMPONENT "${project}_dev"
-  )
+  file(INSTALL DESTINATION \"\${CMAKE_INSTALL_PREFIX}/share/boost/CMake/components\" TYPE FILE FILES \"\${config_file}\")"
+    COMPONENT "${project}_develop"
+    )
 endfunction(boost_project)

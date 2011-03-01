@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 find_package(Boost 1.45 REQUIRED COMPONENTS quickbook NO_MODULE)
 include("${Boost_DEV_FILE}")
 
-boost_project(CMake
+boost_project(CMake TOOL
   AUTHORS
     "Daniel Pfeifer <daniel -at- pfeifer-mail.de>"
   DESCRIPTION
@@ -19,7 +19,7 @@ boost_project(CMake
   DEPENDS
     boostbook
     quickbook
-  DEBIAN_DEPENDS
+  DEB_DEPENDS
     doxygen
     xsltproc
   )

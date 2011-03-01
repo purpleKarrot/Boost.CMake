@@ -137,25 +137,25 @@ function(boost_install_libraries shared static)
   install(TARGETS ${ARGN}
     ARCHIVE
       DESTINATION lib
-      COMPONENT "${BOOST_DEV_COMPONENT}"
+      COMPONENT "${BOOST_DEVELOP_COMPONENT}"
     LIBRARY
       DESTINATION lib
-      COMPONENT "${BOOST_LIB_COMPONENT}"
+      COMPONENT "${BOOST_RUNTIME_COMPONENT}"
     RUNTIME
       DESTINATION bin
-      COMPONENT "${BOOST_LIB_COMPONENT}"
+      COMPONENT "${BOOST_RUNTIME_COMPONENT}"
     )
 
   foreach(target ${ARGN})
     boost_install_pdb(${target}
       DESTINATION bin
-      COMPONENT "${BOOST_LIB_COMPONENT}"
+      COMPONENT "${BOOST_RUNTIME_COMPONENT}"
       OPTIONAL
       )
   endforeach(target ${ARGN})
 
-  set_boost_project("${BOOST_HAS_DEV_VAR}" ON)
+  set_boost_project("${BOOST_HAS_DEVELOP_VAR}" ON)
   if(shared)
-    set_boost_project("${BOOST_HAS_LIB_VAR}" ON)
+    set_boost_project("${BOOST_HAS_RUNTIME_VAR}" ON)
   endif(shared)
 endfunction(boost_install_libraries)
