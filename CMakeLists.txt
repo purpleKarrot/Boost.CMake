@@ -29,7 +29,7 @@ add_subdirectory(doc)
 if(WIN32)
   set(cmake_install_dir "CMake")
 else(WIN32)
-  set(cmake_install_dir "share/Boost/CMake")
+  set(cmake_install_dir "share/boost/CMake")
 endif(WIN32)
 
 set(BOOST_INCLUDE   "${CMAKE_INSTALL_PREFIX}/include")
@@ -43,17 +43,17 @@ foreach(config Config ConfigVersion)
   configure_file("${source_file}" "${binary_file}" @ONLY)
   install(FILES "${binary_file}"
     DESTINATION "${cmake_install_dir}"
-    COMPONENT cmake_exe
+    COMPONENT cmake_runtime
     )
 endforeach(config)
 
 install(DIRECTORY modules resources
   DESTINATION "${cmake_install_dir}"
-  COMPONENT cmake_exe
+  COMPONENT cmake_runtime
   )
 
 #
-set_boost_project("${BOOST_HAS_EXE_VAR}" ON)
+set_boost_project("${BOOST_HAS_RUNTIME_VAR}" ON)
 
 if(WIN32)
   add_subdirectory(xsltproc)
