@@ -30,5 +30,5 @@ function(boost_add_headers)
       )
   endforeach(header)
 
-  set_boost_project("${BOOST_HAS_DEV_VAR}" ON)
+  set_boost_project("${BOOST_HAS_DEVELOP_VAR}" ON)
 endfunction(boost_add_headers)
