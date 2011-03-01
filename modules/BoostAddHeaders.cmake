@@ -26,7 +26,7 @@ function(boost_add_headers)
     string(REGEX MATCH "(.*)[/\\]" directory ${relative})
     install(FILES ${header}
       DESTINATION include/${HDR_PREFIX}/${directory}
-      COMPONENT "${BOOST_DEV_COMPONENT}"
+      COMPONENT "${BOOST_DEVELOP_COMPONENT}"
       )
   endforeach(header)
 
