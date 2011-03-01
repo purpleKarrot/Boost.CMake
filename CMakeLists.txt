@@ -6,7 +6,7 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
 find_package(Boost 1.45 REQUIRED COMPONENTS quickbook NO_MODULE)
 include("${Boost_DEV_FILE}")
