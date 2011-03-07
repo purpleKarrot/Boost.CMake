@@ -59,53 +59,28 @@ function(boost_project name)
   # this will be obsolete once CMake supports the FOLDER property on directories
   set(BOOST_CURRENT_FOLDER "${name}" PARENT_SCOPE)
 
-  # write component file
-  set(config_file_prefix "${CMAKE_CURRENT_BINARY_DIR}/${project}")
-  set(component_file "${config_file_prefix}.cmake")
-  set(BOOST_COMPONENT_FILE "${component_file}.in" PARENT_SCOPE)
-  set(include_guard "_boost_${project}_component_included")
-  file(WRITE "${component_file}.in"
-    "#\n\n"
-    "if(${include_guard})\n"
-    "  return()\n"
-    "endif(${include_guard})\n"
-    "set(${include_guard} TRUE)\n\n"
-    "get_filename_component(_DIR \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)\n\n"
-    )
-  foreach(depend ${PROJ_DEPENDS})
-    file(APPEND "${component_file}.in" "include(\${_DIR}/${depend}.cmake)\n")
-  endforeach(depend)
+  # export file
+  set(export_file "${CMAKE_CURRENT_BINARY_DIR}/exports.txt")
+  file(WRITE "${export_file}" "")
+  set(BOOST_EXPORT_FILE "${export_file}" PARENT_SCOPE)
+
+  # target list file
+  set(target_list_file "${CMAKE_CURRENT_BINARY_DIR}/target_list.txt")
+  file(WRITE "${target_list_file}" "")
+  set(BOOST_TARGET_LIST_FILE "${target_list_file}" PARENT_SCOPE)
+
+  if(PROJ_TOOL)
+    set(export_component "${project}_runtime")
+  else()
+    set(export_component "${project}_develop")
+  endif()
 
   install(CODE
-  "configure_file(\"${component_file}.in\" \"${component_file}\" COPYONLY)
-  file(APPEND \"${component_file}\" \"
-file(GLOB config_files \\\"\\\${_DIR}/${project}-*.cmake\\\")
-foreach(file \\\${config_files})
-  include(\"\\\${file}\")
-endforeach(file)
-\")"
-    COMPONENT "${project}_develop"
-    )
-
-  install(FILES "${component_file}"
-    DESTINATION "share/boost/CMake/components"
-    COMPONENT "${project}_develop"
-    )
-
-  # write config file
-  set(config_file "${config_file_prefix}-config.cmake.in")
-  set(BOOST_CONFIG_FILE "${config_file}" PARENT_SCOPE)
-
-  file(WRITE "${config_file}"
-    "#\n"
-    )
-
-  install(CODE
-  "string(TOLOWER \"\${CMAKE_INSTALL_CONFIG_NAME}\" config)
-  string(TOUPPER \"\${CMAKE_INSTALL_CONFIG_NAME}\" CONFIG)
-  set(config_file \"${config_file_prefix}-\${config}.cmake\")
-  configure_file(\"${config_file}\" \"\${config_file}\" @ONLY)
-  file(INSTALL DESTINATION \"\${CMAKE_INSTALL_PREFIX}/share/boost/CMake/components\" TYPE FILE FILES \"\${config_file}\")"
-    COMPONENT "${project}_develop"
+  "set(BOOST_PROJECT ${project})
+  set(BOOST_DEPENDS ${PROJ_DEPENDS})
+  set(BOOST_TARGETS ${target_list_file})
+  set(BOOST_EXPORTS ${export_file})
+  include(${Boost_MODULE_PATH}/BoostInstallComponent.cmake)"
+    COMPONENT "${export_component}"
     )
 endfunction(boost_project)

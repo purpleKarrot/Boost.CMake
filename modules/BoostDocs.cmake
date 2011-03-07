@@ -39,11 +39,6 @@ if(NOT BOOSTBOOK_FOUND)
   set(BOOST_BUILD_DOCUMENTATION OFF)
 endif(NOT BOOSTBOOK_FOUND)
 
-find_package(QuickBook)
-if(NOT QUICKBOOK_FOUND)
-  set(BOOST_BUILD_DOCUMENTATION OFF)
-endif(NOT QUICKBOOK_FOUND)
-
 find_package(HTMLHelp QUIET)
 find_package(DBLATEX QUIET)
 find_package(FOP QUIET)
@@ -253,7 +248,7 @@ function(boost_qbk_doc input)
   get_filename_component(input_path ${input} PATH)
   set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.xml)
   add_custom_command(OUTPUT ${output}
-    COMMAND ${QUICKBOOK_EXECUTABLE}
+    COMMAND $<TARGET_FILE:${BOOST_NAMESPACE}quickbook>
             --input-file ${input}
             --include-path ${input_path}
             --include-path ${CMAKE_CURRENT_SOURCE_DIR}

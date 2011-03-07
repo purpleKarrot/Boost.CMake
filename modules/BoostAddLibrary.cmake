@@ -8,6 +8,7 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+include(BoostExport)
 
 # Creates a Boost library target that generates a compiled library
 # (.a, .lib, .dll, .so, etc) from source files.
@@ -78,18 +79,7 @@ function(boost_add_library)
     foreach(lib ${TARGET_LINK_BOOST_LIBRARIES})
       list(APPEND interface_libraries "boost_${lib}-shared")
     endforeach(lib)
-    file(APPEND ${BOOST_COMPONENT_FILE} "\n"
-      "add_library(boost_${target} SHARED IMPORTED)\n"
-      "set_target_properties(boost_${target} PROPERTIES\n"
-      "  IMPORTED_LINK_INTERFACE_LANGUAGES \"CXX\"\n"
-      "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${interface_libraries}\"\n"
-      "  )\n"
-      )
-    file(APPEND ${BOOST_CONFIG_FILE} "\n"
-      "set_property(TARGET boost_${target} APPEND PROPERTY IMPORTED_CONFIGURATIONS @CONFIG@)\n"
-      "set_property(TARGET boost_${target} PROPERTY IMPORTED_LOCATION_@CONFIG@"
-      " \"${CMAKE_INSTALL_PREFIX}/lib/libboost_${TARGET_NAME}.so\")\n"
-      )
+    boost_export(${target} ${interface_libraries})      
     list(APPEND targets ${target})
   endif(TARGET_SHARED)
 
@@ -106,18 +96,7 @@ function(boost_add_library)
     foreach(lib ${TARGET_LINK_BOOST_LIBRARIES})
       list(APPEND interface_libraries "boost_${lib}-static")
     endforeach(lib)
-    file(APPEND ${BOOST_COMPONENT_FILE}
-      "\nadd_library(boost_${target} STATIC IMPORTED)\n"
-      "set_target_properties(boost_${target} PROPERTIES\n"
-      "  IMPORTED_LINK_INTERFACE_LANGUAGES \"CXX\"\n"
-      "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${interface_libraries}\"\n"
-      "  )\n"
-      )
-    file(APPEND ${BOOST_CONFIG_FILE} "\n"
-      "set_property(TARGET boost_${target} APPEND PROPERTY IMPORTED_CONFIGURATIONS @CONFIG@)\n"
-      "set_property(TARGET boost_${target} PROPERTY IMPORTED_LOCATION_@CONFIG@"
-      " \"${CMAKE_INSTALL_PREFIX}/lib/libboost_${TARGET_NAME}.a\")\n"
-      )
+    boost_export(${target} ${interface_libraries})      
     list(APPEND targets ${target})
   endif(TARGET_STATIC)
 
