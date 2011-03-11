@@ -23,7 +23,7 @@ set(Boost_DEV_FILE "${Boost_MODULE_PATH}/UseBoostDev.cmake")
 
 foreach(component ${Boost_FIND_COMPONENTS})
   message(STATUS "Looking for Boost component: ${component}")
-  set(component_file "@BOOST_CMAKE_DIR@/components/${component}.cmake")
+  set(component_file "@CMAKE_INSTALL_PREFIX@/@BOOST_CMAKE_DIR@/components/${component}.cmake")
   if(EXISTS "${component_file}")
     include("${component_file}")
     set(Boost_${component}_FOUND TRUE)

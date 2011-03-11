@@ -27,28 +27,28 @@ boost_project(CMake TOOL
 add_subdirectory(doc)
 
 if(WIN32)
-  set(cmake_install_dir "CMake")
+  set(BOOST_CMAKE_DIR "CMake")
 else(WIN32)
-  set(cmake_install_dir "share/boost/CMake")
+  set(BOOST_CMAKE_DIR "share/boost/CMake")
 endif(WIN32)
 
 set(BOOST_INCLUDE   "${CMAKE_INSTALL_PREFIX}/include")
 set(BOOST_LIBRARIES "${CMAKE_INSTALL_PREFIX}/lib")
-set(BOOST_MODULES   "${CMAKE_INSTALL_PREFIX}/${cmake_install_dir}/modules")
-set(BOOST_RESOURCES "${CMAKE_INSTALL_PREFIX}/${cmake_install_dir}/resources")
+set(BOOST_MODULES   "${CMAKE_INSTALL_PREFIX}/${BOOST_CMAKE_DIR}/modules")
+set(BOOST_RESOURCES "${CMAKE_INSTALL_PREFIX}/${BOOST_CMAKE_DIR}/resources")
 
 foreach(config Config ConfigVersion)
   set(source_file "${CMAKE_CURRENT_SOURCE_DIR}/Boost${config}.cmake.in")
   set(binary_file "${CMAKE_CURRENT_BINARY_DIR}/Boost${config}.cmake")
   configure_file("${source_file}" "${binary_file}" @ONLY)
   install(FILES "${binary_file}"
-    DESTINATION "${cmake_install_dir}"
+    DESTINATION "${BOOST_CMAKE_DIR}"
     COMPONENT cmake_runtime
     )
 endforeach(config)
 
 install(DIRECTORY modules resources
-  DESTINATION "${cmake_install_dir}"
+  DESTINATION "${BOOST_CMAKE_DIR}"
   COMPONENT cmake_runtime
   )
 
