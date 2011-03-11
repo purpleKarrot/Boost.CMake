@@ -39,4 +39,6 @@ function(boost_add_headers)
       COMPONENT "${BOOST_DEVELOP_COMPONENT}"
       )
   endforeach(header)
+
+  set_boost_project("${BOOST_HAS_DEVELOP_VAR}" ON)
 endfunction(boost_add_headers)
