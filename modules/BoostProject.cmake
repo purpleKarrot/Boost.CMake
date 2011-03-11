@@ -80,6 +80,7 @@ function(boost_project name)
   set(BOOST_DEPENDS ${PROJ_DEPENDS})
   set(BOOST_TARGETS ${target_list_file})
   set(BOOST_EXPORTS ${export_file})
+  set(BOOST_IS_TOOL ${PROJ_TOOL})
   include(${Boost_MODULE_PATH}/BoostInstallComponent.cmake)"
     COMPONENT "${export_component}"
     )

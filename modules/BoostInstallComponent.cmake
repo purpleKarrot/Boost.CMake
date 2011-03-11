@@ -27,11 +27,13 @@ file(WRITE ${component_file}
   "set(${include_guard} TRUE)\n\n"
   )
 
-foreach(depend ${BOOST_DEPENDS})
-  file(APPEND ${component_file}
-    "include(\${CMAKE_CURRENT_LIST_DIR}/${depend}.cmake)\n"
-    )
-endforeach(depend)
+if(NOT BOOST_IS_TOOL)
+  foreach(depend ${BOOST_DEPENDS})
+    file(APPEND ${component_file}
+      "include(\${CMAKE_CURRENT_LIST_DIR}/${depend}.cmake)\n"
+      )
+  endforeach(depend)
+endif(NOT BOOST_IS_TOOL)
 
 file(READ ${BOOST_EXPORTS} exports)
 file(APPEND ${component_file} "${exports}")

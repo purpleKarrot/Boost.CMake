@@ -8,7 +8,7 @@
 
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
-find_package(Boost 1.45 REQUIRED COMPONENTS quickbook NO_MODULE)
+find_package(Boost 1.45 REQUIRED COMPONENTS quickbook boostbook NO_MODULE)
 include("${Boost_DEV_FILE}")
 
 boost_project(CMake TOOL
@@ -25,6 +25,11 @@ boost_project(CMake TOOL
   )
 
 add_subdirectory(doc)
+
+file(WRITE ${BOOST_EXPORT_FILE} "\n"
+  "include(\${CMAKE_CURRENT_LIST_DIR}/boostbook.cmake)\n"
+  "include(\${CMAKE_CURRENT_LIST_DIR}/quickbook.cmake)\n"
+  )
 
 if(WIN32)
   set(BOOST_CMAKE_DIR "CMake")

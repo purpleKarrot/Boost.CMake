@@ -20,6 +20,7 @@ function(boost_export target)
       "set_target_properties(\${BOOST_NAMESPACE}${target} PROPERTIES\n"
       "  IMPORTED_LINK_INTERFACE_LANGUAGES \"CXX\"\n"
       "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${ARGN}\"\n"
+      "  )\n"
       )
     set(output "${CMAKE_INSTALL_PREFIX}/lib/$<TARGET_LINKER_FILE_NAME:${target}>")
   elseif(type STREQUAL "STATIC_LIBRARY")
@@ -28,6 +29,7 @@ function(boost_export target)
       "set_target_properties(\${BOOST_NAMESPACE}${target} PROPERTIES\n"
       "  IMPORTED_LINK_INTERFACE_LANGUAGES \"CXX\"\n"
       "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${ARGN}\"\n"
+      "  )\n"
       )
     set(output "${CMAKE_INSTALL_PREFIX}/lib/$<TARGET_LINKER_FILE_NAME:${target}>")
   endif()
