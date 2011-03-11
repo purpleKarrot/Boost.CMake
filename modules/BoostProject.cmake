@@ -71,8 +71,10 @@ function(boost_project name)
 
   if(PROJ_TOOL)
     set(export_component "${project}_runtime")
+    set_boost_project(${project}_HAS_RUNTIME ON)
   else()
     set(export_component "${project}_develop")
+    set_boost_project(${project}_HAS_DEVELOP ON)
   endif()
 
   install(CODE

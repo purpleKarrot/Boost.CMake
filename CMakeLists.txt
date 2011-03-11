@@ -26,6 +26,10 @@ boost_project(CMake TOOL
 
 add_subdirectory(doc)
 
+if(WIN32)
+  add_subdirectory(xsltproc)
+endif(WIN32)
+
 file(WRITE ${BOOST_EXPORT_FILE} "\n"
   "include(\${CMAKE_CURRENT_LIST_DIR}/boostbook.cmake)\n"
   "include(\${CMAKE_CURRENT_LIST_DIR}/quickbook.cmake)\n"
@@ -56,10 +60,3 @@ install(DIRECTORY modules resources
   DESTINATION "${BOOST_CMAKE_DIR}"
   COMPONENT cmake_runtime
   )
-
-#
-set_boost_project("${BOOST_HAS_RUNTIME_VAR}" ON)
-
-if(WIN32)
-  add_subdirectory(xsltproc)
-endif(WIN32)
