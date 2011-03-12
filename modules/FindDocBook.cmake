@@ -7,24 +7,6 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-# Find the BoostBook DTD
-find_path(BOOSTBOOK_DTD_DIR boostbook.dtd
-  PATHS
-    "/usr/share/boostbook/dtd"
-    "$ENV{ProgramFiles}/boost/share/boostbook/dtd"
-  DOC
-    "Path to the BoostBook DTD"
-  )
-
-# Find the BoostBook XSL stylesheets
-find_path(BOOSTBOOK_XSL_DIR docbook.xsl
-  PATHS
-    "/usr/share/boostbook/xsl"
-    "$ENV{ProgramFiles}/boost/share/boostbook/xsl"
-  DOC
-    "Path to the BoostBook XSL stylesheets"
-  )
-
 # Find the DocBook DTD (version 4.2)
 find_path(DOCBOOK_DTD_DIR docbookx.dtd
   PATHS
@@ -45,27 +27,23 @@ find_path(DOCBOOK_XSL_DIR html/html.xsl
     "Path to the DocBook XSL stylesheets"
   )
 
-set(BOOSTBOOK_CATALOG ${CMAKE_BINARY_DIR}/boostbook_catalog.xml
+set(DOCBOOK_CATALOG ${CMAKE_BINARY_DIR}/docbook_catalog.xml
   CACHE INTERNAL "" FORCE
   )
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(BoostBook DEFAULT_MSG
-  BOOSTBOOK_CATALOG
-  BOOSTBOOK_DTD_DIR
-  BOOSTBOOK_XSL_DIR
+find_package_handle_standard_args(DocBook DEFAULT_MSG
+  DOCBOOK_CATALOG
   DOCBOOK_DTD_DIR
   DOCBOOK_XSL_DIR
   )
 
-mark_as_advanced(BOOSTBOOK_DTD_DIR BOOSTBOOK_XSL_DIR BOOSTBOOK_CATALOG)
-
-if(NOT BOOSTBOOK_FOUND)
-  set(BOOSTBOOK_CATALOG BOOSTBOOK_CATALOG-NOTFOUND CACHE INTERNAL "" FORCE)
+if(NOT DOCBOOK_FOUND)
+  set(DOCBOOK_CATALOG DOCBOOK_CATALOG-NOTFOUND CACHE INTERNAL "" FORCE)
   return()
-endif(NOT BOOSTBOOK_FOUND)
+endif(NOT DOCBOOK_CATALOG)
 
-file(WRITE ${BOOSTBOOK_CATALOG}
+file(WRITE ${DOCBOOK_CATALOG}
   "<?xml version=\"1.0\"?>\n"
   "<!DOCTYPE catalog\n"
   " PUBLIC \"-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN\"\n"
@@ -78,14 +56,6 @@ file(WRITE ${BOOSTBOOK_CATALOG}
   " <rewriteURI"
     " uriStartString=\"http://docbook.sourceforge.net/release/xsl/current/\""
     " rewritePrefix=\"${DOCBOOK_XSL_DIR}/\""
-    "/>\n"
-  " <rewriteURI"
-    " uriStartString=\"http://www.boost.org/tools/boostbook/dtd/\""
-    " rewritePrefix=\"${BOOSTBOOK_DTD_DIR}/\""
-    "/>\n"
-  " <rewriteURI"
-    " uriStartString=\"http://www.boost.org/tools/boostbook/xsl/\""
-    " rewritePrefix=\"${BOOSTBOOK_XSL_DIR}/\""
     "/>\n"
   "</catalog>\n"
   )

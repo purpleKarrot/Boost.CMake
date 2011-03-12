@@ -34,10 +34,10 @@ if(NOT XSLTPROC_FOUND)
   set(BOOST_BUILD_DOCUMENTATION OFF)
 endif(NOT XSLTPROC_FOUND)
 
-find_package(BoostBook)
-if(NOT BOOSTBOOK_FOUND)
+find_package(DocBook)
+if(NOT DOCBOOK_FOUND)
   set(BOOST_BUILD_DOCUMENTATION OFF)
-endif(NOT BOOSTBOOK_FOUND)
+endif(NOT DOCBOOK_FOUND)
 
 find_package(HTMLHelp QUIET)
 find_package(DBLATEX QUIET)
@@ -76,7 +76,7 @@ function(boost_docbook input)
     set(chm_output "${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm")
     set(stylesheet "${Boost_RESOURCE_PATH}/docbook-xsl/htmlhelp.xsl")
     boost_xsltproc("${hhp_output}" "${stylesheet}" "${input}"
-      CATALOG ${BOOSTBOOK_CATALOG}
+      CATALOGS ${BOOSTBOOK_CATALOG} ${DOCBOOK_CATALOG}
       PARAMETERS "htmlhelp.chm=../${BOOST_CURRENT_PROJECT}.chm"
       )
     set(hhc_cmake ${CMAKE_CURRENT_BINARY_DIR}/hhc.cmake)
@@ -97,12 +97,12 @@ function(boost_docbook input)
     set(output_html "${html_dir}/index.html")
     set(stylesheet "${Boost_RESOURCE_PATH}/docbook-xsl/xhtml.xsl")
     boost_xsltproc("${output_html}" "${stylesheet}" "${input}"
-      CATALOG ${BOOSTBOOK_CATALOG}
+      CATALOGS ${BOOSTBOOK_CATALOG} ${DOCBOOK_CATALOG}
       )
     list(APPEND doc_targets ${output_html})
 #   set(output_man  ${CMAKE_CURRENT_BINARY_DIR}/man/man.manifest)
 #   boost_xsltproc(${output_man} ${BOOSTBOOK_XSL_DIR}/manpages.xsl ${input}
-#     CATALOG ${BOOSTBOOK_CATALOG}
+#     CATALOGS ${BOOSTBOOK_CATALOG} ${DOCBOOK_CATALOG}
 #     )
 #   list(APPEND doc_targets ${output_man})
     install(DIRECTORY "${html_dir}"
@@ -122,7 +122,7 @@ function(boost_docbook input)
     elseif(FOP_FOUND)
       set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.fo)
       boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
-        CATALOG ${BOOSTBOOK_CATALOG}
+        CATALOGS ${BOOSTBOOK_CATALOG} ${DOCBOOK_CATALOG}
         PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
         )
       add_custom_command(OUTPUT ${pdf_file}
@@ -230,7 +230,7 @@ endfunction(boost_html_doc)
 function(boost_xml_doc input)
   set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.docbook)
   boost_xsltproc(${output} ${BOOSTBOOK_XSL_DIR}/docbook.xsl ${input}
-    CATALOG ${BOOSTBOOK_CATALOG}
+    CATALOGS ${BOOSTBOOK_CATALOG} ${DOCBOOK_CATALOG}
     DEPENDS ${input} ${ARGN}
     )
 

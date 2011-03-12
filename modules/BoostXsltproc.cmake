@@ -42,7 +42,7 @@ endif(NOT BOOST_BUILD_DOCUMENTATION)
 
 
 function(boost_xsltproc output stylesheet input)
-  cmake_parse_arguments(THIS_XSL "" "CATALOG" "PARAMETERS;DEPENDS" ${ARGN})
+  cmake_parse_arguments(THIS_XSL "" "" "CATALOGS;DEPENDS;PARAMETERS" ${ARGN})
 
   set(catalog)
   if(THIS_XSL_CATALOG)
