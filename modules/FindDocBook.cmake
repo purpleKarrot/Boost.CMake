@@ -41,7 +41,7 @@ find_package_handle_standard_args(DocBook DEFAULT_MSG
 if(NOT DOCBOOK_FOUND)
   set(DOCBOOK_CATALOG DOCBOOK_CATALOG-NOTFOUND CACHE INTERNAL "" FORCE)
   return()
-endif(NOT DOCBOOK_CATALOG)
+endif(NOT DOCBOOK_FOUND)
 
 file(WRITE ${DOCBOOK_CATALOG}
   "<?xml version=\"1.0\"?>\n"

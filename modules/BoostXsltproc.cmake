@@ -44,28 +44,36 @@ endif(NOT BOOST_BUILD_DOCUMENTATION)
 function(boost_xsltproc output stylesheet input)
   cmake_parse_arguments(THIS_XSL "" "" "CATALOGS;DEPENDS;PARAMETERS" ${ARGN})
 
-  set(catalog)
-  if(THIS_XSL_CATALOG)
-    set(catalog "XML_CATALOG_FILES=${THIS_XSL_CATALOG}")
-    if(CMAKE_HOST_WIN32)
-      set(catalog set "${catalog}" &)
-    endif(CMAKE_HOST_WIN32)
-  endif(THIS_XSL_CATALOG)
+  # XML_CATALOG_FILES must be space separated
+  string(REPLACE ";" " " THIS_XSL_CATALOGS "${THIS_XSL_CATALOGS}")
+
+  file(WRITE ${output}.cmake
+    "set(ENV{XML_CATALOG_FILES} \"${THIS_XSL_CATALOGS}\")\n"
+    "execute_process(COMMAND ${XSLTPROC_EXECUTABLE} --xinclude --nonet\n"
+    )
 
   # Translate XSL parameters into a form that xsltproc can use.
-  set(stringparams)
   foreach(param ${THIS_XSL_PARAMETERS})
     string(REGEX REPLACE "([^=]*)=([^;]*)" "\\1;\\2" name_value ${param})
     list(GET name_value 0 name)
     list(GET name_value 1 value)
-    list(APPEND stringparams --stringparam ${name} ${value})
+    file(APPEND ${output}.cmake
+      "    --stringparam ${name} \"${value}\"\n"
+      )
   endforeach(param)
+
+  file(APPEND ${output}.cmake
+    "    -o ${output} ${stylesheet} ${input}\n"
+    "  RESULT_VARIABLE result\n"
+    "  )\n"
+    "if(NOT result EQUAL 0)\n"
+    "  message(FATAL_ERROR \"xsltproc returned \${result}\")\n"
+    "endif()\n"
+    )
 
   # Run the XSLT processor to do the XML transformation.
   add_custom_command(OUTPUT ${output}
-    COMMAND ${catalog} ${XSLTPROC_EXECUTABLE} --xinclude --nonet
-            ${stringparams} -o ${output} ${stylesheet} ${input}
+    COMMAND ${CMAKE_COMMAND} -P ${output}.cmake
     DEPENDS ${input} ${THIS_XSL_DEPENDS}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 endfunction(boost_xsltproc)
