@@ -9,10 +9,6 @@
 
 ##
 function(boost_add_pch name source_list)
-  if(NOT MSVC)
-    return()
-  endif(NOT MSVC)
-
   set(pch_header "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.hpp")
   set(pch_source "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.cpp")
   set(pch_binary "${CMAKE_CURRENT_BINARY_DIR}/${name}.pch")
@@ -20,6 +16,10 @@ function(boost_add_pch name source_list)
   if(MSVC_IDE)
     set(pch_binary "$(IntDir)/${name}.pch")
   endif(MSVC_IDE)
+
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    set(pch_binary "${pch_header}.gch")
+  endif(CMAKE_COMPILER_IS_GNUCXX)
 
   file(WRITE ${pch_header}.in "/* ${name} precompiled header file */\n\n")
   foreach(header ${ARGN})
@@ -35,15 +35,67 @@ function(boost_add_pch name source_list)
   file(WRITE ${pch_source}.in "#include \"${pch_header}\"\n")
   configure_file(${pch_source}.in ${pch_source} COPYONLY)
 
-  set_source_files_properties(${pch_source} PROPERTIES
-    COMPILE_FLAGS "/Yc\"${pch_header}\" /Fp\"${pch_binary}\""
-    OBJECT_OUTPUTS "${pch_binary}"
-    )
-
-  set_source_files_properties(${${source_list}} PROPERTIES
-    COMPILE_FLAGS "/Yu\"${pch_header}\" /FI\"${pch_header}\" /Fp\"${pch_binary}\""
-    OBJECT_DEPENDS "${pch_binary}"
-    )
-
-  set(${source_list} ${pch_source} ${${source_list}} PARENT_SCOPE)
+  if(MSVC)
+    set_source_files_properties(${pch_source} PROPERTIES
+      COMPILE_FLAGS "/Yc\"${pch_header}\" /Fp\"${pch_binary}\""
+      OBJECT_OUTPUTS "${pch_binary}"
+      )
+    set_source_files_properties(${${source_list}} PROPERTIES
+      COMPILE_FLAGS "/Yu\"${pch_header}\" /FI\"${pch_header}\" /Fp\"${pch_binary}\""
+      OBJECT_DEPENDS "${pch_binary}"
+      )
+    set(${source_list} ${pch_source} ${${source_list}} PARENT_SCOPE)
+  endif(MSVC)
+  
+  set(PCH_HEADER ${pch_header} PARENT_SCOPE)
 endfunction(boost_add_pch)
+
+
+##
+function(boost_add_pch_to_target target header)
+  if(NOT header)
+    return()
+  endif(NOT header)
+
+  set_target_properties(${target} PROPERTIES
+    XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${header}"
+    XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES"
+    )
+
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    string(TOUPPER "${CMAKE_BUILD_TYPE}" build_type)
+    set(compile_flags ${CMAKE_CXX_FLAGS_${build_type}})
+
+    get_target_property(target_type ${target} TYPE)
+    if(${target_type} STREQUAL SHARED_LIBRARY)
+      list(APPEND compile_flags "-fPIC")
+    endif(${target_type} STREQUAL SHARED_LIBRARY)
+
+    get_directory_property(include_directories INCLUDE_DIRECTORIES)
+    foreach(dir ${include_directories})
+      list(APPEND compile_flags "-I${dir}")
+    endforeach(dir)
+
+    get_directory_property(definitions DEFINITIONS)
+    list(APPEND compile_flags ${definitions})
+
+    separate_arguments(compile_flags)
+
+    set(pch_header "${CMAKE_CURRENT_BINARY_DIR}/${target}.hpp")
+    boost_forward_file(${header} ${pch_header})
+    set(pch_binary "${pch_header}.gch")
+
+    add_custom_command(OUTPUT ${pch_binary} 	
+      COMMAND ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}
+      ${compile_flags} -x c++-header -o ${pch_binary} ${pch_header}
+      )
+    set_property(TARGET ${target} APPEND PROPERTY
+      COMPILE_FLAGS "-include ${pch_header} -Winvalid-pch"
+      )
+
+    # I wish CMake would support targets depending on files...
+    #add_dependencies(${target} ${pch_binary})
+    add_custom_target(${target}-pch DEPENDS ${pch_binary})
+    add_dependencies(${target} ${target}-pch)
+  endif(CMAKE_COMPILER_IS_GNUCXX)
+endfunction(boost_add_pch_to_target)

@@ -86,6 +86,7 @@ function(boost_add_executable)
       )
 # endif(_BOOST_MONOLITHIC_BUILD)
 
+  boost_add_pch_to_target(${TARGET_NAME} ${TARGET_PCH})
   boost_export(${TARGET_NAME})
 
   install(TARGETS ${TARGET_NAME}

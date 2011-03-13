@@ -75,6 +75,8 @@ function(boost_add_library)
     set_target_properties(${target} PROPERTIES
       PROJECT_LABEL "${TARGET_NAME} (shared library)"
       )
+    boost_add_pch_to_target(${target} ${TARGET_PCH})
+
     set(interface_libraries)
     foreach(lib ${TARGET_LINK_BOOST_LIBRARIES})
       list(APPEND interface_libraries "boost_${lib}-shared")
@@ -92,6 +94,8 @@ function(boost_add_library)
       PROJECT_LABEL "${TARGET_NAME} (static library)"
       PREFIX "lib"
       )
+    boost_add_pch_to_target(${target} ${TARGET_PCH})
+
     set(interface_libraries)
     foreach(lib ${TARGET_LINK_BOOST_LIBRARIES})
       list(APPEND interface_libraries "boost_${lib}-static")
