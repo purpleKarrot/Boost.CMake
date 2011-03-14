@@ -8,20 +8,6 @@
 
 
 ##
-function(boost_install_pdb target)
-  if(MSVC)
-    get_target_property(location "${target}" LOCATION)
-    if(NOT CMAKE_CFG_INTDIR STREQUAL ".")	
-      string(REPLACE "${CMAKE_CFG_INTDIR}" "\${CMAKE_INSTALL_CONFIG_NAME}" location "${location}")
-    endif()
-    get_filename_component(extension "${location}" EXT)
-    string(REGEX REPLACE "${extension}$" ".pdb" pdb_file "${location}")
-    install(FILES "${pdb_file}" CONFIGURATIONS Debug RelWithDebInfo ${ARGN})
-  endif(MSVC)
-endfunction(boost_install_pdb)
-
-
-##
 function(boost_parse_target_arguments name)
   cmake_parse_arguments(TARGET
     "SHARED;STATIC;SINGLE_THREADED;MULTI_THREADED;NO_SYMBOL"

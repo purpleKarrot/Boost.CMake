@@ -129,14 +129,6 @@ function(boost_install_libraries shared static)
       COMPONENT "${BOOST_RUNTIME_COMPONENT}"
     )
 
-  foreach(target ${ARGN})
-    boost_install_pdb(${target}
-      DESTINATION bin
-      COMPONENT "${BOOST_RUNTIME_COMPONENT}"
-      OPTIONAL
-      )
-  endforeach(target ${ARGN})
-
   set_boost_project("${BOOST_HAS_DEVELOP_VAR}" ON)
   if(shared)
     set_boost_project("${BOOST_HAS_RUNTIME_VAR}" ON)

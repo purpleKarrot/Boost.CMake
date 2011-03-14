@@ -8,13 +8,19 @@
 
 string(TOLOWER ${CMAKE_INSTALL_CONFIG_NAME} config)
 string(TOUPPER ${CMAKE_INSTALL_CONFIG_NAME} CONFIG)
-set(export_dir "${CMAKE_BINARY_DIR}/export/${CMAKE_INSTALL_CONFIG_NAME}")
+set(export_dir "${BOOST_BINARY_DIR}/export/${CMAKE_INSTALL_CONFIG_NAME}")
 file(STRINGS ${BOOST_TARGETS} targets)
+
+if(WIN32)
+  set(components_dir "CMake/components")
+else(WIN32)
+  set(components_dir "share/boost/CMake/components")
+endif(WIN32)
 
 ##########################################################################
 # write component file
 
-set(config_file_prefix "${CMAKE_BINARY_DIR}/install/${BOOST_PROJECT}")
+set(config_file_prefix "${BOOST_BINARY_DIR}/install/${BOOST_PROJECT}")
 set(component_file "${config_file_prefix}.cmake")
 
 set(include_guard "_boost_${BOOST_PROJECT}_component_included")
@@ -48,7 +54,7 @@ if(targets)
 endif(targets)
 
 file(INSTALL
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/share/boost/CMake/components"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/${components_dir}"
   TYPE FILE
   FILES "${component_file}"
   )
@@ -75,7 +81,7 @@ foreach(target ${targets})
 endforeach(target)
 
 file(INSTALL
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/share/boost/CMake/components"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/${components_dir}"
   TYPE FILE
   FILES "${config_file}"
   )
