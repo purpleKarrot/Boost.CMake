@@ -7,6 +7,7 @@
 ##########################################################################
 
 include("${Boost_USE_FILE}")
+include(BoostConfiguration)
 
 include(BoostProject)
 include(BoostForwardFile)

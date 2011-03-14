@@ -8,6 +8,78 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+if(_boost_configuration_included)
+  return()
+endif(_boost_configuration_included)
+set(_boost_configuration_included TRUE)
+
+
+# make universal binaries on OS X
+set(CMAKE_OSX_ARCHITECTURES "i386;x86_64" CACHE STRING "Architectures for OS X")
+
+# set CMAKE_THREAD_PREFER_PTHREAD if you prefer pthread on windows
+find_package(Threads)
+# LINK_LIBRARIES ${CMAKE_THREAD_LIBS_INIT}
+
+# Multi-threading support
+if(CMAKE_SYSTEM_NAME STREQUAL "SunOS")
+  set(MULTI_THREADED_COMPILE_FLAGS "-pthreads")
+  set(MULTI_THREADED_LINK_LIBS rt)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "BeOS")
+  # No threading options necessary for BeOS
+elseif(CMAKE_SYSTEM_NAME MATCHES ".*BSD")
+  set(MULTI_THREADED_COMPILE_FLAGS "-pthread")
+  set(MULTI_THREADED_LINK_FLAGS "-lpthread")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "DragonFly")
+  # DragonFly is a FreeBSD bariant
+  set(MULTI_THREADED_COMPILE_FLAGS "-pthread")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "IRIX")
+  # TODO: GCC on Irix doesn't support multi-threading?
+elseif(CMAKE_SYSTEM_NAME STREQUAL "HP-UX")
+  # TODO: gcc on HP-UX does not support multi-threading?
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  # No threading options necessary for Mac OS X
+elseif(UNIX)
+  # Assume -pthread and -lrt on all other variants
+  set(MULTI_THREADED_COMPILE_FLAGS "-pthread -D_REENTRANT")
+  set(MULTI_THREADED_LINK_FLAGS "-lpthread -lrt")
+endif()
+
+
+# Limit CMAKE_CONFIGURATION_TYPES to Debug and Release
+set(config_types "Debug;Release")
+
+#if(MSVC)
+#  foreach(config C_FLAGS_DEBUG CXX_FLAGS_DEBUG C_FLAGS_RELEASE CXX_FLAGS_RELEASE)
+#    string(REPLACE "/MD" "/MT" flags "${CMAKE_${config}}")
+#    set(CMAKE_${config}STATICRUNTIME CACHE STRING "${flags}" FORCE) 
+#  endforeach(config)
+#  list(APPEND config_types DebugStaticRuntime ReleaseStaticRuntime)
+#
+#  # these need to be set too:
+#  # EXE_LINKER_FLAGS_DEBUG EXE_LINKER_FLAGS_RELEASE
+#  # SHARED_LINKER_FLAGS_DEBUG SHARED_LINKER_FLAGS_RELEASE
+#endif(MSVC)
+
+# The way to identify whether a generator is multi-configuration is to
+# check whether CMAKE_CONFIGURATION_TYPES is set.  The VS/XCode generators
+# set it (and ignore CMAKE_BUILD_TYPE).  The Makefile generators do not
+# set it (and use CMAKE_BUILD_TYPE).  If CMAKE_CONFIGURATION_TYPES is not
+# already set, don't set it.                                   --Brad King
+
+# Tweak the configuration and build types appropriately.
+if(CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_CONFIGURATION_TYPES "${config_types}" CACHE STRING
+    "Semicolon-separate list of supported configuration types" FORCE)
+else(CMAKE_CONFIGURATION_TYPES)
+  # Build in release mode by default
+  if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+      "Choose the type of build (${config_types})" FORCE)
+  endif (NOT CMAKE_BUILD_TYPE)
+endif(CMAKE_CONFIGURATION_TYPES)
+
+
 # http://www.boost.org/doc/libs/release/more/getting_started/windows.html#library-naming
 
 # TODO: make this an option
@@ -57,12 +129,7 @@ if (NOT BOOST_TOOLSET)
   
   # create cache entry
   set(BOOST_TOOLSET ${BOOST_TOOLSET} CACHE STRING "Boost toolset")
-  message(STATUS "Boost toolset: ${BOOST_TOOLSET}")
 endif (NOT BOOST_TOOLSET)
-
-# Set the build name 
-# set(BUILDNAME "${BOOST_COMPILER}-${BOOST_COMPILER_VERSION}-${BOOST_PLATFORM}")
-# boost_report_pretty("Build name" BUILDNAME)
 
 
 # Append the Boost version number to the versioned name
