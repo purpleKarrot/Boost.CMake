@@ -87,21 +87,21 @@ function(boost_docbook input)
   if(DBLATEX_FOUND OR FOP_FOUND)
     set(pdf_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.pdf)
   
-    if(DBLATEX_FOUND)
-      add_custom_command(OUTPUT ${pdf_file}
-        COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} 2>${dev_null}
-        DEPENDS ${input}
-        )
-    elseif(FOP_FOUND)
+    if(FOP_FOUND)
       set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.fo)
       boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
         CATALOGS ${BOOSTBOOK_CATALOG} ${DOCBOOK_CATALOG}
         PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
         )
       add_custom_command(OUTPUT ${pdf_file}
-        COMMAND ${FOP_EXECUTABLE} ${fop_file} ${pdf_file} 2>${dev_null}
+        COMMAND ${FO_PROCESSOR} ${fop_file} ${pdf_file} 2>${dev_null}
         DEPENDS ${fop_file}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+    elseif(DBLATEX_FOUND)
+      add_custom_command(OUTPUT ${pdf_file}
+        COMMAND ${DBLATEX_EXECUTABLE} -o ${pdf_file} ${input} 2>${dev_null}
+        DEPENDS ${input}
         )
     endif()
 

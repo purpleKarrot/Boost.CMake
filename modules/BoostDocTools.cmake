@@ -30,7 +30,7 @@ endif(NOT DOCBOOK_FOUND)
 
 find_package(HTMLHelp QUIET)
 find_package(DBLATEX QUIET)
-find_package(FOP QUIET)
+find_package(FOProcessor QUIET)
 
 set(BOOST_BUILD_DOCUMENTATION ${BOOST_BUILD_DOCUMENTATION}
   CACHE BOOL "Whether documentation should be built" FORCE)

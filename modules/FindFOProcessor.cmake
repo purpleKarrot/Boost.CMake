@@ -6,7 +6,15 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                       #
 ################################################################################
 
-find_program(FOP_EXECUTABLE fop)
+find_program(FO_PROCESSOR
+  NAMES
+    fop
+    xep.bat
+  PATHS
+    $ENV{PROGRAMFILES}/RenderX/XEP
+  DOC
+    "An XSL-FO processor"
+  )
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(FOP DEFAULT_MSG FOP_EXECUTABLE)
+find_package_handle_standard_args(FOProcessor DEFAULT_MSG FO_PROCESSOR)
