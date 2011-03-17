@@ -48,7 +48,7 @@ function(boost_project name)
   endforeach(param)
 
   #
-  foreach(component doc develop runtime)
+  foreach(component develop runtime manual)
     string(TOUPPER "${component}" upper)
     set(BOOST_${upper}_COMPONENT "${project}_${component}" PARENT_SCOPE)
     set(has_var "${project}_HAS_${upper}")

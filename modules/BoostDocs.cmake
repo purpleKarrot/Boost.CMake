@@ -34,7 +34,7 @@ include(CMakeParseArguments)
 ##########################################################################
 
 function(boost_docbook input)
-  set_boost_project("${BOOST_HAS_DOC_VAR}" ON)
+  set_boost_project("${BOOST_HAS_MANUAL_VAR}" ON)
 
   set(doc_targets)
   set(html_dir "${CMAKE_CURRENT_BINARY_DIR}/html/${BOOST_CURRENT_PROJECT}")
@@ -66,7 +66,7 @@ function(boost_docbook input)
     list(APPEND doc_targets ${chm_output})
     install(FILES "${chm_output}"
       DESTINATION "doc"
-      COMPONENT "${BOOST_DOC_COMPONENT}"
+      COMPONENT "${BOOST_MANUAL_COMPONENT}"
       )
   else() # generate HTML and manpages
     set(output_html "${html_dir}/index.html")
@@ -82,7 +82,7 @@ function(boost_docbook input)
 #   list(APPEND doc_targets ${output_man})
     install(DIRECTORY "${html_dir}"
       DESTINATION "share/doc/boost/"
-      COMPONENT "${BOOST_DOC_COMPONENT}"
+      COMPONENT "${BOOST_MANUAL_COMPONENT}"
       )
   endif()
 
