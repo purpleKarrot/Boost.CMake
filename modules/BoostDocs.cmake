@@ -34,6 +34,8 @@ include(CMakeParseArguments)
 ##########################################################################
 
 function(boost_docbook input)
+  set_boost_project("${BOOST_HAS_DOC_VAR}" ON)
+
   set(doc_targets)
   set(html_dir "${CMAKE_CURRENT_BINARY_DIR}/html/${BOOST_CURRENT_PROJECT}")
 
@@ -84,9 +86,19 @@ function(boost_docbook input)
       )
   endif()
 
+  set(target "${BOOST_CURRENT_PROJECT}-doc")
+  add_custom_target(${target} ALL DEPENDS ${doc_targets})
+  set_target_properties(${target} PROPERTIES
+    FOLDER "${BOOST_CURRENT_FOLDER}"
+    PROJECT_LABEL "${BOOST_CURRENT_PROJECT} (documentation)"
+    )
+
+  # build documentation as pdf
   if(DBLATEX_FOUND OR FOP_FOUND)
-    set(pdf_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.pdf)
-  
+    set(pdf_dir ${Boost_BINARY_DIR}/pdf)
+    set(pdf_file ${pdf_dir}/${BOOST_CURRENT_PROJECT}.pdf)
+    file(MAKE_DIRECTORY ${pdf_dir})
+
     if(FOP_FOUND)
       set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.fo)
       boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
@@ -105,23 +117,13 @@ function(boost_docbook input)
         )
     endif()
 
-    list(APPEND doc_targets ${pdf_file})
-    install(FILES ${pdf_file}
-      DESTINATION share/doc/Boost
-      COMPONENT "${BOOST_DOC_COMPONENT}"
+    set(target "${BOOST_CURRENT_PROJECT}-pdf")
+    add_custom_target(${target} DEPENDS ${pdf_file})
+    set_target_properties(${target} PROPERTIES
+      FOLDER "${BOOST_CURRENT_FOLDER}"
+      PROJECT_LABEL "${BOOST_CURRENT_PROJECT} (pdf)"
       )
-  endif()
-
-  set(target "${BOOST_CURRENT_PROJECT}-doc")
-  add_custom_target(${target} DEPENDS ${doc_targets})
-  set_target_properties(${target} PROPERTIES
-    FOLDER "${BOOST_CURRENT_FOLDER}"
-    PROJECT_LABEL "${BOOST_CURRENT_PROJECT} (documentation)"
-    )
-
-  # TODO: actually I want to add this to 'preinstall'
-  add_dependencies(documentation ${target})
-  set_boost_project("${BOOST_HAS_DOC_VAR}" ON)
+  endif(DBLATEX_FOUND OR FOP_FOUND)
 endfunction(boost_docbook)
 
 ##########################################################################
