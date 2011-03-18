@@ -61,6 +61,8 @@ file(INSTALL
   FILES "${component_file}"
   )
 
+file(REMOVE "${component_file}")
+
 ##########################################################################
 # write config file (if there are any targets)
 
@@ -92,3 +94,5 @@ file(INSTALL
   TYPE FILE
   FILES "${config_file}"
   )
+
+file(REMOVE "${config_file}")
