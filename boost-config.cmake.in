@@ -6,18 +6,11 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-# - Config file for the Boost package
-# It defines the following variables
-#  BOOST_INCLUDE_DIRS - include directories for Boost
-#  BOOST_LIBRARY_DIRS - library directories for Boost (normally not used!)
-#  BOOST_LIBRARIES    - libraries to link against
-#  BOOST_USE_FILE     -
-
 set(Boost_FOUND TRUE)
 set(Boost_INCLUDE_DIRS "@BOOST_INCLUDE@")
 set(Boost_LIBRARY_DIRS "@BOOST_LIBRARIES@")
-set(Boost_RESOURCE_PATH "@BOOST_RESOURCES@")
-set(Boost_MODULE_PATH "@BOOST_MODULES@")
+set(Boost_RESOURCE_PATH "${CMAKE_CURRENT_LIST_DIR}/resources")
+set(Boost_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/modules")
 set(Boost_USE_FILE "${Boost_MODULE_PATH}/UseBoost.cmake")
 set(Boost_DEV_FILE "${Boost_MODULE_PATH}/UseBoostDev.cmake")
 
@@ -26,7 +19,7 @@ set(Boost_COMPONENTS_MISSING)
 
 foreach(component ${Boost_FIND_COMPONENTS})
   string(TOUPPER ${component} COMPONENT)
-  set(component_file "@CMAKE_INSTALL_PREFIX@/@BOOST_CMAKE_DIR@/components/${component}.cmake")
+  set(component_file "${CMAKE_CURRENT_LIST_DIR}/components/${component}.cmake")
   if(BOOST_MAINTAIN_${COMPONENT})
     set(Boost_${COMPONENT}_FOUND TRUE)
   elseif(EXISTS "${component_file}")

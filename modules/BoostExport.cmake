@@ -13,7 +13,7 @@ function(boost_export target)
     file(APPEND ${BOOST_EXPORT_FILE} "\n"
       "add_executable(\${BOOST_NAMESPACE}${target} IMPORTED)\n"
       )
-    set(output "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:${target}>")
+    set(output "bin/$<TARGET_FILE_NAME:${target}>")
   elseif(type STREQUAL "SHARED_LIBRARY")
     file(APPEND ${BOOST_EXPORT_FILE} "\n"
       "add_library(\${BOOST_NAMESPACE}${target} SHARED IMPORTED)\n"
@@ -22,7 +22,7 @@ function(boost_export target)
       "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${ARGN}\"\n"
       "  )\n"
       )
-    set(output "${CMAKE_INSTALL_PREFIX}/lib/$<TARGET_LINKER_FILE_NAME:${target}>")
+    set(output "lib/$<TARGET_LINKER_FILE_NAME:${target}>")
   elseif(type STREQUAL "STATIC_LIBRARY")
     file(APPEND ${BOOST_EXPORT_FILE} "\n"
       "add_library(\${BOOST_NAMESPACE}${target} STATIC IMPORTED)\n"
@@ -31,7 +31,7 @@ function(boost_export target)
       "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${ARGN}\"\n"
       "  )\n"
       )
-    set(output "${CMAKE_INSTALL_PREFIX}/lib/$<TARGET_LINKER_FILE_NAME:${target}>")
+    set(output "lib/$<TARGET_LINKER_FILE_NAME:${target}>")
   endif()
 
   set(export_dir "${CMAKE_BINARY_DIR}/export/$<CONFIGURATION>")

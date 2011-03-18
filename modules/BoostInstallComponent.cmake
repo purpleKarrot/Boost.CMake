@@ -12,9 +12,11 @@ set(export_dir "${BOOST_BINARY_DIR}/export/${CMAKE_INSTALL_CONFIG_NAME}")
 file(STRINGS ${BOOST_TARGETS} targets)
 
 if(WIN32)
-  set(components_dir "CMake/components")
+  set(components_dir "components")
+  set(boost_root_dir "\${CMAKE_CURRENT_LIST_DIR}/..")
 else(WIN32)
-  set(components_dir "share/boost/CMake/components")
+  set(components_dir "share/boost/components")
+  set(boost_root_dir "\${CMAKE_CURRENT_LIST_DIR}/../../..")
 endif(WIN32)
 
 ##########################################################################
@@ -74,9 +76,14 @@ file(WRITE "${config_file}"
 
 foreach(target ${targets})
   file(READ "${export_dir}/${target}.txt" location)
+  set(location "${boost_root_dir}/${location}")
   file(APPEND ${config_file} "\n"
-    "set_property(TARGET \${BOOST_NAMESPACE}${target} APPEND PROPERTY IMPORTED_CONFIGURATIONS ${CONFIG})\n"
-    "set_property(TARGET \${BOOST_NAMESPACE}${target} PROPERTY IMPORTED_LOCATION_${CONFIG} \"${location}\")\n"
+    "set_property(TARGET \${BOOST_NAMESPACE}${target} APPEND PROPERTY\n"
+    "  IMPORTED_CONFIGURATIONS ${CONFIG}\n"
+    "  )\n"
+    "set_property(TARGET \${BOOST_NAMESPACE}${target} PROPERTY\n"
+    "  IMPORTED_LOCATION_${CONFIG} \"${location}\"\n"
+    "  )\n"
     )
 endforeach(target)
 

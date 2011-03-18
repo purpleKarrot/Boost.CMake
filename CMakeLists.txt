@@ -8,7 +8,7 @@
 
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
-find_package(Boost 1.45 REQUIRED COMPONENTS quickbook boostbook NO_MODULE)
+find_package(Boost 1.45 REQUIRED COMPONENTS boostbook quickbook NO_MODULE)
 include("${Boost_DEV_FILE}")
 
 boost_project(CMake TOOL
@@ -36,27 +36,27 @@ file(WRITE ${BOOST_EXPORT_FILE} "\n"
   )
 
 if(WIN32)
-  set(BOOST_CMAKE_DIR "CMake")
+  set(boost_data_dir  ".")
+  set(BOOST_INCLUDE   "\${CMAKE_CURRENT_LIST_DIR}/include")
+  set(BOOST_LIBRARIES "\${CMAKE_CURRENT_LIST_DIR}/lib")
 else(WIN32)
-  set(BOOST_CMAKE_DIR "share/boost/CMake")
+  set(boost_data_dir  "share/boost")
+  set(BOOST_INCLUDE   "\${CMAKE_CURRENT_LIST_DIR}/../../include")
+  set(BOOST_LIBRARIES "\${CMAKE_CURRENT_LIST_DIR}/../../lib")
 endif(WIN32)
 
-set(BOOST_INCLUDE   "${CMAKE_INSTALL_PREFIX}/include")
-set(BOOST_LIBRARIES "${CMAKE_INSTALL_PREFIX}/lib")
-set(BOOST_MODULES   "${CMAKE_INSTALL_PREFIX}/${BOOST_CMAKE_DIR}/modules")
-set(BOOST_RESOURCES "${CMAKE_INSTALL_PREFIX}/${BOOST_CMAKE_DIR}/resources")
+set(config_file "${CMAKE_CURRENT_BINARY_DIR}/boost-config.cmake")
+set(version_file "${CMAKE_CURRENT_BINARY_DIR}/boost-config-version.cmake")
 
-foreach(config Config ConfigVersion)
-  set(source_file "${CMAKE_CURRENT_SOURCE_DIR}/Boost${config}.cmake.in")
-  set(binary_file "${CMAKE_CURRENT_BINARY_DIR}/Boost${config}.cmake")
-  configure_file("${source_file}" "${binary_file}" @ONLY)
-  install(FILES "${binary_file}"
-    DESTINATION "${BOOST_CMAKE_DIR}"
-    COMPONENT cmake_runtime
-    )
-endforeach(config)
+configure_file(boost-config.cmake.in "${config_file}" @ONLY)
+configure_file(boost-config-version.cmake.in "${version_file}" @ONLY)
+
+install(FILES "${config_file}" "${version_file}"
+  DESTINATION "${boost_data_dir}"
+  COMPONENT "${BOOST_RUNTIME_COMPONENT}"
+  )
 
 install(DIRECTORY modules resources
-  DESTINATION "${BOOST_CMAKE_DIR}"
-  COMPONENT cmake_runtime
+  DESTINATION "${boost_data_dir}"
+  COMPONENT "${BOOST_RUNTIME_COMPONENT}"
   )

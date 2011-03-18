@@ -95,7 +95,7 @@ function(boost_docbook input)
 
   # build documentation as pdf
   if(DBLATEX_FOUND OR FOP_FOUND)
-    set(pdf_dir ${Boost_BINARY_DIR}/pdf)
+    set(pdf_dir ${CMAKE_BINARY_DIR}/pdf)
     set(pdf_file ${pdf_dir}/${BOOST_CURRENT_PROJECT}.pdf)
     file(MAKE_DIRECTORY ${pdf_dir})
 
