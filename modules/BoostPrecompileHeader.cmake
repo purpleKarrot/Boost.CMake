@@ -57,10 +57,13 @@ function(boost_add_pch_to_target target header)
     return()
   endif(NOT header)
 
-  set_target_properties(${target} PROPERTIES
-    XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${header}"
-    XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES"
-    )
+  if(XCODE_VERSION)
+    set_target_properties(${target} PROPERTIES
+      XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${header}"
+      XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES"
+      )
+    return()
+  endif(XCODE_VERSION)
 
   if(CMAKE_COMPILER_IS_GNUCXX)
     string(TOUPPER "${CMAKE_BUILD_TYPE}" build_type)

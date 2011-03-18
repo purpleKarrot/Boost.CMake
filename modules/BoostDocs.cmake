@@ -37,7 +37,7 @@ function(boost_docbook input)
   set_boost_project("${BOOST_HAS_MANUAL_VAR}" ON)
 
   set(doc_targets)
-  set(html_dir "${CMAKE_CURRENT_BINARY_DIR}/html/${BOOST_CURRENT_PROJECT}")
+  set(html_dir "${CMAKE_CURRENT_BINARY_DIR}/html")
 
   file(COPY
       "${Boost_RESOURCE_PATH}/images"
@@ -80,8 +80,8 @@ function(boost_docbook input)
 #     CATALOGS ${BOOSTBOOK_CATALOG} ${DOCBOOK_CATALOG}
 #     )
 #   list(APPEND doc_targets ${output_man})
-    install(DIRECTORY "${html_dir}"
-      DESTINATION "share/doc/boost/"
+    install(DIRECTORY "${html_dir}/"
+      DESTINATION "share/doc/boost/${BOOST_CURRENT_PROJECT}"
       COMPONENT "${BOOST_MANUAL_COMPONENT}"
       )
   endif()
