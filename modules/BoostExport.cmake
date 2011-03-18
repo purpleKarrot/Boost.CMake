@@ -15,20 +15,28 @@ function(boost_export target)
       )
     set(output "bin/$<TARGET_FILE_NAME:${target}>")
   elseif(type STREQUAL "SHARED_LIBRARY")
+    set(interface_libraries)
+    foreach(lib ${ARGN})
+      list(APPEND interface_libraries "\${BOOST_NAMESPACE}${lib}-shared")
+    endforeach(lib)
     file(APPEND ${BOOST_EXPORT_FILE} "\n"
       "add_library(\${BOOST_NAMESPACE}${target} SHARED IMPORTED)\n"
       "set_target_properties(\${BOOST_NAMESPACE}${target} PROPERTIES\n"
       "  IMPORTED_LINK_INTERFACE_LANGUAGES \"CXX\"\n"
-      "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${ARGN}\"\n"
+      "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${interface_libraries}\"\n"
       "  )\n"
       )
     set(output "lib/$<TARGET_LINKER_FILE_NAME:${target}>")
   elseif(type STREQUAL "STATIC_LIBRARY")
+    set(interface_libraries)
+    foreach(lib ${ARGN})
+      list(APPEND interface_libraries "\${BOOST_NAMESPACE}${lib}-static")
+    endforeach(lib)
     file(APPEND ${BOOST_EXPORT_FILE} "\n"
       "add_library(\${BOOST_NAMESPACE}${target} STATIC IMPORTED)\n"
       "set_target_properties(\${BOOST_NAMESPACE}${target} PROPERTIES\n"
       "  IMPORTED_LINK_INTERFACE_LANGUAGES \"CXX\"\n"
-      "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${ARGN}\"\n"
+      "  IMPORTED_LINK_INTERFACE_LIBRARIES \"${interface_libraries}\"\n"
       "  )\n"
       )
     set(output "lib/$<TARGET_LINKER_FILE_NAME:${target}>")

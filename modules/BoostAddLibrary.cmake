@@ -76,13 +76,9 @@ function(boost_add_library)
       PROJECT_LABEL "${TARGET_NAME} (shared library)"
       )
     boost_add_pch_to_target(${target} ${TARGET_PCH})
-
-    set(interface_libraries)
-    foreach(lib ${TARGET_LINK_BOOST_LIBRARIES})
-      list(APPEND interface_libraries "boost_${lib}-shared")
-    endforeach(lib)
-    boost_export(${target} ${interface_libraries})      
+    boost_export(${target} ${TARGET_LINK_BOOST_LIBRARIES})      
     list(APPEND targets ${target})
+    set_boost_project("${BOOST_HAS_RUNTIME_VAR}" ON)
   endif(TARGET_SHARED)
 
   if(TARGET_STATIC)
@@ -95,13 +91,9 @@ function(boost_add_library)
       PREFIX "lib"
       )
     boost_add_pch_to_target(${target} ${TARGET_PCH})
-
-    set(interface_libraries)
-    foreach(lib ${TARGET_LINK_BOOST_LIBRARIES})
-      list(APPEND interface_libraries "boost_${lib}-static")
-    endforeach(lib)
-    boost_export(${target} ${interface_libraries})      
+    boost_export(${target} ${TARGET_LINK_BOOST_LIBRARIES})      
     list(APPEND targets ${target})
+    set_boost_project("${BOOST_HAS_DEVELOP_VAR}" ON)
   endif(TARGET_STATIC)
 
   set_target_properties(${targets} PROPERTIES
@@ -111,12 +103,12 @@ function(boost_add_library)
     VERSION "${Boost_VERSION}"
     )
 
-  boost_install_libraries(TARGET_SHARED TARGET_STATIC ${targets})
+  boost_install_libraries(${targets})
 endfunction(boost_add_library)
 
 
 ##
-function(boost_install_libraries shared static)
+function(boost_install_libraries)
   install(TARGETS ${ARGN}
     ARCHIVE
       DESTINATION lib
@@ -128,9 +120,4 @@ function(boost_install_libraries shared static)
       DESTINATION bin
       COMPONENT "${BOOST_RUNTIME_COMPONENT}"
     )
-
-  set_boost_project("${BOOST_HAS_DEVELOP_VAR}" ON)
-  if(shared)
-    set_boost_project("${BOOST_HAS_RUNTIME_VAR}" ON)
-  endif(shared)
 endfunction(boost_install_libraries)
