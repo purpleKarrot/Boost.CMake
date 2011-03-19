@@ -26,7 +26,7 @@ following instructions in the install section of its documentation:
 * extract the archive into the boost-source directory
 * run bjam
 
-Easy, three simple steps and your library is built. [*If] you are used to build
+Easy, three simple steps and your library is built, [*if] you are used to build
 Boost from source. If you usually install Boost prebuilt via an installer or
 package management system, you might ask yourself: ["The easiest way to install
 this library is to deinstall Boost and then recompile everything? What is this
@@ -72,7 +72,7 @@ some of those:
 * Quickbook
 * doxygen
 * xsltproc
-* FOP (requires Java)
+* FOP or XEP (requires Java)
 * dblatex (requires Python and LaTeX)
 
 [endsect]
@@ -86,7 +86,7 @@ Open a console window and type in the following:[teletype]
 
   $ sudo add-apt-repository ppa:purplekarrot/ppa
   $ sudo apt-get update
-  $ sudo apt-get install boost-cmake1.46
+  $ sudo apt-get install boost-cmake
 
 [endsect]
 
@@ -158,7 +158,7 @@ Your CMakeLists.txt file will look something like this: [python]
   # Distributed under the Boost Software License, Version 1.0.
   # See http://www.boost.org/LICENSE_1_0.txt
 
-  cmake_minimum_required(VERSION 2.8)
+  cmake_minimum_required(VERSION 2.8.4)
 
   find_package(Boost "1.46" REQUIRED COMPONENTS filesystem test NO_MODULE)
   include("${Boost_DEV_FILE}")
@@ -196,8 +196,42 @@ Declare your public header files with the `boost_add_headers()` command. This
 command will make sure that the headers get installed and can be included by
 other Boost projects when doing a monolithic build.
 
-  file(GLOB_RECURSE headers ${CMAKE_CURRENT_SOURCE_DIR}/boost/*.?pp)
+  file(GLOB_RECURSE headers "boost/*.hpp")
   boost_add_headers(${headers})
+
+In the example above, the ["boost] directory is searched recursively for files
+that end with .hpp. The directory structure is preserved, so all found headers get
+installed to the directory ["<include dir>/boost].
+
+It might be the case that the directory structure should be modified when
+installing header files. As an optional argument, you may specify a prefix.
+Possible scenarios are:
+
+* Your headers are in ["boost/bar] relative to your CMakeLists.txt and you want to
+  install them to ["<include dir>/boost/bar].
+  You may omit the prefix parameter or set it to ["].
+
+* Your headers are in the same directory as the CMakeLists.txt and you want to
+  install them to ["<include dir>/boost/foo], then you should use ["boost/foo] as a prefix.
+
+* Your headers are in ["include/boost/baz] relative to your CMakeLists.txt and you
+  want to install them to ["<include dir>/boost/baz]. In that case, you need a replacement prefix:
+  ["!include/boost/baz!boost/baz!] or ["!include/boost!boost!] or ["!include!!] will
+  provide the appropriate result in this case.
+
+  file(GLOB_RECURSE headers "include/*.hpp")
+  boost_add_headers(${headers} PREFIX "!include!boost!")
+
+Please note that the use of a globbing expression is [_not recommended]
+(see [@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:file CMake manual]),
+it is better to list all header files explicitely in the CMakeLists.txt file.
+
+  boost_add_headers(PREFIX "!include!boost!"
+    include/foo.hpp
+    include/foo/bar.hpp
+    include/foo/baz.hpp
+    ...
+    )
 
 [endsect]
 
@@ -268,6 +302,39 @@ the documentation.
 [section Tests]
 Use the 'boost_add_test' command to ad a single test case. Use
 'boost_test_suite' to add multiple tests at once.
+[endsect]
+
+[section Workspace]
+If you are a maintainer of more than one Boost library, you may want have some
+kind of workspace that contains just your libraries.
+
+You should create a directory and place all your libraries inside. You may also
+create a meta-repository and use your libraries as svn:externals or git-submodules.
+Also, maybe Ryppl can be used to create such a directory layout.
+
+In the root directory you should create a CMakeLists.txt file with the following
+content:
+
+  cmake_minimum_required(VERSION 2.8.4)
+  project(Workspace)
+
+  # set this property to OFF when you use Visual Studio Express
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+  enable_testing()
+
+  set(BOOST_FILESYSTEM_MAINTENANCE ON)
+  set(BOOST_QUICKBOOK_MAINTENANCE ON)
+
+  include_directories(${CMAKE_BINARY_DIR}/include)
+
+  add_subdirectory(filesystem)
+  add_subdirectory(quickbook)
+
+  include(CPack)
+  
+Instead of filesystem and quickbook, you will list all your libraries. It is
+important, that you also set the BOOST_*_MAINTENANCE variables to ON.
 [endsect]
 
 [endsect]
