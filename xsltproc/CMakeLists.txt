@@ -145,7 +145,7 @@ file(WRITE ${include_dir}/exsltconfig.h "#include <libexslt/exsltconfig.h>\n")
 
 ##########################################################################
 
-boost_add_executable(xsltproc
+add_executable(xsltproc
   ${libxml2_dir}/SAX.c
   ${libxml2_dir}/entities.c
   ${libxml2_dir}/encoding.c
@@ -221,4 +221,15 @@ boost_add_executable(xsltproc
   ${libxslt_dir}/libexslt/saxon.c
   ${libxslt_dir}/libexslt/dynamic.c
   ${libxslt_dir}/xsltproc/xsltproc.c
+  )
+
+set_target_properties(xsltproc PROPERTIES
+  FOLDER "${BOOST_CURRENT_FOLDER}"
+  PROJECT_LABEL "xsltproc (executable)"
+  )
+
+install(TARGETS xsltproc
+  DESTINATION bin
+  COMPONENT "${BOOST_RUNTIME_COMPONENT}"
+  CONFIGURATIONS Release
   )

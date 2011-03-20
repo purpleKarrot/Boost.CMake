@@ -47,9 +47,10 @@ function(boost_xsltproc output stylesheet input)
   # XML_CATALOG_FILES must be space separated
   string(REPLACE ";" " " THIS_XSL_CATALOGS "${THIS_XSL_CATALOGS}")
 
+  get_target_property(xsltproc ${BOOST_NAMESPACE}xsltproc LOCATION)
   file(WRITE ${output}.cmake
     "set(ENV{XML_CATALOG_FILES} \"${THIS_XSL_CATALOGS}\")\n"
-    "execute_process(COMMAND ${XSLTPROC_EXECUTABLE} --xinclude --nonet\n"
+    "execute_process(COMMAND ${xsltproc} --xinclude --nonet\n"
     )
 
   # Translate XSL parameters into a form that xsltproc can use.
@@ -74,6 +75,6 @@ function(boost_xsltproc output stylesheet input)
   # Run the XSLT processor to do the XML transformation.
   add_custom_command(OUTPUT ${output}
     COMMAND ${CMAKE_COMMAND} -P ${output}.cmake
-    DEPENDS ${input} ${THIS_XSL_DEPENDS}
+    DEPENDS ${input} ${THIS_XSL_DEPENDS} ${BOOST_NAMESPACE}xsltproc
     )
 endfunction(boost_xsltproc)
