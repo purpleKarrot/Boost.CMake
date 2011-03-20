@@ -80,11 +80,11 @@ function(boost_project name)
   install(CODE
   "set(BOOST_PROJECT ${project})
   set(BOOST_DEPENDS ${PROJ_DEPENDS})
-  set(BOOST_TARGETS ${target_list_file})
-  set(BOOST_EXPORTS ${export_file})
+  set(BOOST_TARGETS \"${target_list_file}\")
+  set(BOOST_EXPORTS \"${export_file}\")
   set(BOOST_IS_TOOL ${PROJ_TOOL})
-  set(BOOST_BINARY_DIR ${CMAKE_BINARY_DIR})
-  include(${Boost_MODULE_PATH}/BoostInstallComponent.cmake)"
+  set(BOOST_BINARY_DIR \"${CMAKE_BINARY_DIR}\")
+  include(\"${Boost_MODULE_PATH}/BoostInstallComponent.cmake\")"
     COMPONENT "${export_component}"
     )
 endfunction(boost_project)

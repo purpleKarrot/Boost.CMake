@@ -77,16 +77,30 @@ file(WRITE "${config_file}"
   )
 
 foreach(target ${targets})
-  file(READ "${export_dir}/${target}.txt" location)
-  set(location "${boost_root_dir}/${location}")
+  file(READ "${export_dir}/${target}.location" location)
   file(APPEND ${config_file} "\n"
     "set_property(TARGET \${BOOST_NAMESPACE}${target} APPEND PROPERTY\n"
     "  IMPORTED_CONFIGURATIONS ${CONFIG}\n"
     "  )\n"
-    "set_property(TARGET \${BOOST_NAMESPACE}${target} PROPERTY\n"
-    "  IMPORTED_LOCATION_${CONFIG} \"${location}\"\n"
-    "  )\n"
+    "set_target_properties(\${BOOST_NAMESPACE}${target} PROPERTIES\n"
+    "  IMPORTED_LOCATION_${CONFIG} \"${boost_root_dir}/${location}\"\n"
     )
+
+  if(EXISTS "${export_dir}/${target}.implib")
+    file(READ "${export_dir}/${target}.implib" implib)
+    file(APPEND ${config_file}
+      "  IMPORTED_IMPLIB_${CONFIG} \"${boost_root_dir}/${implib}\"\n"
+      )
+  endif(EXISTS "${export_dir}/${target}.implib")
+
+  if(EXISTS "${export_dir}/${target}.soname")
+    file(READ "${export_dir}/${target}.soname" soname)
+    file(APPEND ${config_file}
+      "  IMPORTED_SONAME_${CONFIG} \"${boost_root_dir}/${soname}\"\n"
+      )
+  endif(EXISTS "${export_dir}/${target}.soname")
+
+  file(APPEND ${config_file} "  )\n")
 endforeach(target)
 
 file(INSTALL
