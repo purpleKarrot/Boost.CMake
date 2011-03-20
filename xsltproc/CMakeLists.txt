@@ -8,7 +8,7 @@
 
 if(NOT WIN32)
   return()
-endif(WIN32)
+endif(NOT WIN32)
 
 file(APPEND ${BOOST_EXPORT_FILE}
   "add_executable(\${BOOST_NAMESPACE}xsltproc IMPORTED)\n"
