@@ -25,21 +25,11 @@ boost_project(CMake TOOL
   )
 
 add_subdirectory(doc)
+add_subdirectory(xsltproc)
 
-if(WIN32)
-  add_subdirectory(xsltproc)
-  set(xsltproc_location "\${CMAKE_CURRENT_LIST_DIR}/../bin/xsltproc.exe")
-else(WIN32)
-  set(xsltproc_location "/usr/bin/xsltproc")
-endif(WIN32)
-
-file(WRITE ${BOOST_EXPORT_FILE}
+file(APPEND ${BOOST_EXPORT_FILE} "\n"
   "include(\${CMAKE_CURRENT_LIST_DIR}/boostbook.cmake)\n"
-  "include(\${CMAKE_CURRENT_LIST_DIR}/quickbook.cmake)\n\n"
-  "add_executable(\${BOOST_NAMESPACE}xsltproc IMPORTED)\n"
-  "set_target_properties(\${BOOST_NAMESPACE}xsltproc PROPERTIES\n"
-  "  IMPORTED_LOCATION \"${xsltproc_location}\"\n"
-  "  )\n"
+  "include(\${CMAKE_CURRENT_LIST_DIR}/quickbook.cmake)\n"
   )
 
 if(WIN32)

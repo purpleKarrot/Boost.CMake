@@ -6,6 +6,31 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+find_program(XSLTPROC_EXECUTABLE xsltproc)
+if(XSLTPROC_EXECUTABLE)
+  add_executable(xsltproc IMPORTED)
+  set_target_properties(xsltproc PROPERTIES
+    IMPORTED_LOCATION "${XSLTPROC_EXECUTABLE}"
+    )
+endif(XSLTPROC_EXECUTABLE)
+
+if(WIN32)
+  set(xsltproc_location "\${CMAKE_CURRENT_LIST_DIR}/../bin/xsltproc.exe")
+else(WIN32)
+  set(xsltproc_location "${XSLTPROC_EXECUTABLE}")
+endif(WIN32)
+
+file(APPEND ${BOOST_EXPORT_FILE} "\n"
+  "add_executable(\${BOOST_NAMESPACE}xsltproc IMPORTED)\n"
+  "set_target_properties(\${BOOST_NAMESPACE}xsltproc PROPERTIES\n"
+  "  IMPORTED_LOCATION \"${xsltproc_location}\"\n"
+  "  )\n"
+  )
+
+if(NOT WIN32)
+  return()
+endif(NOT WIN32)
+
 include(BoostExtract)
 
 ##########################################################################
