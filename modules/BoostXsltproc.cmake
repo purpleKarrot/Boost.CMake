@@ -54,9 +54,8 @@ function(boost_xsltproc output stylesheet input)
 
   # Run the XSLT processor to do the XML transformation.
   add_custom_command(OUTPUT ${output}
-    COMMAND ${catalog} $<TARGET_FILE:${BOOST_NAMESPACE}xsltproc>
-      --xinclude --nonet ${stringparams}
-      -o ${output} ${stylesheet} ${input}
+    COMMAND ${catalog} ${XSLTPROC_EXECUTABLE} --xinclude --nonet
+            ${stringparams} -o ${output} ${stylesheet} ${input}
     DEPENDS ${input} ${THIS_XSL_DEPENDS}
     )
 endfunction(boost_xsltproc)
