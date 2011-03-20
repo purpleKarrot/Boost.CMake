@@ -18,11 +18,6 @@
 # This function builds a custom command that transforms an XML file
 # (input) via the given XSL stylesheet. 
 #
-# XML catalogs can be used to remap parts of URIs within the
-# stylesheet to other (typically local) entities. To provide an XML
-# catalog file, specify the name of the XML catalog file via the
-# CATALOG argument. It will be provided to the XSL transform.
-#
 # The PARAMETERS argument is followed by param=value pairs that set
 # additional parameters to the XSL stylesheet. The parameter names
 # that can be used correspond to the <xsl:param> elements within the
@@ -43,34 +38,25 @@ endif(NOT BOOST_BUILD_DOCUMENTATION)
 function(boost_xsltproc output stylesheet input)
   cmake_parse_arguments(THIS_XSL "" "" "DEPENDS;PARAMETERS" ${ARGN})
 
-  get_target_property(xsltproc ${BOOST_NAMESPACE}xsltproc LOCATION)
-  file(WRITE ${output}.cmake
-    "set(ENV{XML_CATALOG_FILES} \"${BOOSTBOOK_CATALOG}\")\n"
-    "execute_process(COMMAND ${xsltproc} --xinclude --nonet\n"
-    )
+  set(catalog "XML_CATALOG_FILES=${BOOSTBOOK_CATALOG}")
+  if(CMAKE_HOST_WIN32)
+    set(catalog set "${catalog}" &)
+  endif(CMAKE_HOST_WIN32)
 
   # Translate XSL parameters into a form that xsltproc can use.
+  set(stringparams)
   foreach(param ${THIS_XSL_PARAMETERS})
     string(REGEX REPLACE "([^=]*)=([^;]*)" "\\1;\\2" name_value ${param})
     list(GET name_value 0 name)
     list(GET name_value 1 value)
-    file(APPEND ${output}.cmake
-      "    --stringparam ${name} \"${value}\"\n"
-      )
+    list(APPEND stringparams --stringparam ${name} ${value})
   endforeach(param)
-
-  file(APPEND ${output}.cmake
-    "    -o ${output} ${stylesheet} ${input}\n"
-    "  RESULT_VARIABLE result\n"
-    "  )\n"
-    "if(NOT result EQUAL 0)\n"
-    "  message(FATAL_ERROR \"xsltproc returned \${result}\")\n"
-    "endif()\n"
-    )
 
   # Run the XSLT processor to do the XML transformation.
   add_custom_command(OUTPUT ${output}
-    COMMAND ${CMAKE_COMMAND} -P ${output}.cmake
-    DEPENDS ${input} ${THIS_XSL_DEPENDS} ${BOOST_NAMESPACE}xsltproc
+    COMMAND ${catalog} $<TARGET_FILE:${BOOST_NAMESPACE}xsltproc>
+      --xinclude --nonet ${stringparams}
+      -o ${output} ${stylesheet} ${input}
+    DEPENDS ${input} ${THIS_XSL_DEPENDS}
     )
 endfunction(boost_xsltproc)
