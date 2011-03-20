@@ -6,37 +6,7 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-function(extract archive destination)
-  if(EXISTS "${destination}" AND NOT "${archive}" IS_NEWER_THAN "${destination}")
-    return()
-  endif()
-
-  # Extract it
-  set(tempdir "${destination}-tmp")
-  file(MAKE_DIRECTORY "${tempdir}")
-  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz "${archive}"
-    WORKING_DIRECTORY "${tempdir}"
-    RESULT_VARIABLE rv)
-  if(NOT rv EQUAL 0)
-    file(REMOVE_RECURSE "${tempdir}")
-    message(FATAL_ERROR "error: extract of '${archive}' failed")
-  endif()
-
-  # Analyze what came out of the tar file
-  file(GLOB contents "${tempdir}/*")
-  list(LENGTH contents n)
-  if(NOT n EQUAL 1 OR NOT IS_DIRECTORY "${contents}")
-    set(contents "${tempdir}")
-  endif()
-
-  # Move "the one" directory to the final directory
-  file(REMOVE_RECURSE "${destination}")
-  get_filename_component(contents "${contents}" ABSOLUTE)
-  file(RENAME "${contents}" "${destination}")
-
-  # Clean up
-  file(REMOVE_RECURSE "${tempdir}")
-endfunction(extract)
+include(BoostExtract)
 
 ##########################################################################
 
@@ -47,7 +17,7 @@ set(libxml2_dir "${CMAKE_CURRENT_BINARY_DIR}/libxml2")
 message(STATUS "Downloading 'libxml2-2.7.8.tar.gz'")
 file(DOWNLOAD "${libxml2_url}" "${libxml2_tgz}" SHOW_PROGRESS
   EXPECTED_MD5 "8127a65e8c3b08856093099b52599c86")
-extract("${libxml2_tgz}" "${libxml2_dir}")
+boost_extract("${libxml2_tgz}" "${libxml2_dir}")
 
 set(libxslt_url "ftp://xmlsoft.org/libxml2/libxslt-1.1.26.tar.gz")
 set(libxslt_tgz "${CMAKE_CURRENT_BINARY_DIR}/libxslt.tgz")
@@ -56,7 +26,7 @@ set(libxslt_dir "${CMAKE_CURRENT_BINARY_DIR}/libxslt")
 message(STATUS "Downloading 'libxslt-1.1.26.tar.gz'")
 file(DOWNLOAD "${libxslt_url}" "${libxslt_tgz}" SHOW_PROGRESS
   EXPECTED_MD5 "e61d0364a30146aaa3001296f853b2b9")
-extract("${libxslt_tgz}" "${libxslt_dir}")
+boost_extract("${libxslt_tgz}" "${libxslt_dir}")
 
 set(include_dir ${CMAKE_CURRENT_BINARY_DIR}/include)
 file(MAKE_DIRECTORY ${include_dir})

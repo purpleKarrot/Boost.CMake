@@ -11,7 +11,6 @@
 # Transforms the input XML file by applying the given XSL stylesheet.
 #
 #   boost_xsltproc(<output> <stylesheet> <input>
-#     [CATALOG <catalog>]
 #     [PARAMETERS param1=value1 param2=value2 ...]
 #     [DEPENDS <dependancies>]
 #     )
@@ -42,14 +41,11 @@ endif(NOT BOOST_BUILD_DOCUMENTATION)
 
 
 function(boost_xsltproc output stylesheet input)
-  cmake_parse_arguments(THIS_XSL "" "" "CATALOGS;DEPENDS;PARAMETERS" ${ARGN})
-
-  # XML_CATALOG_FILES must be space separated
-  string(REPLACE ";" " " THIS_XSL_CATALOGS "${THIS_XSL_CATALOGS}")
+  cmake_parse_arguments(THIS_XSL "" "" "DEPENDS;PARAMETERS" ${ARGN})
 
   get_target_property(xsltproc ${BOOST_NAMESPACE}xsltproc LOCATION)
   file(WRITE ${output}.cmake
-    "set(ENV{XML_CATALOG_FILES} \"${THIS_XSL_CATALOGS}\")\n"
+    "set(ENV{XML_CATALOG_FILES} \"${BOOSTBOOK_CATALOG}\")\n"
     "execute_process(COMMAND ${xsltproc} --xinclude --nonet\n"
     )
 

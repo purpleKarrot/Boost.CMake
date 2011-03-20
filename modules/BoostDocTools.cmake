@@ -18,11 +18,6 @@ if(NOT DOXYGEN_FOUND)
   set(BOOST_BUILD_DOCUMENTATION OFF)
 endif(NOT DOXYGEN_FOUND)
 
-find_package(DocBook)
-if(NOT DOCBOOK_FOUND)
-  set(BOOST_BUILD_DOCUMENTATION OFF)
-endif(NOT DOCBOOK_FOUND)
-
 find_package(HTMLHelp QUIET)
 find_package(DBLATEX QUIET)
 find_package(FOProcessor QUIET)
