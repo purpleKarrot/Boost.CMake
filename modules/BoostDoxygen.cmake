@@ -7,6 +7,15 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+include(BoostXsltproc)
+include(CMakeParseArguments)
+
+if(TARGET ${BOOST_NAMESPACE}doxygen)
+  set(DOXYGEN_EXECUTABLE "$<TARGET_FILE:${BOOST_NAMESPACE}doxygen>")
+else()
+  set(DOXYGEN_SKIP_DOT ON)
+  find_package(Doxygen REQUIRED)
+endif()
 
 #
 #   boost_doxygen(<name> [XML] [TAG]
@@ -16,17 +25,6 @@
 #     [PARAMETERS <parameters>]
 #     )
 #
-function(boost_doxygen name)
-  set(${name}_tag "${name}_tag-NOTFOUND" PARENT_SCOPE)
-  set(${name}_xml "${name}_xml-NOTFOUND" PARENT_SCOPE)
-endfunction(boost_doxygen)
-
-
-if(NOT BOOST_BUILD_DOCUMENTATION)
-  return()
-endif(NOT BOOST_BUILD_DOCUMENTATION)
-
-
 function(boost_doxygen name)
   cmake_parse_arguments(DOXY
     "XML;TAG" "DOXYFILE" "INPUT;TAGFILES;PARAMETERS" ${ARGN})

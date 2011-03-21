@@ -7,6 +7,7 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+option(BOOST_BUILD_DOCUMENTATION "Should documentation be built?" ON)
 
 # Adds documentation for the current library or tool project
 #
@@ -22,15 +23,10 @@
 # QuickBook
 # BoostBook (.XML extension):
 function(boost_documentation input)
-endfunction(boost_documentation)
+  if(NOT BOOST_BUILD_DOCUMENTATION)
+    return()
+  endif(NOT BOOST_BUILD_DOCUMENTATION)
 
-
-if(NOT BOOST_BUILD_DOCUMENTATION)
-  return()
-endif(NOT BOOST_BUILD_DOCUMENTATION)
-
-
-function(boost_documentation input)
   get_filename_component(input ${input} ABSOLUTE)
   get_filename_component(input_ext ${input} EXT)
   get_filename_component(input_name ${input} NAME)

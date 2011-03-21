@@ -90,35 +90,7 @@ extract_download(doxygen
   cafd01d3460066c40a377fd00dd98f8a
   )
 
-extract_download(iconv
-  ftp://ftp.zlatkovic.com/pub/libxml/iconv-1.9.2.win32.zip
-  da5f3164bbd21e7830faef7e5a7ea5e6
-  )
-
-extract_download(libxml2
-  ftp://ftp.zlatkovic.com/pub/libxml/libxml2-2.7.7.win32.zip
-  d72348706d1d1a7659e7916e0786dc9c
-  )
-
-extract_download(libxslt
-  ftp://ftp.zlatkovic.com/pub/libxml/libxslt-1.1.26.win32.zip
-  36fb352ea5b6309305476bcb8cabc31e
-  )
-
-extract_download(zlib
-  ftp://ftp.zlatkovic.com/pub/libxml/zlib-1.2.5.win32.zip
-  1f814c66a98bd4f1913198fc3c7f304d
-  )
-
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/doxygen/doxygen.exe
-    ${CMAKE_CURRENT_BINARY_DIR}/doxygen/doxytag.exe
-    ${CMAKE_CURRENT_BINARY_DIR}/iconv/bin/iconv.dll
-    ${CMAKE_CURRENT_BINARY_DIR}/libxml2/bin/libxml2.dll
-    ${CMAKE_CURRENT_BINARY_DIR}/libxslt/bin/libexslt.dll
-    ${CMAKE_CURRENT_BINARY_DIR}/libxslt/bin/libxslt.dll
-    ${CMAKE_CURRENT_BINARY_DIR}/libxslt/bin/xsltproc.exe
-    ${CMAKE_CURRENT_BINARY_DIR}/zlib/bin/zlib1.dll
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/doxygen/doxygen.exe
   DESTINATION bin
   COMPONENT "${BOOST_RUNTIME_COMPONENT}"
   CONFIGURATIONS Release
@@ -129,8 +101,6 @@ file(APPEND ${BOOST_EXPORT_FILE}
   "set_target_properties(\${BOOST_NAMESPACE}doxygen PROPERTIES\n"
   " IMPORTED_LOCATION \"\${CMAKE_CURRENT_LIST_DIR}/../bin/doxygen.exe\"\n"
   " )\n"
-  "add_executable(\${BOOST_NAMESPACE}xsltproc IMPORTED)\n"
-  "set_target_properties(\${BOOST_NAMESPACE}xsltproc PROPERTIES\n"
-  " IMPORTED_LOCATION \"\${CMAKE_CURRENT_LIST_DIR}/../bin/xsltproc.exe\"\n"
-  " )\n"
   )
+
+add_subdirectory(xsltproc)

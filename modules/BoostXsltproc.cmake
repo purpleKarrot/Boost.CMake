@@ -27,35 +27,47 @@
 # For example, dependancies might refer to other XML files that are
 # included by the input file through XInclude.
 function(boost_xsltproc output stylesheet input)
-endfunction(boost_xsltproc)
-
-
-if(NOT BOOST_BUILD_DOCUMENTATION)
-  return()
-endif(NOT BOOST_BUILD_DOCUMENTATION)
-
-
-function(boost_xsltproc output stylesheet input)
   cmake_parse_arguments(THIS_XSL "" "" "DEPENDS;PARAMETERS" ${ARGN})
 
-  set(catalog "XML_CATALOG_FILES=${BOOSTBOOK_CATALOG}")
-  if(CMAKE_HOST_WIN32)
-    set(catalog set "${catalog}" &)
-  endif(CMAKE_HOST_WIN32)
+  file(RELATIVE_PATH name "${CMAKE_CURRENT_BINARY_DIR}" "${output}")
+  string(REGEX REPLACE "[./]" "_" name ${name})
+  set(script "${CMAKE_CURRENT_BINARY_DIR}/${name}.cmake")
+
+  file(WRITE ${script}
+    "set(ENV{XML_CATALOG_FILES} \"${BOOSTBOOK_CATALOG}\")\n"
+    "execute_process(COMMAND \${XSLTPROC_EXECUTABLE} --xinclude --nonet\n"
+    )
 
   # Translate XSL parameters into a form that xsltproc can use.
-  set(stringparams)
   foreach(param ${THIS_XSL_PARAMETERS})
     string(REGEX REPLACE "([^=]*)=([^;]*)" "\\1;\\2" name_value ${param})
     list(GET name_value 0 name)
     list(GET name_value 1 value)
-    list(APPEND stringparams --stringparam ${name} ${value})
+    file(APPEND ${script} "  --stringparam ${name} \"${value}\"\n")
   endforeach(param)
+
+  file(APPEND ${script}
+    "  -o ${output} ${stylesheet} ${input}\n"
+    "  RESULT_VARIABLE result\n"
+    "  )\n"
+    "if(NOT result EQUAL 0)\n"
+    "  message(FATAL_ERROR \"xsltproc returned \${result}\")\n"
+    "endif()\n"
+    )
+
+  if(CMAKE_HOST_WIN32)
+    set(XSLTPROC_EXECUTABLE "$<TARGET_FILE:${BOOST_NAMESPACE}xsltproc>")
+    list(APPEND THIS_XSL_DEPENDS "${BOOST_NAMESPACE}xsltproc")
+  else(CMAKE_HOST_WIN32)
+    find_program(XSLTPROC_EXECUTABLE xsltproc)
+    if(NOT XSLTPROC_EXECUTABLE)
+      message(FATAL_ERROR "xsltproc notfound!")
+    endif(NOT XSLTPROC_EXECUTABLE)
+  endif(CMAKE_HOST_WIN32)
 
   # Run the XSLT processor to do the XML transformation.
   add_custom_command(OUTPUT ${output}
-    COMMAND ${catalog} ${XSLTPROC_EXECUTABLE} --xinclude --nonet
-            ${stringparams} -o ${output} ${stylesheet} ${input}
+    COMMAND ${CMAKE_COMMAND} -DXSLTPROC_EXECUTABLE=${XSLTPROC_EXECUTABLE} -P ${script}
     DEPENDS ${input} ${THIS_XSL_DEPENDS}
     )
 endfunction(boost_xsltproc)

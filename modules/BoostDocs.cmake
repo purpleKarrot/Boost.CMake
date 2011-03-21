@@ -17,6 +17,10 @@ if(NOT TARGET documentation)
   add_custom_target(documentation)
 endif(NOT TARGET documentation)  
 
+find_package(HTMLHelp QUIET)
+find_package(DBLATEX QUIET)
+find_package(FOProcessor QUIET)
+
 ##########################################################################
 
 include(BoostDocTools)
