@@ -13,10 +13,17 @@
 ]
 
 [section Introduction]
-[:["You can tell a craftsman by his tools.] -- ['Sokrates]]
+
 Boost.CMake is a collection of CMake modules to simplify the use and development
-of Boost libraries. It is [*not] a CMake-ified collection of the Boost
-libraries.
+of Boost libraries.
+
+[warning
+  Boost.CMake is [*NOT] the official build system for the Boost libraries.
+
+  You might be interested in the official
+  [@http://www.boost.org/more/getting_started/index.html Getting Started] section
+  on the Boost website. 
+]
 
 [section Motivation]
 If you want to use a library that is proposed for Boost, you might find the
@@ -60,9 +67,9 @@ In that case, the dependencies of each library do not have to be installed.
 [section Required Tools]
 To use Boost.CMake you need:
 
-* Boost.CMake, of course
 * [@http://www.cmake.org/ CMake]
 * your favorite compiler and IDE
+* Boost.CMake, of course
 
 Depending on the documentation format you want to create, you will also need
 some of those:
@@ -91,7 +98,11 @@ Open a console window and type in the following:[teletype]
 [endsect]
 
 [section Install on Windows]
+
+[@https://github.com/purpleKarrot/Boost.CMake/archives/master]
+
 [@http://dblatex.sourceforge.net/doc/manual/ch02s03.html]
+
 [endsect]
 
 [section Install on Other Platforms]
@@ -200,31 +211,34 @@ other Boost projects when doing a monolithic build.
   boost_add_headers(${headers})
 
 In the example above, the ["boost] directory is searched recursively for files
-that end with .hpp. The directory structure is preserved, so all found headers get
-installed to the directory ["<include dir>/boost].
+that end with .hpp. The directory structure is preserved, so all found headers
+get installed to the directory ["<include dir>/boost].
 
 It might be the case that the directory structure should be modified when
 installing header files. As an optional argument, you may specify a prefix.
 Possible scenarios are:
 
-* Your headers are in ["boost/bar] relative to your CMakeLists.txt and you want to
-  install them to ["<include dir>/boost/bar].
+* Your headers are in ["boost/bar] relative to your CMakeLists.txt and you want
+  to install them to ["<include dir>/boost/bar].
   You may omit the prefix parameter or set it to ["].
 
 * Your headers are in the same directory as the CMakeLists.txt and you want to
-  install them to ["<include dir>/boost/foo], then you should use ["boost/foo] as a prefix.
+  install them to ["<include dir>/boost/foo], then you should use ["boost/foo]
+  as a prefix.
 
-* Your headers are in ["include/boost/baz] relative to your CMakeLists.txt and you
-  want to install them to ["<include dir>/boost/baz]. In that case, you need a replacement prefix:
-  ["!include/boost/baz!boost/baz!] or ["!include/boost!boost!] or ["!include!!] will
-  provide the appropriate result in this case.
+* Your headers are in ["include/boost/baz] relative to your CMakeLists.txt and
+  you want to install them to ["<include dir>/boost/baz]. In that case, you need
+  a replacement prefix:
+  ["!include/boost/baz!boost/baz!] or ["!include/boost!boost!] or ["!include!!]
+  will provide the appropriate result in this case.
 
   file(GLOB_RECURSE headers "include/*.hpp")
   boost_add_headers(${headers} PREFIX "!include!boost!")
 
-Please note that the use of a globbing expression is [_not recommended]
-(see [@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:file CMake manual]),
-it is better to list all header files explicitely in the CMakeLists.txt file.
+Please note that the use of a globbing expression is [_not recommended] (see
+[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:file CMake
+manual]), it is better to list all header files explicitely in the
+CMakeLists.txt file.
 
   boost_add_headers(PREFIX "!include!boost!"
     include/foo.hpp
@@ -237,7 +251,8 @@ it is better to list all header files explicitely in the CMakeLists.txt file.
 
 [section Libraries and Executables]
 To add a compiled library, use the `boost_add_library()` command instead of
-[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library `add_library`].
+[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library
+`add_library`].
 
   boost_add_library(example example.cpp)
 
@@ -256,7 +271,8 @@ To link third party libraries, list them after LINK_LIBRARIES.
     )
 
 To add an executable, use the `boost_add_executable()` command instead of
-[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable `add_executable()`].
+[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable
+`add_executable()`].
 This command supports the same arguments as the `boost_add_library()` command.
 
   boost_add_executable(example
@@ -309,8 +325,8 @@ If you are a maintainer of more than one Boost library, you may want have some
 kind of workspace that contains just your libraries.
 
 You should create a directory and place all your libraries inside. You may also
-create a meta-repository and use your libraries as svn:externals or git-submodules.
-Also, maybe Ryppl can be used to create such a directory layout.
+create a meta-repository and use your libraries as svn:externals or
+git-submodules. Also, maybe Ryppl can be used to create such a directory layout?
 
 In the root directory you should create a CMakeLists.txt file with the following
 content:
@@ -348,4 +364,52 @@ important, that you also set the BOOST_*_MAINTENANCE variables to ON.
 [include BoostAddReference.qbk]
 [include BoostDocumentation.qbk]
 [include BoostTesting.qbk]
+[endsect]
+
+[section Boost.Defrag]
+While all Boost libraries and tools may be developed individually, we still want
+do be able to release Boost as a whole. Boost.Defrag is a tool that can
+aggregate ['fragments][footnote The term ['module] is already used in CMake,
+thus we refer to them as ['fragments] to avoid misconceptions.] from different
+sources (CVS, SVN, GIT, ...) and create monolithic packages. The packages
+[@https://github.com/purpleKarrot/Boost.CMake/archives/master here], as well as
+the ubuntu packages in [@https://launchpad.net/~purplekarrot/+archive/ppa my 
+PPA] have been created with Boost.Defrag.
+
+[note
+  This tool is intended for release managers and package maintainers.
+  Neither Boost developers nor clients should need to use Boost.Defrag.
+]
+
+For each fragment, Boost.Defrag contains a fragment definition. Such a fragment
+definition might look like this:
+
+  boost_fragment(foo
+    STABLE DOWNLOAD
+      URL "http://example.org/release/foo.tar.gz"
+      MD5 "6a0076285cb11b293836"
+    UNSTABLE SVN
+      URL "http://svn.example.org/foo/trunk/"
+      REV "HEAD"
+    )
+
+Fragment definitions of libraries under construction should be placed in the
+["inclubating] directory. They are usually excluded from packages but can be
+activated with the `BOOST_INCLUDE_INCUBATING` option.
+
+Boost.Defrag provides additional files for all fragments that are not properly
+ported to Boost.CMake yet. These files are found in the ["provided] directory.
+[endsect]
+
+[section Open Issues]
+
+* Running tests is really slow. Currently, CMake repeats the usual compiler
+  checks for each single test case. This clearly is not acceptable.
+
+* The ubuntu packages might not satisfy debian quality standards.
+
+* Support for RPM packages is very provisional.
+
+Please let me know about further issues or possible enhancements.
+
 [endsect]
