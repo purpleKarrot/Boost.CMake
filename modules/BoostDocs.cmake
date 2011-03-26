@@ -23,7 +23,6 @@ find_package(FOProcessor QUIET)
 
 ##########################################################################
 
-include(BoostDocTools)
 include(BoostAddReference)
 include(BoostDocumentation)
 include(BoostDoxygen)
