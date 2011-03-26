@@ -7,6 +7,7 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+include(CMakeParseArguments)
 
 # Transforms the input XML file by applying the given XSL stylesheet.
 #

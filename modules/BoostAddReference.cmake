@@ -7,6 +7,8 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+include(BoostDoxygen)
+include(BoostXsltproc)
 
 # Use Doxygen to parse header files and produce BoostBook output.
 #
@@ -26,15 +28,6 @@
 # following the PARAMETERS argument. These parameters will be added to
 # the Doxygen configuration file.
 #
-function(boost_add_reference name)
-endfunction(boost_add_reference)
-
-
-if(NOT BOOST_BUILD_DOCUMENTATION)
-  return()
-endif(NOT BOOST_BUILD_DOCUMENTATION)
-
-
 function(boost_add_reference name)
   cmake_parse_arguments(REF ""
     "ID;TITLE;DOXYFILE" "DOXYGEN_PARAMETERS;TAGFILES;DEPENDS" ${ARGN})

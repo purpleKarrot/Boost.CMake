@@ -10,13 +10,6 @@
 include(BoostXsltproc)
 include(CMakeParseArguments)
 
-if(TARGET ${BOOST_NAMESPACE}doxygen)
-  set(DOXYGEN_EXECUTABLE "$<TARGET_FILE:${BOOST_NAMESPACE}doxygen>")
-else()
-  set(DOXYGEN_SKIP_DOT ON)
-  find_package(Doxygen REQUIRED)
-endif()
-
 #
 #   boost_doxygen(<name> [XML] [TAG]
 #     [DOXYFILE <doxyfile>]
@@ -80,6 +73,7 @@ function(boost_doxygen name)
   endforeach(file)
   file(APPEND ${doxyfile} "INPUT = ${input}\n")
 
+  find_package(Doxygen REQUIRED)
   add_custom_command(OUTPUT ${output}
     COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
     DEPENDS ${DOXY_INPUT} ${DOXY_TAGFILES}

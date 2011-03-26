@@ -8,10 +8,6 @@
 
 # Find DocBook to LaTeX Publishing (http://dblatex.sourceforge.net/)
 
-if(DBLATEX_FOUND)
-  return()
-endif(DBLATEX_FOUND)
-
 if(CMAKE_HOST_WIN32)
   include(FindPythonInterp)
   find_file(dblatex_py dblatex
@@ -30,18 +26,17 @@ else()
   find_program(DBLATEX_EXECUTABLE dblatex)
 endif()
 
-#if(DBLATEX_EXECUTABLE)
-#  execute_process(COMMAND ${DBLATEX_EXECUTABLE} --version
-#    OUTPUT_VARIABLE DBLATEX_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-#  string(REGEX REPLACE "^dblatex version (.+)$" "\\1"
-#    DBLATEX_VERSION "${DBLATEX_VERSION}")
-#endif(DBLATEX_EXECUTABLE)
+if(DBLATEX_EXECUTABLE)
+  execute_process(COMMAND ${DBLATEX_EXECUTABLE} --version
+    OUTPUT_VARIABLE DBLATEX_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+  string(REGEX REPLACE "^dblatex version (.+)$" "\\1"
+    DBLATEX_VERSION "${DBLATEX_VERSION}")
+endif(DBLATEX_EXECUTABLE)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(DBLATEX
   REQUIRED_VARS DBLATEX_EXECUTABLE
-# VERSION_VAR DBLATEX_VERSION
+  VERSION_VAR DBLATEX_VERSION
   )
 
 mark_as_advanced(DBLATEX_EXECUTABLE)
-set(DBLATEX_FOUND ${DBLATEX_FOUND} CACHE INTERNAL "")
