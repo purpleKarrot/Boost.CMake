@@ -70,20 +70,12 @@ function(boost_project name)
   file(WRITE "${target_list_file}" "")
   set(BOOST_TARGET_LIST_FILE "${target_list_file}" PARENT_SCOPE)
 
-  if(PROJ_TOOL)
-    set(export_component "${project}_runtime")
-  else()
-    set(export_component "${project}_develop")
-  endif()
-
-  install(CODE
-  "set(BOOST_PROJECT ${project})
-  set(BOOST_DEPENDS ${PROJ_DEPENDS})
-  set(BOOST_TARGETS \"${target_list_file}\")
-  set(BOOST_EXPORTS \"${export_file}\")
-  set(BOOST_IS_TOOL ${PROJ_TOOL})
-  set(BOOST_BINARY_DIR \"${CMAKE_BINARY_DIR}\")
-  include(\"${Boost_MODULE_PATH}/BoostInstallComponent.cmake\")"
-    COMPONENT "${export_component}"
+  install(CODE "set(BOOST_PROJECT ${project})
+set(BOOST_DEPENDS ${PROJ_DEPENDS})
+set(BOOST_TARGETS \"${target_list_file}\")
+set(BOOST_EXPORTS \"${export_file}\")
+set(BOOST_IS_TOOL ${PROJ_TOOL})
+set(BOOST_BINARY_DIR \"${CMAKE_BINARY_DIR}\")
+include(\"${Boost_MODULE_PATH}/BoostInstallComponent.cmake\")"
     )
 endfunction(boost_project)
