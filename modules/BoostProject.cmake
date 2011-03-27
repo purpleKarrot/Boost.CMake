@@ -48,13 +48,14 @@ function(boost_project name)
   endforeach(param)
 
   #
-  foreach(component develop runtime manual)
+  foreach(component debug develop runtime manual)
     string(TOUPPER "${component}" upper)
     set(BOOST_${upper}_COMPONENT "${project}_${component}" PARENT_SCOPE)
-    set(has_var "${project}_HAS_${upper}")
-    set_boost_project(${has_var} OFF)
-    set(BOOST_HAS_${upper}_VAR "${has_var}" PARENT_SCOPE)
   endforeach(component)
+
+  set(header_only "${project}_HEADER_ONLY")
+  set_boost_project(${header_only} ON)
+  set(BOOST_HEADER_ONLY "${header_only}" PARENT_SCOPE)
 
   # this will be obsolete once CMake supports the FOLDER property on directories
   set(BOOST_CURRENT_FOLDER "${name}" PARENT_SCOPE)
@@ -71,10 +72,8 @@ function(boost_project name)
 
   if(PROJ_TOOL)
     set(export_component "${project}_runtime")
-    set_boost_project(${project}_HAS_RUNTIME ON)
   else()
     set(export_component "${project}_develop")
-    set_boost_project(${project}_HAS_DEVELOP ON)
   endif()
 
   install(CODE

@@ -38,5 +38,4 @@ function(boost_add_python_extension)
   endif()
 
   boost_install_libraries(${target})
-  set_boost_project("${BOOST_HAS_RUNTIME_VAR}" ON)
 endfunction(boost_add_python_extension)

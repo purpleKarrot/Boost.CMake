@@ -80,7 +80,6 @@ function(boost_add_library)
     boost_add_pch_to_target(${target} ${TARGET_PCH})
     boost_export(${target} ${TARGET_LINK_BOOST_LIBRARIES})      
     list(APPEND targets ${target})
-    set_boost_project("${BOOST_HAS_RUNTIME_VAR}" ON)
   endif(TARGET_SHARED)
 
   if(TARGET_STATIC)
@@ -95,7 +94,6 @@ function(boost_add_library)
     boost_add_pch_to_target(${target} ${TARGET_PCH})
     boost_export(${target} ${TARGET_LINK_BOOST_LIBRARIES})      
     list(APPEND targets ${target})
-    set_boost_project("${BOOST_HAS_DEVELOP_VAR}" ON)
   endif(TARGET_STATIC)
 
   set_target_properties(${targets} PROPERTIES
@@ -116,13 +114,26 @@ function(boost_install_libraries)
       DESTINATION lib
       COMPONENT "${BOOST_DEVELOP_COMPONENT}"
       CONFIGURATIONS "Release"
+    ARCHIVE
+      DESTINATION lib
+      COMPONENT "${BOOST_DEBUG_COMPONENT}"
+      CONFIGURATIONS "Debug"
     LIBRARY
       DESTINATION lib
       COMPONENT "${BOOST_RUNTIME_COMPONENT}"
       CONFIGURATIONS "Release"
+    LIBRARY
+      DESTINATION lib
+      COMPONENT "${BOOST_DEBUG_COMPONENT}"
+      CONFIGURATIONS "Debug"
     RUNTIME
       DESTINATION bin
       COMPONENT "${BOOST_RUNTIME_COMPONENT}"
       CONFIGURATIONS "Release"
+    RUNTIME
+      DESTINATION bin
+      COMPONENT "${BOOST_DEBUG_COMPONENT}"
+      CONFIGURATIONS "Debug"
     )
+  set_boost_project("${BOOST_HEADER_ONLY}" OFF)
 endfunction(boost_install_libraries)

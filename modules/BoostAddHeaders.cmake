@@ -40,6 +40,4 @@ function(boost_add_headers)
       CONFIGURATIONS "Release"
       )
   endforeach(header)
-
-  set_boost_project("${BOOST_HAS_DEVELOP_VAR}" ON)
 endfunction(boost_add_headers)

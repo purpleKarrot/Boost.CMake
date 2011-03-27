@@ -90,8 +90,6 @@ find_package(FOProcessor QUIET)
 ##########################################################################
 
 function(boost_docbook input)
-  set_boost_project("${BOOST_HAS_MANUAL_VAR}" ON)
-
   set(doc_targets)
   set(html_dir "${CMAKE_CURRENT_BINARY_DIR}/html")
 
