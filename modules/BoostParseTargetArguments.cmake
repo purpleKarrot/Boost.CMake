@@ -6,6 +6,7 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+include(CMakeParseArguments)
 
 ##
 function(boost_parse_target_arguments name)

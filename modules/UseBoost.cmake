@@ -9,7 +9,6 @@
 list(APPEND CMAKE_MODULE_PATH "${Boost_MODULE_PATH}")
 include_directories("${Boost_INCLUDE_DIRS}")
 
-
 ## this function is like 'target_link_libraries, except only for boost libs
 function(boost_link_libraries target)
   cmake_parse_arguments(LIBS "SHARED;STATIC" "" "" ${ARGN})

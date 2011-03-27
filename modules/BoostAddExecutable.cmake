@@ -8,6 +8,8 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+include(BoostParseTargetArguments)
+include(BoostPrecompileHeader)
 include(BoostExport)
 
 # Creates a new executable from source files.
