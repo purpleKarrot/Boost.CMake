@@ -37,6 +37,7 @@ function(boost_add_headers)
     install(FILES ${header}
       DESTINATION "include/${prefix}/${directory}"
       COMPONENT "${BOOST_DEVELOP_COMPONENT}"
+      CONFIGURATIONS "Release"
       )
   endforeach(header)
 

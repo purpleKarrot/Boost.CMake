@@ -6,7 +6,7 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-include(BoostDocs)
+include(BoostDocumentation)
 
 set(boost_modules
   BoostProject

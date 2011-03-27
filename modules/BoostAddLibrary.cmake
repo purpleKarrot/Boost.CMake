@@ -113,11 +113,14 @@ function(boost_install_libraries)
     ARCHIVE
       DESTINATION lib
       COMPONENT "${BOOST_DEVELOP_COMPONENT}"
+      CONFIGURATIONS "Release"
     LIBRARY
       DESTINATION lib
       COMPONENT "${BOOST_RUNTIME_COMPONENT}"
+      CONFIGURATIONS "Release"
     RUNTIME
       DESTINATION bin
       COMPONENT "${BOOST_RUNTIME_COMPONENT}"
+      CONFIGURATIONS "Release"
     )
 endfunction(boost_install_libraries)
