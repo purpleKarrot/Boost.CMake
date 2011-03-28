@@ -75,38 +75,42 @@ function(boost_project name)
   set(BOOST_TARGET_LIST_FILE "${target_list_file}" PARENT_SCOPE)
 
   set(install_code "set(BOOST_PROJECT ${project})
-  set(BOOST_DEPENDS ${PROJ_DEPENDS})
-  set(BOOST_TARGETS \"${target_list_file}\")
-  set(BOOST_EXPORTS \"${export_file}\")
-  set(BOOST_IS_TOOL ${PROJ_TOOL})
-  set(BOOST_BINARY_DIR \"${CMAKE_BINARY_DIR}\")"
+    set(BOOST_DEPENDS ${PROJ_DEPENDS})
+    set(BOOST_TARGETS \"${target_list_file}\")
+    set(BOOST_EXPORTS \"${export_file}\")
+    set(BOOST_IS_TOOL ${PROJ_TOOL})
+    set(BOOST_BINARY_DIR \"${CMAKE_BINARY_DIR}\")"
     )
 
+  # istall(CODE) seems to ignore CONFIGURATIONS...
+  set(debug_match
+    "\"\${CMAKE_INSTALL_CONFIG_NAME}\" MATCHES \"^([Dd][Ee][Bb][Uu][Gg])$\""
+    )
   set(release_match
     "\"\${CMAKE_INSTALL_CONFIG_NAME}\" MATCHES \"^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$\""
     )
 
   if(PROJ_TOOL)
-    install(CODE "${install_code}
-  if(${release_match})
+    install(CODE "if(${release_match})
+    ${install_code}
     include(\"${Boost_MODULE_PATH}/BoostInstallComponent.cmake\")
-  endif(${release_match})
-  include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")"
+    include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")
+  endif(${release_match})"
       COMPONENT "${project}_runtime"
       )
   else(PROJ_TOOL)
-    install(CODE "${install_code}
-  include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")"
-      CONFIGURATIONS "Debug"
+    install(CODE "if(${debug_match})
+    ${install_code}
+    include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")
+  endif(${debug_match})"
       COMPONENT "${project}_debug"
       )
-    install(CODE "${install_code}
-  if(${release_match})
+    install(CODE "if(${release_match})
+    ${install_code}
     include(\"${Boost_MODULE_PATH}/BoostInstallComponent.cmake\")
-  endif(${release_match})
-  include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")"
+    include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")
+  endif(${release_match})"
       COMPONENT "${project}_develop"
-      CONFIGURATIONS "Release"
       )
   endif(PROJ_TOOL)
 endfunction(boost_project)
