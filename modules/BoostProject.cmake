@@ -54,7 +54,11 @@ function(boost_project name)
   endforeach(component)
 
   set(header_only "${project}_HEADER_ONLY")
-  set_boost_project(${header_only} ON)
+  if(PROJ_TOOL)
+    set_boost_project(${header_only} OFF)
+  else(PROJ_TOOL)
+    set_boost_project(${header_only} ON)
+  endif(PROJ_TOOL)
   set(BOOST_HEADER_ONLY "${header_only}" PARENT_SCOPE)
 
   # this will be obsolete once CMake supports the FOLDER property on directories
@@ -70,12 +74,39 @@ function(boost_project name)
   file(WRITE "${target_list_file}" "")
   set(BOOST_TARGET_LIST_FILE "${target_list_file}" PARENT_SCOPE)
 
-  install(CODE "set(BOOST_PROJECT ${project})
-set(BOOST_DEPENDS ${PROJ_DEPENDS})
-set(BOOST_TARGETS \"${target_list_file}\")
-set(BOOST_EXPORTS \"${export_file}\")
-set(BOOST_IS_TOOL ${PROJ_TOOL})
-set(BOOST_BINARY_DIR \"${CMAKE_BINARY_DIR}\")
-include(\"${Boost_MODULE_PATH}/BoostInstallComponent.cmake\")"
+  set(install_code "set(BOOST_PROJECT ${project})
+  set(BOOST_DEPENDS ${PROJ_DEPENDS})
+  set(BOOST_TARGETS \"${target_list_file}\")
+  set(BOOST_EXPORTS \"${export_file}\")
+  set(BOOST_IS_TOOL ${PROJ_TOOL})
+  set(BOOST_BINARY_DIR \"${CMAKE_BINARY_DIR}\")"
     )
+
+  set(release_match
+    "\"\${CMAKE_INSTALL_CONFIG_NAME}\" MATCHES \"^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$\""
+    )
+
+  if(PROJ_TOOL)
+    install(CODE "${install_code}
+  if(${release_match})
+    include(\"${Boost_MODULE_PATH}/BoostInstallComponent.cmake\")
+  endif(${release_match})
+  include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")"
+      COMPONENT "${project}_runtime"
+      )
+  else(PROJ_TOOL)
+    install(CODE "${install_code}
+  include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")"
+      CONFIGURATIONS "Debug"
+      COMPONENT "${project}_debug"
+      )
+    install(CODE "${install_code}
+  if(${release_match})
+    include(\"${Boost_MODULE_PATH}/BoostInstallComponent.cmake\")
+  endif(${release_match})
+  include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")"
+      COMPONENT "${project}_develop"
+      CONFIGURATIONS "Release"
+      )
+  endif(PROJ_TOOL)
 endfunction(boost_project)
