@@ -1,0 +1,44 @@
+[////////////////////////////////////////////////////////////////////////]
+[/ Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>           /]
+[/                                                                      /]
+[/ Distributed under the Boost Software License, Version 1.0.           /]
+[/ See accompanying file LICENSE_1_0.txt or copy at                     /]
+[/   http://www.boost.org/LICENSE_1_0.txt                               /]
+[////////////////////////////////////////////////////////////////////////]
+
+[section Boost.Defrag]
+
+While all Boost libraries and tools may be developed individually, we still want
+do be able to release Boost as a whole. Boost.Defrag is a tool that can
+aggregate ['fragments][footnote The term ['module] is already used in CMake,
+thus we refer to them as ['fragments] to avoid misconceptions.] from different
+sources (CVS, SVN, GIT, ...) and create monolithic packages. The packages
+[@https://github.com/purpleKarrot/Boost.CMake/archives/master here], as well as
+the ubuntu packages in [@https://launchpad.net/~purplekarrot/+archive/ppa my 
+PPA] have been created with Boost.Defrag.
+
+[note
+  This tool is intended for release managers and package maintainers.
+  Neither Boost developers nor clients should need to use Boost.Defrag.
+]
+
+For each fragment, Boost.Defrag contains a fragment definition. Such a fragment
+definition might look like this:
+
+  boost_fragment(foo
+    STABLE DOWNLOAD
+      URL "http://example.org/release/foo.tar.gz"
+      MD5 "6a0076285cb11b293836"
+    UNSTABLE SVN
+      URL "http://svn.example.org/foo/trunk/"
+      REV "HEAD"
+    )
+
+Fragment definitions of libraries under construction should be placed in the
+["inclubating] directory. They are usually excluded from packages but can be
+activated with the `BOOST_INCLUDE_INCUBATING` option.
+
+Boost.Defrag provides additional files for all fragments that are not properly
+ported to Boost.CMake yet. These files are found in the ["provided] directory.
+
+[endsect]

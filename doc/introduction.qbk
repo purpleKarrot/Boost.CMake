@@ -1,0 +1,59 @@
+[////////////////////////////////////////////////////////////////////////]
+[/ Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>           /]
+[/                                                                      /]
+[/ Distributed under the Boost Software License, Version 1.0.           /]
+[/ See accompanying file LICENSE_1_0.txt or copy at                     /]
+[/   http://www.boost.org/LICENSE_1_0.txt                               /]
+[////////////////////////////////////////////////////////////////////////]
+
+[section Introduction]
+
+Boost.CMake is a collection of CMake modules to simplify the use and development
+of Boost libraries.
+
+[warning
+  Boost.CMake is [*NOT] the official build system for the Boost libraries.
+
+  You might be interested in the official
+  [@http://www.boost.org/more/getting_started/index.html Getting Started] section
+  on the Boost website. 
+]
+
+[section Motivation]
+
+If you want to use a library that is proposed for Boost, you might find the
+following instructions in the install section of its documentation:
+
+* download the sources from Boost Vault
+* extract the archive into the boost-source directory
+* run bjam
+
+Easy, three simple steps and your library is built, [*if] you are used to build
+Boost from source. If you usually install Boost prebuilt via an installer or
+package management system, you might ask yourself: ["The easiest way to install
+this library is to deinstall Boost and then recompile everything? What is this
+bjam thing anyway, can't I use Visual Studio?]
+
+With Boost.CMake, the install instruction might look like this:
+
+* download and extract the sources from Boost Vault
+* run CMake to generate project files or makefiles
+* open the generated project with your IDE
+* use your IDE to build and install the library
+
+This instruction is longer and far more ambiguous. It is unclear what is meant
+by ['project files], ['makefiles], ['generated project] and ['IDE].
+This ambiguity is intended. Unlike bjam, CMake is not a build-system; it is a
+meta-build-system, or build-system generator. CMake supports multiple native
+build systems on certain platforms. Supported build-systems are specified in
+the [@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#section_Generators
+Generators section] of the CMake manual.
+
+With Boost.CMake, it is not required to have the Boost source code to build
+one individual library. The only requirement is that all its dependencies are
+installed. It is still possible to build the whole Boost distribution at once.
+In that case, the dependencies of each library do not have to be installed.
+
+[endsect]
+
+[endsect]

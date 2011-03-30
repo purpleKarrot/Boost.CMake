@@ -1,0 +1,85 @@
+[////////////////////////////////////////////////////////////////////////]
+[/ Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>           /]
+[/                                                                      /]
+[/ Distributed under the Boost Software License, Version 1.0.           /]
+[/ See accompanying file LICENSE_1_0.txt or copy at                     /]
+[/   http://www.boost.org/LICENSE_1_0.txt                               /]
+[////////////////////////////////////////////////////////////////////////]
+
+[section Getting Started]
+
+[section Required Tools]
+To use Boost.CMake you need:
+
+* [@http://www.cmake.org/ CMake]
+* your favorite compiler and IDE
+* Boost.CMake, of course
+
+Depending on the documentation format you want to create, you will also need
+some of those:
+
+* BoostBook
+* DocBook
+* Quickbook
+* doxygen
+* xsltproc
+* FOP or XEP (requires Java)
+* dblatex (requires Python and LaTeX)
+
+[endsect]
+
+[section Install on Ubuntu]
+On Ubuntu, Boost.CMake can be installed from
+[@https://launchpad.net/~purplekarrot/+archive/ppa my PPA].
+This will automatically install all dependancies. 
+
+Open a console window and type in the following:[teletype]
+
+  $ sudo add-apt-repository ppa:purplekarrot/ppa
+  $ sudo apt-get update
+  $ sudo apt-get install boost-cmake
+
+[endsect]
+
+[section Install on Windows]
+
+[@https://github.com/purpleKarrot/Boost.CMake/archives/master]
+
+[@http://dblatex.sourceforge.net/doc/manual/ch02s03.html]
+
+[endsect]
+
+[section Install on Other Platforms]
+If you figured out how to install all the required tools on any other platform,
+please let me know.
+[endsect]
+
+[section Use the Boost Package in CMake]
+If you never worked with CMake before, you should familiarize yourself with the
+[@http://www.cmake.org/cmake/help/syntax.html Syntax] and have a look at this
+[@http://www.cmake.org/cmake/help/examples.html simple example]. There is also a 
+[@http://www.cmake.org/cmake/help/cmake_tutorial.html Turorial] which gives a
+good introduction.
+
+If you already used Boost with CMake, then you probably used the FindBoost
+module that ships with CMake. When Boost is installed as a CMake package, you
+should tell the `find_package()` command to skip this module and search for a
+Boost package in ["Config] mode. This is achieved with the `NO_MODULE` keyword:
+[c++]
+
+  find_package(Boost "1.46" REQUIRED COMPONENTS filesystem ``[*NO_MODULE]``)
+  include("${Boost_USE_FILE}")
+
+The variable `Boost_USE_FILE` is set to the path of a CMake file that can be
+included to add the include and library paths.
+
+To link agains Boost libraries, use the function `boost_link_libraries()`. This
+function works similar to `target_link_libraries()`, but it only links the
+libraries when autolinking is not supported.
+
+  add_executable(hello hello.cpp)
+  boost_link_libraries(hello filesystem)
+
+[endsect]
+
+[endsect]

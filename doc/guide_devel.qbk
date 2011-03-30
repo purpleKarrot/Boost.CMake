@@ -1,0 +1,223 @@
+[////////////////////////////////////////////////////////////////////////]
+[/ Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>           /]
+[/                                                                      /]
+[/ Distributed under the Boost Software License, Version 1.0.           /]
+[/ See accompanying file LICENSE_1_0.txt or copy at                     /]
+[/   http://www.boost.org/LICENSE_1_0.txt                               /]
+[////////////////////////////////////////////////////////////////////////]
+
+[section Boost.CMake for Boost projects]
+
+In this section I will guide you through the required steps to create a new
+Boost library or port an existing Boost library to the CMake build system.
+
+[section Handling Dependencies]
+If your project depends on other Boost components, these components should be
+installed with CMake. It follows, that you can only CMake-ify a Boost component
+once all dependencies have been CMake-ified before.
+
+Depending components should be listed after the `COMPONENTS` keyword in the
+`find_package()` command when searching for Boost. It does not matter whether 
+these components are header only or not. Dependencies are transitive, that means
+if your project depends on Boost.Filesystem and Boost.System you only have to
+check for Boost.Filesystem.
+
+Next, include `Boost_DEV_FILE`. This will enable all the commands documented
+below.
+
+[note
+  The `Boost_USE_FILE` variable is intended for projects that are built with
+  CMake and depend on Boost. Projects that are part of Boost should use
+  `Boost_DEV_FILE` instead.
+]
+
+Your CMakeLists.txt file will look something like this: [python]
+
+  # Distributed under the Boost Software License, Version 1.0.
+  # See http://www.boost.org/LICENSE_1_0.txt
+
+  cmake_minimum_required(VERSION 2.8.4)
+
+  find_package(Boost "1.46" REQUIRED COMPONENTS filesystem test NO_MODULE)
+  include("${Boost_DEV_FILE}")
+
+In this example, the required components are Boost.Filesystem and Boost.Test.
+[endsect]
+
+[section Project Definition]
+Call the `boost_project()` command to set a name and description to the project.
+If the name of your project contains spaces, you should put the whole project's
+name in quotes. 
+
+  boost_project("Example Project"
+    AUTHORS
+      "John Doe <john@doe.com>"
+    DESCRIPTION
+      "This is an example project for Boost.CMake."
+    DEPENDS
+      filesystem
+    )
+
+You see that you have to list dependencies again! But there is a difference:
+The `COMPONENTS` in the `find_package()` command checks that all the required
+components are available when CMake is run, i.e. when someone builds the
+project. The `DEPENDS` argument in the `boost_project()` command defines
+dependencies for the generated package.
+
+In the shown example that means that everybody who installs our project, should
+also install Boost.Filesystem and all its dependencies. To build the project,
+Boost.Test is required too (e.g. because the unit tests depend on it).
+[endsect]
+
+[section Public Header Files]
+Declare your public header files with the `boost_add_headers()` command. This
+command will make sure that the headers get installed and can be included by
+other Boost projects when doing a monolithic build.
+
+  file(GLOB_RECURSE headers "boost/*.hpp")
+  boost_add_headers(${headers})
+
+In the example above, the ["boost] directory is searched recursively for files
+that end with .hpp. The directory structure is preserved, so all found headers
+get installed to the directory ["<include dir>/boost].
+
+It might be the case that the directory structure should be modified when
+installing header files. As an optional argument, you may specify a prefix.
+Possible scenarios are:
+
+* Your headers are in ["boost/bar] relative to your CMakeLists.txt and you want
+  to install them to ["<include dir>/boost/bar].
+  You may omit the prefix parameter or set it to ["].
+
+* Your headers are in the same directory as the CMakeLists.txt and you want to
+  install them to ["<include dir>/boost/foo], then you should use ["boost/foo]
+  as a prefix.
+
+* Your headers are in ["include/boost/baz] relative to your CMakeLists.txt and
+  you want to install them to ["<include dir>/boost/baz]. In that case, you need
+  a replacement prefix:
+  ["!include/boost/baz!boost/baz!] or ["!include/boost!boost!] or ["!include!!]
+  will provide the appropriate result in this case.
+
+  file(GLOB_RECURSE headers "include/*.hpp")
+  boost_add_headers(${headers} PREFIX "!include!boost!")
+
+Please note that the use of a globbing expression is [_not recommended] (see
+[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:file CMake
+manual]), it is better to list all header files explicitely in the
+CMakeLists.txt file.
+
+  boost_add_headers(PREFIX "!include!boost!"
+    include/foo.hpp
+    include/foo/bar.hpp
+    include/foo/baz.hpp
+    ...
+    )
+
+[endsect]
+
+[section Libraries and Executables]
+To add a compiled library, use the `boost_add_library()` command instead of
+[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library
+`add_library`].
+
+  boost_add_library(example example.cpp)
+
+If you need to link other boost libraries, list them after LINK_BOOST_LIBRARIES.
+To link third party libraries, list them after LINK_LIBRARIES.
+
+  find_package(ZLIB REQUIRED)
+
+  boost_add_library(example
+    SOURCE
+      example.cpp
+    LINK_BOOST_LIBRARIES
+      filesystem
+    LINK_LIBRARIES
+      ${ZLIB_LIBRARIES}
+    )
+
+To add an executable, use the `boost_add_executable()` command instead of
+[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable
+`add_executable()`].
+This command supports the same arguments as the `boost_add_library()` command.
+
+  boost_add_executable(example
+    SOURCE
+      exe.cpp
+    LINK_BOOST_LIBRARIES
+      example
+    )
+
+[endsect]
+
+[section Precompiling Headers]
+Precompiling header files can speed up compilation by creating a partially
+processed version of some header files, and then using that version during
+compilations rather than repeatedly parsing the original headers.
+
+To precompile headers, list them after the `PRECOMPILE` keyword in the
+`boost_add_library()` or `boost_add_executable()` command. If precompiled
+headers are supported, these headers are included in all source files. It is
+therefore not required to explicitely include these headers in your source. It
+is also not required to guard the inclusion with a PCH_ENABLED macro.
+
+  boost_add_library(example
+    SOURCE
+      example.cpp
+    PRECOMPILE
+      "precompile.hpp"
+      <boost/filesystem.hpp>
+    LINK_BOOST_LIBRARIES
+      filesystem
+    LINK_LIBRARIES
+      ${ZLIB_LIBRARIES}
+    )
+
+[endsect]
+
+[section Documentation]
+Generate documentation with the 'boost_documentation' command. Use
+'boost_add_reference' if you want to include one or more reference sections in
+the documentation.
+[endsect]
+
+[section Tests]
+Use the 'boost_add_test' command to ad a single test case. Use
+'boost_test_suite' to add multiple tests at once.
+[endsect]
+
+[section Workspace]
+If you are a maintainer of more than one Boost library, you may want have some
+kind of workspace that contains just your libraries.
+
+You should create a directory and place all your libraries inside. You may also
+create a meta-repository and use your libraries as svn:externals or
+git-submodules. Also, maybe Ryppl can be used to create such a directory layout?
+
+In the root directory you should create a CMakeLists.txt file with the following
+content:
+
+  cmake_minimum_required(VERSION 2.8.4)
+  project(Workspace)
+
+  # set this property to OFF when you use Visual Studio Express
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+  enable_testing()
+
+  set(BOOST_FILESYSTEM_MAINTENANCE ON)
+  set(BOOST_QUICKBOOK_MAINTENANCE ON)
+
+  include_directories(${CMAKE_BINARY_DIR}/include)
+
+  add_subdirectory(filesystem)
+  add_subdirectory(quickbook)
+
+  include(CPack)
+  
+Instead of filesystem and quickbook, you will list all your libraries. It is
+important, that you also set the BOOST_*_MAINTENANCE variables to ON.
+[endsect]
+
+[endsect]
