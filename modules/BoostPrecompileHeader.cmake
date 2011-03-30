@@ -11,15 +11,6 @@
 function(boost_add_pch name source_list)
   set(pch_header "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.hpp")
   set(pch_source "${CMAKE_CURRENT_BINARY_DIR}/${name}_pch.cpp")
-  set(pch_binary "${CMAKE_CURRENT_BINARY_DIR}/${name}.pch")
-
-  if(MSVC_IDE)
-    set(pch_binary "$(IntDir)/${name}.pch")
-  endif(MSVC_IDE)
-
-  if(CMAKE_COMPILER_IS_GNUCXX)
-    set(pch_binary "${pch_header}.gch")
-  endif(CMAKE_COMPILER_IS_GNUCXX)
 
   file(WRITE ${pch_header}.in "/* ${name} precompiled header file */\n\n")
   foreach(header ${ARGN})
@@ -35,7 +26,8 @@ function(boost_add_pch name source_list)
   file(WRITE ${pch_source}.in "#include \"${pch_header}\"\n")
   configure_file(${pch_source}.in ${pch_source} COPYONLY)
 
-  if(MSVC)
+  if(MSVC_IDE)
+    set(pch_binary "$(IntDir)/${name}.pch")
     set_source_files_properties(${pch_source} PROPERTIES
       COMPILE_FLAGS "/Yc\"${pch_header}\" /Fp\"${pch_binary}\""
       OBJECT_OUTPUTS "${pch_binary}"
@@ -45,7 +37,7 @@ function(boost_add_pch name source_list)
       OBJECT_DEPENDS "${pch_binary}"
       )
     set(${source_list} ${pch_source} ${${source_list}} PARENT_SCOPE)
-  endif(MSVC)
+  endif(MSVC_IDE)
   
   set(PCH_HEADER ${pch_header} PARENT_SCOPE)
 endfunction(boost_add_pch)

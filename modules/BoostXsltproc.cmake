@@ -34,8 +34,9 @@ function(boost_xsltproc output stylesheet input)
   string(REGEX REPLACE "[./]" "_" name ${name})
   set(script "${CMAKE_CURRENT_BINARY_DIR}/${name}.cmake")
 
+  string(REPLACE " " "%20" catalog "${BOOSTBOOK_CATALOG}")
   file(WRITE ${script}
-    "set(ENV{XML_CATALOG_FILES} \"${BOOSTBOOK_CATALOG}\")\n"
+    "set(ENV{XML_CATALOG_FILES} \"${catalog}\")\n"
     "execute_process(COMMAND \${XSLTPROC_EXECUTABLE} --xinclude --nonet\n"
     )
 
@@ -48,7 +49,7 @@ function(boost_xsltproc output stylesheet input)
   endforeach(param)
 
   file(APPEND ${script}
-    "  -o ${output} ${stylesheet} ${input}\n"
+    "  -o \"${output}\" \"${stylesheet}\" \"${input}\"\n"
     "  RESULT_VARIABLE result\n"
     "  )\n"
     "if(NOT result EQUAL 0)\n"

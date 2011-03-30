@@ -146,12 +146,12 @@ function(boost_docbook input)
   add_dependencies(documentation ${target})
 
   # build documentation as pdf
-  if(DBLATEX_FOUND OR FOP_FOUND)
+  if(DBLATEX_FOUND OR FOPROCESSOR_FOUND)
     set(pdf_dir ${CMAKE_BINARY_DIR}/pdf)
     set(pdf_file ${pdf_dir}/${BOOST_CURRENT_PROJECT}.pdf)
     file(MAKE_DIRECTORY ${pdf_dir})
 
-    if(FOP_FOUND)
+    if(FOPROCESSOR_FOUND)
       set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.fo)
       boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
         PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
@@ -174,7 +174,7 @@ function(boost_docbook input)
       FOLDER "${BOOST_CURRENT_FOLDER}"
       PROJECT_LABEL "${BOOST_CURRENT_PROJECT} (pdf)"
       )
-  endif(DBLATEX_FOUND OR FOP_FOUND)
+  endif(DBLATEX_FOUND OR FOPROCESSOR_FOUND)
 endfunction(boost_docbook)
 
 ##########################################################################
