@@ -9,14 +9,19 @@
 
 include(BoostDoxygen)
 include(BoostXsltproc)
+include(CMakeParseArguments)
 
 # Use Doxygen to parse header files and produce BoostBook output.
 #
-#   doxygen_to_boostbook(output header1 header2 ...
-#     [PARAMETERS param1=value1 param2=value2 ... ]
+#   boost_add_reference(name header1 header2 ...
+#     [DOXYFILE doxyfile ]
+#     [TAGFILES tagfile1 tagfile2 ... ]
+#     [DOXYGEN_PARAMETERS param1=value1 param2=value2 ... ]
+#     [XSLTPROC_PARAMETERS param1=value1 param2=value2 ... ]
+#     [DEPENDS dep dep2 ... ]
 #     )
 #
-# This macro sets up rules to transform a set of C/C++ header files
+# This function sets up rules to transform a set of C/C++ header files
 # into BoostBook reference documentation. The resulting BoostBook XML
 # file will be named by the "output" parameter, and the set of headers
 # is provided following the output file. The actual parsing of header
@@ -25,13 +30,14 @@ include(BoostXsltproc)
 #
 # Doxygen has a variety of configuration parameters. One can supply
 # extra Doxygen configuration parameters by providing NAME=VALUE pairs
-# following the PARAMETERS argument. These parameters will be added to
+# following the DOXYGEN_PARAMETERS argument. These parameters will be added to
 # the Doxygen configuration file.
 #
 function(boost_add_reference name)
-  cmake_parse_arguments(REF ""
-    "ID;TITLE;DOXYFILE" "DOXYGEN_PARAMETERS;TAGFILES;DEPENDS" ${ARGN})
+  set(mv_keys TAGFILES DOXYGEN_PARAMETERS XSLTPROC_PARAMETERS DEPENDS)
+  cmake_parse_arguments(REF "" "DOXYFILE" "${mv_keys}" ${ARGN})
 
+  # generate Doxygen XML from input source files
   boost_doxygen(${name} XML
     INPUT      ${REF_UNPARSED_ARGUMENTS}
     DOXYFILE   "${REF_DOXYFILE}"
@@ -39,20 +45,11 @@ function(boost_add_reference name)
     PARAMETERS "${REF_DOXYGEN_PARAMETERS}"
     )
 
-  set(parameters)
-  if(REF_ID)
-    list(APPEND parameters "boost.doxygen.refid=${REF_ID}")
-  endif(REF_ID)
-
-  if(REF_TITLE)
-    list(APPEND parameters "boost.doxygen.reftitle=${REF_TITLE}")
-  endif(REF_TITLE)
-
   # Transform single Doxygen XML file into BoostBook XML
   boost_xsltproc(
-    ${CMAKE_CURRENT_BINARY_DIR}/${name}.xml
-    ${BOOSTBOOK_XSL_DIR}/doxygen/doxygen2boostbook.xsl
-    ${${name}_xml}
-    PARAMETERS ${parameters}
+    "${CMAKE_CURRENT_BINARY_DIR}/${name}.xml"
+    "${BOOSTBOOK_XSL_DIR}/doxygen/doxygen2boostbook.xsl"
+    "${${name}_xml}"
+    PARAMETERS "${REF_XSLTPROC_PARAMETERS}"
     )
 endfunction(boost_add_reference)

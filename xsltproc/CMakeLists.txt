@@ -6,28 +6,13 @@
 # http://www.boost.org/LICENSE_1_0.txt #
 ##########################################################################
 
+include(BoostDownload)
 include(BoostExtract)
 
-function(download name url md5)
-  set(archive "${CMAKE_CURRENT_BINARY_DIR}/${name}.tgz")
-  if(EXISTS "${archive}")
-    execute_process(COMMAND "${CMAKE_COMMAND}" -E md5sum "${archive}"
-      OUTPUT_VARIABLE output
-      )
-    if("${output}" MATCHES "^${md5} ")
-      return()
-    endif("${output}" MATCHES "^${md5} ")
-  endif(EXISTS "${archive}")
-  message(STATUS "Downloading '${url}'")
-  file(DOWNLOAD "${url}" "${archive}" SHOW_PROGRESS EXPECTED_MD5 "${md5}")
-endfunction(download)
-
 function(extract_download name url md5)
-  download(${name} ${url} ${md5})
-  boost_extract(
-    "${CMAKE_CURRENT_BINARY_DIR}/${name}.tgz"
-    "${CMAKE_CURRENT_BINARY_DIR}/${name}"
-    )
+  set(archive "${CMAKE_CURRENT_BINARY_DIR}/${name}.tgz")
+  boost_download("${archive}" ${url} ${md5})
+  boost_extract("${archive}" "${CMAKE_CURRENT_BINARY_DIR}/${name}")
 endfunction(extract_download)
 
 ##########################################################################

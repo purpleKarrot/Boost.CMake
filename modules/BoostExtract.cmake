@@ -7,6 +7,18 @@
 ##########################################################################
 
 function(boost_extract archive destination)
+  if(NOT IS_ABSOLUTE "${archive}")
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${archive}")
+      set(archive "${CMAKE_CURRENT_SOURCE_DIR}/${archive}")
+    else
+      set(archive "${CMAKE_CURRENT_BINARY_DIR}/${archive}")
+    endif()
+  endif()
+
+  if(NOT IS_ABSOLUTE "${destination}")
+    set(destination "${CMAKE_CURRENT_BINARY_DIR}/${destination}")
+  endif()
+
   if(EXISTS "${destination}" AND NOT "${archive}" IS_NEWER_THAN "${destination}")
     return()
   endif()
@@ -16,7 +28,8 @@ function(boost_extract archive destination)
   file(MAKE_DIRECTORY "${tempdir}")
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz "${archive}"
     WORKING_DIRECTORY "${tempdir}"
-    RESULT_VARIABLE rv)
+    RESULT_VARIABLE rv
+    )
   if(NOT rv EQUAL 0)
     file(REMOVE_RECURSE "${tempdir}")
     message(FATAL_ERROR "error: extract of '${archive}' failed")

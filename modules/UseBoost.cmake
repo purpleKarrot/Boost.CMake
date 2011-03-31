@@ -17,23 +17,19 @@ function(boost_link_libraries target)
 
   foreach(lib ${LIBS_UNPARSED_ARGUMENTS})
     if(LIBS_STATIC)
-      list(APPEND link_libraries "${lib}-static")
+      list(APPEND link_libraries "${BOOST_NAMESPACE}${lib}-static")
     else()
       string(TOUPPER "BOOST_${lib}_DYN_LINK" def)
       list(APPEND compile_definitions "${def}=1")
-      list(APPEND link_libraries "${lib}-shared")
+      list(APPEND link_libraries "${BOOST_NAMESPACE}${lib}-shared")
     endif()
   endforeach(lib)
 
-  set_property(TARGET ${target} APPEND
-    PROPERTY COMPILE_DEFINITIONS "${compile_definitions}")
+  set_property(TARGET ${target} APPEND PROPERTY
+    COMPILE_DEFINITIONS "${compile_definitions}"
+    )
 
-# if(_BOOST_MONOLITHIC_BUILD)
+  #if(NOT MSVC) #AUTOLINK
     target_link_libraries(${target} ${link_libraries})
-# else(_BOOST_MONOLITHIC_BUILD)
-#   find_package(Boost REQUIRED COMPONENTS ${LIBS_UNPARSED_ARGUMENTS})
-#   if(NOT MSVC) #AUTOLINK
-#     target_link_libraries(${target} ${Boost_LIBRARIES})
-#   endif(NOT MSVC) #AUTOLINK
-# endif(_BOOST_MONOLITHIC_BUILD)
+  #endif(NOT MSVC)
 endfunction(boost_link_libraries)
