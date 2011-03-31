@@ -94,6 +94,7 @@ else(CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
       "Choose the type of build (${config_types})" FORCE)
   endif (NOT CMAKE_BUILD_TYPE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${config_types})
 endif(CMAKE_CONFIGURATION_TYPES)
 
 
