@@ -45,7 +45,7 @@ function(boost_xsltproc output stylesheet input)
     string(REGEX REPLACE "([^=]*)=([^;]*)" "\\1;\\2" name_value ${param})
     list(GET name_value 0 name)
     list(GET name_value 1 value)
-    file(APPEND ${script} "  --stringparam ${name} \"${value}\"\n")
+    file(APPEND ${script} "  --stringparam ${name} ${value}\n")
   endforeach(param)
 
   file(APPEND ${script}
