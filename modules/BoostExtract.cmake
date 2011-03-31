@@ -10,7 +10,7 @@ function(boost_extract archive destination)
   if(NOT IS_ABSOLUTE "${archive}")
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${archive}")
       set(archive "${CMAKE_CURRENT_SOURCE_DIR}/${archive}")
-    else
+    else()
       set(archive "${CMAKE_CURRENT_BINARY_DIR}/${archive}")
     endif()
   endif()
