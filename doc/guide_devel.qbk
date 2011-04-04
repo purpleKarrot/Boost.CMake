@@ -204,7 +204,11 @@ content:
   # set this property to OFF when you use Visual Studio Express
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-  enable_testing()
+  # As long as CTest does not support incremental testing, we disable the
+  # builtin test target and create our own. This target should be "built"
+  # with the "keep going" option, eg: 'make test -k'.
+  add_custom_target(test)
+  #enable_testing()
 
   set(BOOST_FILESYSTEM_MAINTENANCE ON)
   set(BOOST_QUICKBOOK_MAINTENANCE ON)

@@ -79,10 +79,10 @@ function(boost_test_impl_cmake name)
   if(TEST_LINK OR TEST_RUN)
     add_executable(${target} EXCLUDE_FROM_ALL ${sources})
     boost_link_libraries(${target}
-      ${TARGET_LINK_BOOST_LIBRARIES}
+      ${TEST_LINK_BOOST_LIBRARIES}
       )
     target_link_libraries(${target}
-      ${TARGET_LINK_LIBRARIES}
+      ${TEST_LINK_LIBRARIES}
       )
   endif(TEST_LINK OR TEST_RUN)
 
