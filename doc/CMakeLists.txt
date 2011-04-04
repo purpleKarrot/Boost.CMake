@@ -19,7 +19,7 @@ set(boost_modules
 
 set(reference)
 foreach(module ${boost_modules})
-  set(input "${Boost_MODULE_PATH}/${module}.cmake")
+  set(input "${CMAKE_CURRENT_SOURCE_DIR}/../modules/${module}.cmake")
   set(output "${module}.qbk")
   add_custom_command(OUTPUT ${output}
     COMMAND ${CMAKE_COMMAND}

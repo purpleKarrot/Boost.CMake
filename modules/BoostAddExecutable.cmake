@@ -8,9 +8,9 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-include(BoostParseTargetArguments)
-include(BoostPrecompileHeader)
-include(BoostExport)
+include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/parse_target_arguments.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/precompile_header.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/export.cmake")
 
 # Creates a new executable from source files.
 #

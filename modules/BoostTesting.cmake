@@ -1,14 +1,13 @@
 ################################################################################
-# Copyright (C) 2007-2009 Douglas Gregor <doug.gregor@gmail.com>               #
-# Copyright (C) 2007-2009 Troy Straszheim <troy@resophonic.com>                #
-# Copyright (C) 2010-2011 Daniel Pfeifer <daniel@pfeifer-mail.de>              #
+# Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>                   #
 #                                                                              #
 # Distributed under the Boost Software License, Version 1.0.                   #
 # See accompanying file LICENSE_1_0.txt or copy at                             #
 #   http://www.boost.org/LICENSE_1_0.txt                                       #
 ################################################################################
 
-include(CMakeParseArguments)
+#include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/test_impl_ctest.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/test_impl_cmake.cmake")
 
 # This function creates a Boost regression test. If the test can be built,
 # executed, and exits with a return code of zero, it will be considered to have
@@ -42,168 +41,9 @@ include(CMakeParseArguments)
 # test executable when it is run.
 #
 function(boost_add_test name)
-  cmake_parse_arguments(TEST "COMPILE;RUN;LINK;FAIL" ""
-    "ARGS;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
+  #boost_test_impl_ctest(${name} ${ARGN})
 
-  # If no sources are specified, use the name of the test.cpp
-  if(NOT TEST_UNPARSED_ARGUMENTS)
-    set(TEST_UNPARSED_ARGUMENTS ${name})
-  endif(NOT TEST_UNPARSED_ARGUMENTS)
-
-  set(link_boost_libraries)
-  set(link_boost_directories)
-  foreach(lib ${TEST_LINK_BOOST_LIBRARIES})
-    set(target ${lib}-static)
-    list(APPEND link_boost_directories "$<TARGET_LINKER_FILE_DIR:${target}>")
-    list(APPEND link_boost_libraries "$<TARGET_LINKER_FILE:${target}>")
-  endforeach(lib)
-
-  set(test_dir ${CMAKE_CURRENT_BINARY_DIR}/${name}) 
-  set(listfile ${test_dir}/CMakeLists.txt)
-
-  file(WRITE ${listfile}
-    "cmake_minimum_required(VERSION 2.8)\n"
-    "project(Test)\n\n"
-    "set_directory_properties(PROPERTIES\n"
-    )
-
-  foreach(property COMPILE_DEFINITIONS INCLUDE_DIRECTORIES)
-    get_directory_property(value ${property})
-    file(APPEND ${listfile} "  ${property} \"${value}\"\n")
-  endforeach(property)
-
-  file(APPEND ${listfile}
-    "  )\n\n"
-    "link_directories(\${LINK_BOOST_DIRECTORIES})\n\n"
-    "set(sources\n"
-    )
-
-  foreach(source ${TEST_UNPARSED_ARGUMENTS})
-    get_filename_component(absolute "${source}" ABSOLUTE)
-    file(RELATIVE_PATH relative "${test_dir}" "${absolute}")
-    file(APPEND ${listfile} "  ${relative}\n")
-  endforeach(source)
-
-  file(APPEND ${listfile}
-    "  )\n\n"
-    "add_library(compile STATIC \${sources})\n\n"
-    "add_executable(link \${sources})\n"
-    )
-
-  file(APPEND ${listfile} "target_link_libraries(link\n")
-  foreach(lib ${TEST_LINK_LIBRARIES})
-    file(APPEND ${listfile} "  ${lib}\n")
-  endforeach(lib)
-
-  file(APPEND ${listfile}
-    "  \${LINK_BOOST_LIBRARIES}\n"
-    "  )\n\n"
-    "add_custom_target(run COMMAND link \"${TEST_ARGS}\"\n"
-    "  # WORKING_DIRECTORY \${WORKING_DIRECTORY}\n"
-    "  )\n"
-    )
-
-  if(TEST_COMPILE)
-    set(target compile)
-  elseif(TEST_LINK)
-    set(target link)
-  else()
-    set(target run)
-  endif()
-
-  if(MSVC) # use autolink
-    set(boost_libraries_arg "-DLINK_BOOST_DIRECTORIES=${link_boost_directories}")
-  else()
-    set(boost_libraries_arg "-DLINK_BOOST_LIBRARIES=${link_boost_libraries}")
-  endif()
-
-  set(testname "${BOOST_CURRENT_PROJECT}-${name}")
-
-  add_test(NAME ${testname} COMMAND ${CMAKE_CTEST_COMMAND}
-    --build-and-test ${name} ${name}
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target "${target}"
-    --build-noclean
-    --build-options
-#   "-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
-#   "-DCMAKE_CXX_COMPILER_WORKS:INTERNAL=${CMAKE_CXX_COMPILER_WORKS}"
-#   "-DCMAKE_DETERMINE_CXX_ABI_COMPILED:INTERNAL=${CMAKE_DETERMINE_CXX_ABI_COMPILED}"
-#   "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
-#   "-DCMAKE_C_COMPILER_WORKS:INTERNAL=${CMAKE_C_COMPILER_WORKS}"
-#   "-DCMAKE_DETERMINE_C_ABI_COMPILED:INTERNAL=${CMAKE_DETERMINE_C_ABI_COMPILED}"
-    "-DCMAKE_BUILD_TYPE:STRING=$<CONFIGURATION>"
-    "${boost_libraries_arg}"
-    )
-
-  # TODO: RUN FAIL testcases should be tested to COMPILE and LINK too!
-
-  if(TEST_FAIL)
-    set(will_fail ON)
-    set(fail_label known-failure)
-  else(TEST_FAIL)
-    set(will_fail OFF)
-    set(fail_label)
-  endif(TEST_FAIL)
-
-  set_tests_properties(${testname} PROPERTIES
-    LABELS "${BOOST_CURRENT_PROJECT};${fail_label}"
-    WILL_FAIL "${will_fail}"
-    )
+  if(NOT MSVC_IDE)
+    boost_test_impl_cmake(${name} ${ARGN})
+  endif(NOT MSVC_IDE)
 endfunction(boost_add_test)
-
-################################################################################
-
-#
-#   boost_test_suite(
-#     [COMPILE <list of source files>]
-#     [COMPILE_FAIL <list of source files>]
-#     [LINK <list of source files>]
-#     [LINK_FAIL <list of source files>]
-#     [RUN <list of source files>]
-#     [RUN_FAIL <list of source files>]
-#     [LINK_BOOST_LIBRARIES <list of boost libraries to link>]
-#     [LINK_LIBRARIES <list of third party libraries to link>]
-#     )
-#
-function(boost_test_suite)
-  set(args COMPILE COMPILE_FAIL LINK LINK_FAIL RUN RUN_FAIL
-    LINK_BOOST_LIBRARIES LINK_LIBRARIES)
-  cmake_parse_arguments(TEST "" "" "${args}" ${ARGN})
-
-  foreach(test ${TEST_COMPILE})
-    boost_add_test(${test} COMPILE)
-  endforeach(test)
-
-  foreach(test ${TEST_COMPILE_FAIL})
-    boost_add_test(${test} COMPILE FAIL)
-  endforeach(test)
-
-  foreach(test ${TEST_LINK})
-    boost_add_test(${test} LINK
-      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
-      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
-      )
-  endforeach(test)
-
-  foreach(test ${TEST_LINK_FAIL})
-    boost_add_test(${test} LINK FAIL
-      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
-      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
-      )
-  endforeach(test)
-
-  foreach(test ${TEST_RUN})
-    boost_add_test(${test} RUN
-      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
-      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
-      )
-  endforeach(test)
-
-  foreach(test ${TEST_RUN_FAIL})
-    boost_add_test(${test} RUN FAIL
-      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
-      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
-      )
-  endforeach(test)
-endfunction(boost_test_suite)

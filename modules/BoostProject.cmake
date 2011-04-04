@@ -15,6 +15,8 @@ function(set_boost_project name value)
   set(BOOST_PROJECT_${name} "${value}" CACHE INTERNAL "" FORCE)
 endfunction(set_boost_project)
 
+set(boost_private_module_dir "${CMAKE_CURRENT_LIST_DIR}/boost_detail")
+
 ##########################################################################
 
 # use this function as a replacement for 'project' in boost projects.
@@ -97,22 +99,22 @@ function(boost_project name)
   if(PROJ_TOOL)
     install(CODE "if(${release_match})
     ${install_code}
-    include(\"${Boost_MODULE_PATH}/BoostInstallComponent.cmake\")
-    include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")
+    include(\"${boost_private_module_dir}/install_component.cmake\")
+    include(\"${boost_private_module_dir}/install_component_config.cmake\")
   endif(${release_match})"
       COMPONENT "${project}_runtime"
       )
   else(PROJ_TOOL)
     install(CODE "if(${debug_match})
     ${install_code}
-    include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")
+    include(\"${boost_private_module_dir}/install_component_config.cmake\")
   endif(${debug_match})"
       COMPONENT "${project}_debug"
       )
     install(CODE "if(${release_match})
     ${install_code}
-    include(\"${Boost_MODULE_PATH}/BoostInstallComponent.cmake\")
-    include(\"${Boost_MODULE_PATH}/BoostInstallComponentConfig.cmake\")
+    include(\"${boost_private_module_dir}/install_component.cmake\")
+    include(\"${boost_private_module_dir}/install_component_config.cmake\")
   endif(${release_match})"
       COMPONENT "${project}_develop"
       )

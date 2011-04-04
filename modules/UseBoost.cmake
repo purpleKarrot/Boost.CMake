@@ -6,7 +6,6 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-list(APPEND CMAKE_MODULE_PATH "${Boost_MODULE_PATH}")
 include_directories("${Boost_INCLUDE_DIRS}")
 
 ## this function is like 'target_link_libraries, except only for boost libs

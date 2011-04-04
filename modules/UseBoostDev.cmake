@@ -9,6 +9,7 @@
 ##########################################################################
 
 include("${Boost_USE_FILE}")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
 include(BoostProject)
 include(BoostAddHeaders)
@@ -18,6 +19,7 @@ include(BoostAddPythonExtension)
 include(BoostAddReference)
 include(BoostDocumentation)
 include(BoostTesting)
+include(BoostTestSuite)
 
 #
 if(APPLE)
