@@ -6,11 +6,13 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-execute_process(COMMAND "${EXECUTABLE}" RESULT_VARIABLE result)
-
-message(STATUS "${EXECUTABLE} returned ${result}")
+execute_process(COMMAND "${EXECUTABLE}"
+  RESULT_VARIABLE result
+  ERROR_VARIABLE error
+  ERROR_STRIP_TRAILING_WHITESPACE
+  )
 
 if((FAIL AND result EQUAL 0) OR (NOT FAIL AND NOT result EQUAL 0))
   file(REMOVE "${EXECUTABLE}")
-  message(FATAL_ERROR "result unexpected!")
+  message(FATAL_ERROR "${error}")
 endif()
