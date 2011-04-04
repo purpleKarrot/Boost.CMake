@@ -10,7 +10,7 @@ include(CMakeParseArguments)
 
 if(NOT TARGET boost_test_invert)
   set(boost_test_invert_source "${CMAKE_BINARY_DIR}/boost_test_invert.cpp")
-  file(WRITE "${boost_test_invert_source}"
+  file(WRITE "${boost_test_invert_source}.in"
     "#include <cstdlib>\n"
     "#include <sstream>\n"
     "int main(int argc, char* argv[]) {\n"
@@ -20,6 +20,7 @@ if(NOT TARGET boost_test_invert)
     "  return !system(stream.str().c_str());\n"
     "}\n"
     )
+  configure_file("${boost_test_invert_source}.in" "${boost_test_invert_source}" COPYONLY)
   add_executable(boost_test_invert EXCLUDE_FROM_ALL ${boost_test_invert_source})
 endif(NOT TARGET boost_test_invert)
 
