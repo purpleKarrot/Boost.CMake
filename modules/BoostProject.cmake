@@ -28,9 +28,7 @@ set(boost_private_module_dir "${CMAKE_CURRENT_LIST_DIR}/boost_detail")
 #     )
 #
 function(boost_project name)
-  execute_process(COMMAND
-    ${CMAKE_COMMAND} -E cmake_echo_color --blue "++ Boost.${name}"
-    )
+  message(STATUS "+Boost.${name}")
 
   set(parameters "AUTHORS;DESCRIPTION;DEPENDS;DEB_DEPENDS;RPM_DEPENDS")
   cmake_parse_arguments(PROJ "TOOL" "" "${parameters}" ${ARGN})
