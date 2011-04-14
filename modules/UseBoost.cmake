@@ -7,6 +7,7 @@
 ##########################################################################
 
 include_directories("${Boost_INCLUDE_DIRS}")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
 ## this function is like 'target_link_libraries, except only for boost libs
 function(boost_link_libraries target)
