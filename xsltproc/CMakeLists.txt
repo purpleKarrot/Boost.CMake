@@ -87,7 +87,8 @@ set(WITH_ZLIB 0)
 configure_file(${libxml2_dir}/include/libxml/xmlversion.h.in
   ${include_dir}/libxml/xmlversion.h @ONLY)
 
-file(WRITE ${include_dir}/config.h "#include <win32config.h>\n")
+file(WRITE ${include_dir}/config.h.in "#include <win32config.h>\n")
+configure_file(${include_dir}/config.h.in ${include_dir}/config.h COPYONLY)
 
 ##########################################################################
 
@@ -113,7 +114,8 @@ set(WITH_CRYPTO 1)
 configure_file(${libxslt_dir}/libexslt/exsltconfig.h.in
   ${include_dir}/libexslt/exsltconfig.h @ONLY)
 
-file(WRITE ${include_dir}/exsltconfig.h "#include <libexslt/exsltconfig.h>\n")
+file(WRITE ${include_dir}/exsltconfig.h.in "#include <libexslt/exsltconfig.h>\n")
+configure_file(${include_dir}/exsltconfig.h.in ${include_dir}/exsltconfig.h COPYONLY)
 
 ##########################################################################
 

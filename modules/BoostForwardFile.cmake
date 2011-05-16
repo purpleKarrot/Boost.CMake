@@ -33,9 +33,9 @@ endif(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
 # On Windows, symlinks are available since Vista, but they require the
 # /Create Symbolic Link/ privilege, which only administrators have by default.
 function(boost_forward_file file target)
-  if(EXISTS ${target})
-    return()
-  endif(EXISTS ${target})
+  #if(EXISTS ${target})
+  #  return()
+  #endif(EXISTS ${target})
 
   get_filename_component(directory ${target} PATH)
   file(MAKE_DIRECTORY ${directory})
@@ -48,6 +48,9 @@ function(boost_forward_file file target)
     execute_process(COMMAND cmd /C mklink ${target} ${file})
   else()
     # create forwarding header
-    file(WRITE ${target} "#include \"${file}\"\n")
+    file(READ "${target}" file_content)
+	if(NOT file_content STREQUAL "#include \"${file}\"\n")
+      file(WRITE "${target}" "#include \"${file}\"\n")
+	endif()
   endif()
 endfunction(boost_forward_file)
