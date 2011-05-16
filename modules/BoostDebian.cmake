@@ -13,6 +13,16 @@ IF(NOT CPACK_DEBIAN_PACKAGE_NAME)
   STRING(TOLOWER "${CPACK_PACKAGE_NAME}" CPACK_DEBIAN_PACKAGE_NAME)
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_NAME)
 
+execute_process(COMMAND date +%y%m%d
+  OUTPUT_VARIABLE day_suffix
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
+set(package_version ${CPACK_PACKAGE_VERSION_MAJOR})
+set(package_version ${package_version}.${CPACK_PACKAGE_VERSION_MINOR})
+set(package_version ${package_version}.${CPACK_PACKAGE_VERSION_PATCH})
+set(package_version ${package_version}.${day_suffix})
+
 # Section: (recommended)
 IF(NOT CPACK_DEBIAN_PACKAGE_SECTION)
   SET(CPACK_DEBIAN_PACKAGE_SECTION "devel")
@@ -28,7 +38,7 @@ foreach(LINE ${DESC_LINES})
   set(DEB_LONG_DESCRIPTION "${DEB_LONG_DESCRIPTION} ${LINE}\n")
 endforeach(LINE)
 
-set(debian_dir "${BOOST_MONOLITHIC_DIR}/debian")
+set(debian_dir "${CMAKE_BINARY_DIR}/_Debian/boost/debian")
 
 ################################################################################
 # debian/control
@@ -173,16 +183,15 @@ file(WRITE ${debian_dir}/compat "7")
 
 ################################################################################
 # debian/source/format
-file(WRITE ${debian_dir}/source/format "3.0 (native)")
+file(WRITE ${debian_dir}/source/format "3.0 (quilt)")
 
 ################################################################################
 # debian/changelog
 set(debian_changelog ${debian_dir}/changelog)
 execute_process(COMMAND date -R OUTPUT_VARIABLE DATE_TIME)
 #execute_process(COMMAND date +"%a, %d %b %Y %H:%M:%S %z" OUTPUT_VARIABLE DATE_TIME)
-execute_process(COMMAND date +%y%m%d OUTPUT_VARIABLE suffix OUTPUT_STRIP_TRAILING_WHITESPACE)
 file(WRITE ${debian_changelog}
-  "${CPACK_DEBIAN_PACKAGE_NAME} (${Boost_VERSION}-${suffix}) natty; urgency=low\n\n"
+  "${CPACK_DEBIAN_PACKAGE_NAME} (${package_version}) natty; urgency=low\n\n"
   "  * Package built with CMake\n\n"
   " -- ${CPACK_PACKAGE_CONTACT}  ${DATE_TIME}"
   )
@@ -197,17 +206,34 @@ if(NOT DPKG_BUILDPACKAGE OR NOT DPUT)
   return()
 endif()
 
-set(changes_file
-  "${CPACK_DEBIAN_PACKAGE_NAME}_${Boost_VERSION}-${suffix}_source.changes"
+set(package_file_name "${CPACK_DEBIAN_PACKAGE_NAME}_${package_version}")
+
+file(WRITE "${CMAKE_BINARY_DIR}/_Debian/cpack.cmake"
+  "set(CPACK_GENERATOR TGZ)\n"
+  "set(CPACK_PACKAGE_NAME \"${CPACK_DEBIAN_PACKAGE_NAME}\")\n"
+  "set(CPACK_PACKAGE_VERSION \"${CPACK_PACKAGE_VERSION}\")\n"
+  "set(CPACK_PACKAGE_FILE_NAME \"${package_file_name}.orig\")\n"
+  "set(CPACK_PACKAGE_DESCRIPTION \"Boost Source\")\n"
+  "set(CPACK_IGNORE_FILES \"${CMAKE_SOURCE_DIR}/build/;/\\\\.git\")\n"
+  "set(CPACK_INSTALLED_DIRECTORIES \"${CMAKE_SOURCE_DIR};/\")\n"
   )
 
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/${changes_file}
+set(orig_file "${CMAKE_BINARY_DIR}/_Debian/${package_file_name}.orig.tar.gz")
+add_custom_command(OUTPUT "${orig_file}"
+  COMMAND cpack --config ./cpack.cmake
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/_Debian"
+  )
+
+set(changes_file "${package_file_name}_source.changes")
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/_Debian/${changes_file}
   COMMAND ${DPKG_BUILDPACKAGE} -S
-  WORKING_DIRECTORY ${BOOST_MONOLITHIC_DIR}
+  DEPENDS "${orig_file}"
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/_Debian/boost"
   )
 
 add_custom_target(deploy
   ${DPUT} "ppa:purplekarrot/ppa" ${changes_file}
-  DEPENDS ${CMAKE_BINARY_DIR}/${changes_file}
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  DEPENDS ${CMAKE_BINARY_DIR}/_Debian/${changes_file}
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/_Debian"
   )
+

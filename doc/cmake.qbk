@@ -16,5 +16,5 @@
 [include guide_user.qbk]
 [include guide_devel.qbk]
 [include reference.qbk]
-[include defrag.qbk]
-[include issues.qbk]
+[/ include defrag.qbk]
+[/ include issues.qbk]

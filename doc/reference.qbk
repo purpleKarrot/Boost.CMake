@@ -16,5 +16,6 @@
 [include BoostAddReference.qbk]
 [include BoostDocumentation.qbk]
 [include BoostTesting.qbk]
+[include BoostTestSuite.qbk]
 
 [endsect]

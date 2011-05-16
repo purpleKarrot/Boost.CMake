@@ -6,7 +6,7 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                       #
 ################################################################################
 
-#include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/test_impl_ctest.cmake")
+## include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/test_impl_ctest.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/test_impl_cmake.cmake")
 
 # This function creates a Boost regression test. If the test can be built,

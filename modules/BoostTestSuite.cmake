@@ -9,6 +9,7 @@
 include(CMakeParseArguments)
 include(BoostTesting)
 
+# This function is used to add multiple tests at once.
 #
 #   boost_test_suite(
 #     [COMPILE <list of source files>]
@@ -20,6 +21,25 @@ include(BoostTesting)
 #     [LINK_BOOST_LIBRARIES <list of boost libraries to link>]
 #     [LINK_LIBRARIES <list of third party libraries to link>]
 #     )
+#
+# Each file listed after COMPILE, LINK, RUN or their _FAIL conterparts creates
+# one test case.
+#
+#   boost_test_suite(
+#     COMPILE
+#       foo
+#       bar
+#     LINK
+#       baz
+#     LINK_BOOST_LIBRARIES
+#       unit_test_framework
+#     )
+#
+# Is identical to:
+#
+#   boost_add_test(foo COMPILE foo.cpp LINK_BOOST_LIBRARIES unit_test_framework)
+#   boost_add_test(bar COMPILE bar.cpp LINK_BOOST_LIBRARIES unit_test_framework)
+#   boost_add_test(baz LINK    baz.cpp LINK_BOOST_LIBRARIES unit_test_framework)
 #
 function(boost_test_suite)
   set(args COMPILE COMPILE_FAIL LINK LINK_FAIL RUN RUN_FAIL

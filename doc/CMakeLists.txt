@@ -15,6 +15,7 @@ set(boost_modules
   BoostAddReference
   BoostDocumentation
   BoostTesting
+  BoostTestSuite
   )
 
 set(reference)
