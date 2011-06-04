@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
 
-find_package(Boost REQUIRED COMPONENTS boostbook quickbook NO_MODULE)
+find_package(Boost NO_MODULE)
 include("${Boost_DEV_FILE}")
 
 boost_project(CMake TOOL
