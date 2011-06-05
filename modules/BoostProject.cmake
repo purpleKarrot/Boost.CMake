@@ -86,7 +86,7 @@ function(boost_project name)
     set(BOOST_BINARY_DIR \"${CMAKE_BINARY_DIR}\")"
     )
 
-  # istall(CODE) seems to ignore CONFIGURATIONS...
+  # install(CODE) seems to ignore CONFIGURATIONS...
   set(debug_match
     "\"\${CMAKE_INSTALL_CONFIG_NAME}\" MATCHES \"^([Dd][Ee][Bb][Uu][Gg])$\""
     )

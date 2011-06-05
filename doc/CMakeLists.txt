@@ -6,6 +6,8 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+find_package(Boost COMPONENTS boostbook quickbook NO_MODULE)
+
 set(boost_modules
   BoostProject
   BoostAddHeaders
@@ -13,6 +15,7 @@ set(boost_modules
   BoostAddExecutable
   BoostAddPythonExtension
   BoostAddReference
+  BoostAddSubdirectory
   BoostDocumentation
   BoostTesting
   BoostTestSuite
