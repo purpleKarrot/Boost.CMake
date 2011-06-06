@@ -8,10 +8,12 @@
 
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
+#find_package(Boost NO_MODULE)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
-
-find_package(Boost NO_MODULE)
-include("${Boost_DEV_FILE}")
+set(Boost_RESOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/resources")
+set(Boost_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
+set(Boost_USE_FILE UseBoost)
+include(UseBoostDev)
 
 boost_project(CMake TOOL
   AUTHORS
@@ -63,3 +65,10 @@ install(DIRECTORY modules resources
 if(WIN32)
   add_subdirectory(xsltproc)
 endif(WIN32)
+
+set(CPACK_PACKAGE_NAME "BoostCMake")
+set(CPACK_PACKAGE_VENDOR "http://purplekarrot.net/")
+set(CPACK_PACKAGE_CONTACT "Daniel Pfeifer <daniel@pfeifer-mail.de>")
+set(CPACK_PACKAGE_VERSION "0.8.15")
+
+include(BoostCPack)

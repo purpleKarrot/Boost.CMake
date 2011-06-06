@@ -38,7 +38,7 @@ foreach(LINE ${DESC_LINES})
   set(DEB_LONG_DESCRIPTION "${DEB_LONG_DESCRIPTION} ${LINE}\n")
 endforeach(LINE)
 
-set(debian_dir "${CMAKE_BINARY_DIR}/_Debian/boost/debian")
+set(debian_dir "${CMAKE_BINARY_DIR}/_Debian/${CPACK_DEBIAN_PACKAGE_NAME}/debian")
 
 ################################################################################
 # debian/control
@@ -213,9 +213,9 @@ file(WRITE "${CMAKE_BINARY_DIR}/_Debian/cpack.cmake"
   "set(CPACK_PACKAGE_NAME \"${CPACK_DEBIAN_PACKAGE_NAME}\")\n"
   "set(CPACK_PACKAGE_VERSION \"${CPACK_PACKAGE_VERSION}\")\n"
   "set(CPACK_PACKAGE_FILE_NAME \"${package_file_name}.orig\")\n"
-  "set(CPACK_PACKAGE_DESCRIPTION \"Boost Source\")\n"
-  "set(CPACK_IGNORE_FILES \"${CMAKE_SOURCE_DIR}/build/;/\\\\.git\")\n"
-  "set(CPACK_INSTALLED_DIRECTORIES \"${CMAKE_SOURCE_DIR};/\")\n"
+  "set(CPACK_PACKAGE_DESCRIPTION \"${CPACK_PACKAGE_NAME} Source\")\n"
+  "set(CPACK_IGNORE_FILES \"${CPACK_SOURCE_IGNORE_FILES}\")\n"
+  "set(CPACK_INSTALLED_DIRECTORIES \"${CPACK_SOURCE_INSTALLED_DIRECTORIES}\")\n"
   )
 
 set(orig_file "${CMAKE_BINARY_DIR}/_Debian/${package_file_name}.orig.tar.gz")
@@ -228,7 +228,7 @@ set(changes_file "${package_file_name}_source.changes")
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/_Debian/${changes_file}
   COMMAND ${DPKG_BUILDPACKAGE} -S
   DEPENDS "${orig_file}"
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/_Debian/boost"
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/_Debian/${CPACK_DEBIAN_PACKAGE_NAME}"
   )
 
 add_custom_target(deploy

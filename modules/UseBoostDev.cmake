@@ -21,20 +21,7 @@ include(BoostDocumentation)
 include(BoostTesting)
 include(BoostTestSuite)
 
-#
-if(APPLE)
-  set(CPACK_PACKAGE_ICON "${Boost_RESOURCE_PATH}/boost.icns")
-else(APPLE)
-  set(CPACK_PACKAGE_ICON "${Boost_RESOURCE_PATH}\\\\boost.bmp")
-endif(APPLE)
-
-set(CPACK_NSIS_MUI_ICON    "${Boost_RESOURCE_PATH}/boost.ico")
-set(CPACK_NSIS_MUI_UNIICON "${Boost_RESOURCE_PATH}/boost.ico")
-
 ##########################################################################
-
-# make universal binaries on OS X
-set(CMAKE_OSX_ARCHITECTURES "i386;x86_64" CACHE STRING "Architectures for OS X")
 
 # set CMAKE_THREAD_PREFER_PTHREAD if you prefer pthread on windows
 find_package(Threads)
