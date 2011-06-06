@@ -8,6 +8,10 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+if(NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  return()
+endif()
+
 list(SORT BOOST_PROJECTS_ALL)
 list(REMOVE_DUPLICATES BOOST_PROJECTS_ALL)
 
