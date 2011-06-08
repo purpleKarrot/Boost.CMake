@@ -23,37 +23,50 @@ endif(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
 
 # Make a header file available from another path.
 #
-#   boost_forward_file(<file> <target>)
+#   boost_forward_header(<file> <target>)
 #
 # Where <file> is a path to an existing file that you want to include as if
 # it were located at <target>.
+function(boost_forward_header file target)
+  set(file_content)
+  if(EXISTS "${target}")
+    file(READ "${target}" file_content)
+  endif(EXISTS "${target}")
+  if(NOT file_content STREQUAL "#include \"${file}\"\n")
+    file(WRITE "${target}" "#include \"${file}\"\n")
+  endif(NOT file_content STREQUAL "#include \"${file}\"\n")
+endfunction(boost_forward_header)
+
+
+#
+#   boost_forward(<file> <target>)
 #
 # This function creates symlinks where available. As a fallback it simply creates
 # a file at the target position that [c++] `#include`s the appropriate file.
 # On Windows, symlinks are available since Vista, but they require the
 # /Create Symbolic Link/ privilege, which only administrators have by default.
-function(boost_forward_file file target)
-  #if(EXISTS ${target})
-  #  return()
-  #endif(EXISTS ${target})
-
+function(boost_forward file target)
   get_filename_component(directory ${target} PATH)
   file(MAKE_DIRECTORY ${directory})
 
   if(NOT CMAKE_HOST_WIN32)
+    if(EXISTS "${target}" AND NOT IS_SYMLINK "${target}")
+      file(REMOVE_RECURSE "${target}")
+    endif(EXISTS "${target}" AND NOT IS_SYMLINK "${target}")
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${file} ${target})
   elseif(MKLINK_WORKING)
+    if(EXISTS "${target}" AND NOT IS_SYMLINK "${target}")
+      file(REMOVE_RECURSE "${target}")
+    endif(EXISTS "${target}" AND NOT IS_SYMLINK "${target}")
     file(TO_NATIVE_PATH ${file} file)
     file(TO_NATIVE_PATH ${target} target)
     execute_process(COMMAND cmd /C mklink ${target} ${file})
   else()
-    # create forwarding header
-    set(file_content)
-    if(EXISTS "${target}")
-      file(READ "${target}" file_content)
-    endif(EXISTS "${target}")
-    if(NOT file_content STREQUAL "#include \"${file}\"\n")
-      file(WRITE "${target}" "#include \"${file}\"\n")
-    endif(NOT file_content STREQUAL "#include \"${file}\"\n")
-  endif()
-endfunction(boost_forward_file)
+    # create forwarding headers
+    if(IS_DIRECTORY "${file}")
+      # TODO
+      message(STATUS "TODO: forward directory: ${file} -> ${target}")
+    elseif(IS_DIRECTORY "${file}")
+      boost_forward_header("${file}" "${target}")
+    endif(IS_DIRECTORY "${file}")
+endfunction(boost_forward)

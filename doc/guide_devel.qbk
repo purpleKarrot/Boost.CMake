@@ -74,45 +74,24 @@ Declare your public header files with the `boost_add_headers()` command. This
 command will make sure that the headers get installed and can be included by
 other Boost projects when doing a monolithic build.
 
-  file(GLOB_RECURSE headers "boost/*.hpp")
-  boost_add_headers(${headers})
-
-In the example above, the ["boost] directory is searched recursively for files
-that end with .hpp. The directory structure is preserved, so all found headers
-get installed to the directory ["<include dir>/boost].
-
-It might be the case that the directory structure should be modified when
-installing header files. As an optional argument, you may specify a prefix.
-Possible scenarios are:
-
-* Your headers are in ["boost/bar] relative to your CMakeLists.txt and you want
-  to install them to ["<include dir>/boost/bar].
-  You may omit the prefix parameter or set it to ["].
-
-* Your headers are in the same directory as the CMakeLists.txt and you want to
-  install them to ["<include dir>/boost/foo], then you should use ["boost/foo]
-  as a prefix.
-
-* Your headers are in ["include/boost/baz] relative to your CMakeLists.txt and
-  you want to install them to ["<include dir>/boost/baz]. In that case, you need
-  a replacement prefix:
-  ["!include/boost/baz!boost/baz!] or ["!include/boost!boost!] or ["!include!!]
-  will provide the appropriate result in this case.
-
-  file(GLOB_RECURSE headers "include/*.hpp")
-  boost_add_headers(${headers} PREFIX "!include!boost!")
-
-Please note that the use of a globbing expression is [_not recommended] (see
-[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:file CMake
-manual]), it is better to list all header files explicitely in the
-CMakeLists.txt file.
-
-  boost_add_headers(PREFIX "!include!boost!"
+  boost_add_headers(
+    include/foo
     include/foo.hpp
-    include/foo/bar.hpp
-    include/foo/baz.hpp
+    ${CMAKE_BINARY_DIR}/bar.hpp
+    )
+
+All the files and directories that are listed as arguments will be installed
+to ["<include dir>/boost/]. In the above example, foo.hpp and bar.hpp will end
+up right beside each other.
+
+It is possible to specify a location:
+
+  boost_add_headers(LOCATION foobar
     ...
     )
+
+All the listed files and directories will be installed to
+["<include dir>/boost/foobar].
 
 [endsect]
 
