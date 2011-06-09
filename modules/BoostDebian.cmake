@@ -1,27 +1,26 @@
-################################################################################
-# Copyright (C) 2010-2011 Daniel Pfeifer <daniel@pfeifer-mail.de>              #
-#                                                                              #
-# Distributed under the Boost Software License, Version 1.0.                   #
-# See accompanying file LICENSE_1_0.txt or copy at                             #
-#   http://www.boost.org/LICENSE_1_0.txt                                       #
-################################################################################
+##########################################################################
+# Copyright (C) 2010-2011 Daniel Pfeifer <daniel@pfeifer-mail.de>        #
+#                                                                        #
+# Distributed under the Boost Software License, Version 1.0.             #
+# See accompanying file LICENSE_1_0.txt or copy at                       #
+#   http://www.boost.org/LICENSE_1_0.txt                                 #
+##########################################################################
 
-# DEBIAN/control
+find_program(DPKG_BUILDPACKAGE dpkg-buildpackage)
+find_program(DPUT dput)
+
+if(NOT DPKG_BUILDPACKAGE OR NOT DPUT)
+  return()
+endif()
+
 # debian policy enforce lower case for package name
 # Package: (mandatory)
 IF(NOT CPACK_DEBIAN_PACKAGE_NAME)
-  STRING(TOLOWER "${CPACK_PACKAGE_NAME}" CPACK_DEBIAN_PACKAGE_NAME)
+  STRING(TOLOWER
+    "${CPACK_PACKAGE_NAME}${CPACK_PACKAGE_VERSION}"
+    CPACK_DEBIAN_PACKAGE_NAME
+    )
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_NAME)
-
-execute_process(COMMAND date +%y%m%d
-  OUTPUT_VARIABLE day_suffix
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-
-set(package_version ${CPACK_PACKAGE_VERSION_MAJOR})
-set(package_version ${package_version}.${CPACK_PACKAGE_VERSION_MINOR})
-set(package_version ${package_version}.${CPACK_PACKAGE_VERSION_PATCH})
-set(package_version ${package_version}.${day_suffix})
 
 # Section: (recommended)
 IF(NOT CPACK_DEBIAN_PACKAGE_SECTION)
@@ -40,8 +39,10 @@ endforeach(LINE)
 
 set(debian_dir "${CMAKE_BINARY_DIR}/_Debian/${CPACK_DEBIAN_PACKAGE_NAME}/debian")
 
-################################################################################
-# debian/control
+##########################################################################
+# debian/control                                                         #
+##########################################################################
+
 set(debian_control ${debian_dir}/control)
 list(APPEND CPACK_DEBIAN_BUILD_DEPENDS cmake)
 list(REMOVE_DUPLICATES CPACK_DEBIAN_BUILD_DEPENDS)
@@ -87,13 +88,17 @@ foreach(component ${CPACK_COMPONENTS_ALL})
     )
 endforeach(component)
 
-################################################################################
-# debian/copyright
+##########################################################################
+# debian/copyright                                                       #
+##########################################################################
+
 set(debian_copyright ${debian_dir}/copyright)
 configure_file(${CPACK_RESOURCE_FILE_LICENSE} ${debian_copyright} COPYONLY)
 
-################################################################################
-# debian/rules
+##########################################################################
+# debian/rules                                                           #
+##########################################################################
+
 set(debian_rules ${debian_dir}/rules)
 file(WRITE ${debian_rules}
   "#!/usr/bin/make -f\n"
@@ -177,36 +182,41 @@ file(APPEND ${debian_rules}
 
 execute_process(COMMAND chmod +x ${debian_rules})
 
-################################################################################
-# debian/compat
+##########################################################################
+# debian/compat                                                          #
+##########################################################################
+
 file(WRITE ${debian_dir}/compat "7")
 
-################################################################################
-# debian/source/format
+##########################################################################
+# debian/source/format                                                   #
+##########################################################################
+
 file(WRITE ${debian_dir}/source/format "3.0 (quilt)")
 
-################################################################################
-# debian/changelog
+##########################################################################
+# debian/changelog                                                       #
+##########################################################################
+
 set(debian_changelog ${debian_dir}/changelog)
 execute_process(COMMAND date -R OUTPUT_VARIABLE DATE_TIME)
 #execute_process(COMMAND date +"%a, %d %b %Y %H:%M:%S %z" OUTPUT_VARIABLE DATE_TIME)
 file(WRITE ${debian_changelog}
-  "${CPACK_DEBIAN_PACKAGE_NAME} (${package_version}) natty; urgency=low\n\n"
+  "${CPACK_DEBIAN_PACKAGE_NAME} (${CPACK_PACKAGE_VERSION}) unstable; urgency=low\n\n"
   "  * Package built with CMake\n\n"
   " -- ${CPACK_PACKAGE_CONTACT}  ${DATE_TIME}"
   )
 
-##############################################################################
-# upload package to PPA
+##########################################################################
+# .orig.tar.gz                                                           #
+##########################################################################
 
-find_program(DPKG_BUILDPACKAGE dpkg-buildpackage)
-find_program(DPUT dput)
+execute_process(COMMAND date +%y%m%d
+  OUTPUT_VARIABLE day_suffix
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
 
-if(NOT DPKG_BUILDPACKAGE OR NOT DPUT)
-  return()
-endif()
-
-set(package_file_name "${CPACK_DEBIAN_PACKAGE_NAME}_${package_version}")
+set(package_file_name "${CPACK_DEBIAN_PACKAGE_NAME}_${day_suffix}")
 
 file(WRITE "${CMAKE_BINARY_DIR}/_Debian/cpack.cmake"
   "set(CPACK_GENERATOR TGZ)\n"
@@ -224,16 +234,38 @@ add_custom_command(OUTPUT "${orig_file}"
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/_Debian"
   )
 
-set(changes_file "${package_file_name}_source.changes")
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/_Debian/${changes_file}
-  COMMAND ${DPKG_BUILDPACKAGE} -S
-  DEPENDS "${orig_file}"
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/_Debian/${CPACK_DEBIAN_PACKAGE_NAME}"
-  )
+##########################################################################
+# upload packages to PPA                                                 #
+##########################################################################
+
+set(changes_file_list)
+set(changes_file_deps)
+
+foreach(dist maverick natty oneiric)
+  set(dist_dir "${CMAKE_BINARY_DIR}/_Debian/${dist}")
+  file(COPY "${debian_dir}" DESTINATION "${dist_dir}")
+
+  file(WRITE "${dist_dir}/debian/changelog"
+    "${CPACK_DEBIAN_PACKAGE_NAME} (${day_suffix}-${dist}) ${dist}; urgency=low\n\n"
+    "  * Package built with CMake\n\n"
+    " -- ${CPACK_PACKAGE_CONTACT}  ${DATE_TIME}"
+    )
+
+  set(changes_file "${package_file_name}-${dist}_source.changes")
+
+  add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/_Debian/${changes_file}
+    COMMAND ${DPKG_BUILDPACKAGE} -S
+    DEPENDS "${orig_file}"
+    WORKING_DIRECTORY "${dist_dir}"
+    )
+
+  list(APPEND changes_file_list ${changes_file})
+  list(APPEND changes_file_deps ${CMAKE_BINARY_DIR}/_Debian/${changes_file})
+endforeach(dist)
 
 add_custom_target(deploy
-  ${DPUT} "ppa:purplekarrot/ppa" ${changes_file}
-  DEPENDS ${CMAKE_BINARY_DIR}/_Debian/${changes_file}
+  ${DPUT} "ppa:purplekarrot/ppa" ${changes_file_list}
+  DEPENDS ${changes_file_deps}
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/_Debian"
   )
 
