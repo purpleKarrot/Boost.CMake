@@ -11,7 +11,7 @@ if(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
   set(test_file ${CMAKE_CURRENT_BINARY_DIR}/symlinktest)
   file(TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR} file)
   file(TO_NATIVE_PATH ${test_file} target)
-  execute_process(COMMAND cmd /C mklink ${target} ${file})
+  execute_process(COMMAND cmd /C mklink ${target} ${file} OUTPUT_QUIET)
   if(EXISTS ${test_file})
     set(MKLINK_WORKING TRUE CACHE INTERNAL "")
   else(EXISTS ${test_file})
@@ -19,6 +19,29 @@ if(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
     message(STATUS "Symlinks are NOT supported.")
   endif(EXISTS ${test_file})
 endif(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
+
+
+# Create a symbolic link (new -> old) to a file or directory.
+#
+#   boost_create_symlink(<old> <new>)
+#
+# On Windows, symlinks are available since Vista, but they require the
+# /Create Symbolic Link/ privilege, which only administrators have by default.
+function(boost_create_symlink old new)
+  if(NOT CMAKE_HOST_WIN32)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${old} ${new})
+  elseif(MKLINK_WORKING)
+    file(TO_NATIVE_PATH "${new}" native_new)
+    file(TO_NATIVE_PATH "${old}" native_old)
+    if(IS_DIRECTORY "${old}")
+      execute_process(COMMAND cmd /C mklink /D ${native_new} ${native_old} OUTPUT_QUIET)
+    else(IS_DIRECTORY "${target}")
+      execute_process(COMMAND cmd /C mklink ${native_new} ${native_old} OUTPUT_QUIET)
+    endif(IS_DIRECTORY "${target}")
+  else()
+    message(FATAL_ERROR "Unable to create symbolic link: '${new}' -> '${old}'")
+  endif()
+endfunction(boost_create_symlink)
 
 
 # Make a header file available from another path.
@@ -43,30 +66,22 @@ endfunction(boost_forward_header)
 #
 # This function creates symlinks where available. As a fallback it simply creates
 # a file at the target position that [c++] `#include`s the appropriate file.
-# On Windows, symlinks are available since Vista, but they require the
-# /Create Symbolic Link/ privilege, which only administrators have by default.
 function(boost_forward file target)
   get_filename_component(directory ${target} PATH)
   file(MAKE_DIRECTORY ${directory})
 
-  if(NOT CMAKE_HOST_WIN32)
-    if(EXISTS "${target}" AND NOT IS_SYMLINK "${target}")
-      file(REMOVE_RECURSE "${target}")
-    endif(EXISTS "${target}" AND NOT IS_SYMLINK "${target}")
-    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${file} ${target})
-  elseif(MKLINK_WORKING)
-    if(EXISTS "${target}" AND NOT IS_SYMLINK "${target}")
-      file(REMOVE_RECURSE "${target}")
-    endif(EXISTS "${target}" AND NOT IS_SYMLINK "${target}")
-    file(TO_NATIVE_PATH ${file} file)
-    file(TO_NATIVE_PATH ${target} target)
-    execute_process(COMMAND cmd /C mklink ${target} ${file})
+  if(EXISTS "${target}")
+    return()
+  endif(EXISTS "${target}")
+
+  if(NOT CMAKE_HOST_WIN32 OR MKLINK_WORKING)
+    boost_create_symlink(${file} ${target})
   else()
     # create forwarding headers
     if(IS_DIRECTORY "${file}")
       # TODO
       message(STATUS "TODO: forward directory: ${file} -> ${target}")
-    elseif(IS_DIRECTORY "${file}")
+    else(IS_DIRECTORY "${file}")
       boost_forward_header("${file}" "${target}")
     endif(IS_DIRECTORY "${file}")
   endif()
