@@ -81,7 +81,7 @@ foreach(component ${CPACK_COMPONENTS_ALL})
     "Package: ${CPACK_COMPONENT_${COMPONENT}_DEB_PACKAGE}\n"
     "Architecture: ${architecture}\n"
     "Depends: ${deb_depends}\n"
-    "Description: Boost.${display_name}\n"
+    "Description: ${display_name}\n"
     "${DEB_LONG_DESCRIPTION}"
     " .\n"
     " ${description}\n"
