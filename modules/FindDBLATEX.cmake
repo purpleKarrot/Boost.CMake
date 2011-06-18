@@ -9,7 +9,7 @@
 # Find DocBook to LaTeX Publishing (http://dblatex.sourceforge.net/)
 
 if(CMAKE_HOST_WIN32)
-  include(FindPythonInterp)
+  find_package(PythonInterp QUIET)
   find_file(dblatex_py dblatex
     [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.7\\InstallPath]/Scripts
     [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath]/Scripts

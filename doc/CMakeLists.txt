@@ -17,6 +17,7 @@ set(boost_modules
   BoostAddReference
   BoostAddSubdirectory
   BoostDocumentation
+  BoostExtract
   BoostTesting
   BoostTestSuite
   )

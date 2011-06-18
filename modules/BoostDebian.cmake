@@ -251,10 +251,16 @@ foreach(dist maverick natty oneiric)
     " -- ${CPACK_PACKAGE_CONTACT}  ${DATE_TIME}"
     )
 
+  if(changes_file_list)
+    set(options "-sd")
+  else()
+    set(options "-sa")
+  endif()
+
   set(changes_file "${package_file_name}-${dist}_source.changes")
 
   add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/_Debian/${changes_file}
-    COMMAND ${DPKG_BUILDPACKAGE} -S
+    COMMAND ${DPKG_BUILDPACKAGE} -S ${options}
     DEPENDS "${orig_file}"
     WORKING_DIRECTORY "${dist_dir}"
     )
@@ -268,4 +274,3 @@ add_custom_target(deploy
   DEPENDS ${changes_file_deps}
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/_Debian"
   )
-

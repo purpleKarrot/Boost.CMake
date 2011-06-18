@@ -31,7 +31,7 @@ foreach(project ${BOOST_PROJECTS_ALL})
   set(group       "boost_${project}")
 
   if(NOT is_tool)
-    set(name "${name} Library")
+    set(name "Boost ${name} Library")
   endif()
 
   set_cpack_component(GROUP_${group}_DISPLAY_NAME "${name}")

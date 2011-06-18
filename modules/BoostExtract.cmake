@@ -6,18 +6,41 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-function(boost_extract archive destination)
-  if(NOT IS_ABSOLUTE "${archive}")
-    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${archive}")
-      set(archive "${CMAKE_CURRENT_SOURCE_DIR}/${archive}")
-    else()
-      set(archive "${CMAKE_CURRENT_BINARY_DIR}/${archive}")
-    endif()
-  endif()
+
+#   boost_extract(<directory> <archive>)
+#   boost_extract(<directory> DOWNLOAD <url> <md5>)
+#
+function(boost_extract destination)
 
   if(NOT IS_ABSOLUTE "${destination}")
     set(destination "${CMAKE_CURRENT_BINARY_DIR}/${destination}")
   endif()
+
+  if(ARGV1 STREQUAL "DOWNLOAD")
+    set(archive "${destination}.tgz")
+    set(download_required TRUE)
+    if(EXISTS "${archive}")
+      execute_process(COMMAND "${CMAKE_COMMAND}" -E md5sum "${archive}"
+        OUTPUT_VARIABLE output
+        )
+      if("${output}" MATCHES "^${md5} ")
+        set(download_required FALSE)
+      endif()
+    endif()
+    if(download_required)
+      message(STATUS "Downloading '${ARGV2}'")
+      file(DOWNLOAD "${ARGV2}" "${archive}" SHOW_PROGRESS EXPECTED_MD5 "${ARGV3}")
+    endif()
+  else(ARGV1 STREQUAL "DOWNLOAD")
+    set(archive "${ARGV1}")
+    if(NOT IS_ABSOLUTE "${archive}")
+      if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${archive}")
+        set(archive "${CMAKE_CURRENT_SOURCE_DIR}/${archive}")
+      else()
+        set(archive "${CMAKE_CURRENT_BINARY_DIR}/${archive}")
+      endif()
+    endif()
+  endif(ARGV1 STREQUAL "DOWNLOAD")
 
   if(EXISTS "${destination}" AND NOT "${archive}" IS_NEWER_THAN "${destination}")
     return()

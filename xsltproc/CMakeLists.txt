@@ -10,23 +10,16 @@ if(DEFINED CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE STREQUAL "Release")
   return()
 endif()
 
-include(BoostDownload)
 include(BoostExtract)
-
-function(extract_download name url md5)
-  set(archive "${CMAKE_CURRENT_BINARY_DIR}/${name}.tgz")
-  boost_download("${archive}" ${url} ${md5})
-  boost_extract("${archive}" "${CMAKE_CURRENT_BINARY_DIR}/${name}")
-endfunction(extract_download)
 
 ##########################################################################
 
-extract_download(libxml2
+boost_extract(libxml2 DOWNLOAD
   ftp://xmlsoft.org/libxml2/libxml2-2.7.8.tar.gz
   8127a65e8c3b08856093099b52599c86
   )
 
-extract_download(libxslt
+boost_extract(libxslt DOWNLOAD
   ftp://xmlsoft.org/libxml2/libxslt-1.1.26.tar.gz
   e61d0364a30146aaa3001296f853b2b9
   )
