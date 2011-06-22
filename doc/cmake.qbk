@@ -1,6 +1,6 @@
 [library Boost.CMake
   [quickbook 1.5]
-  [authors [Pfeifer, Daniel]]
+  [authors [Abrahams, David][Pfeifer, Daniel]]
   [copyright 2010 2011 Daniel Pfeifer]
   [purpose A collection of CMake modules to simplify the use and development of Boost libraries.]
   [license Distributed under the
@@ -14,6 +14,7 @@
 
 [include introduction.qbk]
 [include guide_user.qbk]
+[include build.qbk]
 [include guide_devel.qbk]
 [include reference.qbk]
 [/ include defrag.qbk]

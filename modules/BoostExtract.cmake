@@ -11,7 +11,6 @@
 #   boost_extract(<directory> DOWNLOAD <url> <md5>)
 #
 function(boost_extract destination)
-
   if(NOT IS_ABSOLUTE "${destination}")
     set(destination "${CMAKE_CURRENT_BINARY_DIR}/${destination}")
   endif()
@@ -23,7 +22,7 @@ function(boost_extract destination)
       execute_process(COMMAND "${CMAKE_COMMAND}" -E md5sum "${archive}"
         OUTPUT_VARIABLE output
         )
-      if("${output}" MATCHES "^${md5} ")
+      if("${output}" MATCHES "^${ARGV3} ")
         set(download_required FALSE)
       endif()
     endif()
