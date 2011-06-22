@@ -14,10 +14,10 @@ if(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
   execute_process(COMMAND cmd /C mklink ${target} ${file} OUTPUT_QUIET)
   if(EXISTS ${test_file})
     set(MKLINK_WORKING TRUE CACHE INTERNAL "")
-  else(EXISTS ${test_file})
+  else()
     set(MKLINK_WORKING FALSE CACHE INTERNAL "")
     message(STATUS "Symlinks are NOT supported.")
-  endif(EXISTS ${test_file})
+  endif()
 endif(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
 
 
@@ -46,43 +46,42 @@ endfunction(boost_create_symlink)
 
 # Make a header file available from another path.
 #
-#   boost_forward_header(<file> <target>)
+#   boost_forward_header(<old> <new>)
 #
-# Where <file> is a path to an existing file that you want to include as if
-# it were located at <target>.
-function(boost_forward_header file target)
+# Where <old> is a path to an existing file that you want to include as if
+# it were located at <new>.
+function(boost_forward_header old new)
   set(file_content)
-  if(EXISTS "${target}")
-    file(READ "${target}" file_content)
-  endif(EXISTS "${target}")
-  if(NOT file_content STREQUAL "#include \"${file}\"\n")
-    file(WRITE "${target}" "#include \"${file}\"\n")
-  endif(NOT file_content STREQUAL "#include \"${file}\"\n")
+  if(EXISTS "${new}")
+    file(READ "${new}" file_content)
+  endif()
+  if(NOT file_content STREQUAL "#include \"${old}\"\n")
+    file(WRITE "${new}" "#include \"${old}\"\n")
+  endif()
 endfunction(boost_forward_header)
 
 
 #
-#   boost_forward(<file> <target>)
+#   boost_forward(<old> <new>)
 #
 # This function creates symlinks where available. As a fallback it simply creates
-# a file at the target position that [c++] `#include`s the appropriate file.
-function(boost_forward file target)
-  get_filename_component(directory ${target} PATH)
+# a file at the new position that [c++] `#include`s the appropriate file.
+function(boost_forward old new)
+  get_filename_component(directory ${new} PATH)
   file(MAKE_DIRECTORY ${directory})
 
-  if(EXISTS "${target}")
+  if(EXISTS "${new}")
     return()
-  endif(EXISTS "${target}")
+  endif()
 
   if(NOT CMAKE_HOST_WIN32 OR MKLINK_WORKING)
-    boost_create_symlink(${file} ${target})
+    boost_create_symlink("${old}" "${new}")
+  elseif(IS_DIRECTORY "${old}")
+	file(GLOB_RECURSE files RELATIVE "${old}" "${old}/*.?pp")
+	foreach(file ${files})
+      boost_forward_header("${old}/${file}" "${new}/${file}")
+	endforeach(file)
   else()
-    # create forwarding headers
-    if(IS_DIRECTORY "${file}")
-      # TODO
-      message(STATUS "TODO: forward directory: ${file} -> ${target}")
-    else(IS_DIRECTORY "${file}")
-      boost_forward_header("${file}" "${target}")
-    endif(IS_DIRECTORY "${file}")
+    boost_forward_header("${old}" "${new}")
   endif()
 endfunction(boost_forward)

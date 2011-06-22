@@ -20,6 +20,9 @@ users will probably want. At the end of this document, we'll refer you on to
 resources that can help you pursue these topics further.
 
 [section Get CMake]
+[figure cmake-install.png..If you intend to build Boost or the examples via the
+command line on Windows, make sure to add CMake to the system PATH.]
+
 [@http://www.cmake.org/ CMake] is a cross-platform, open-source build system. It
 uses simple platform and compiler independent configuration files and generates
 native makefiles or workspaces that can be used in the compiler environment of
@@ -34,6 +37,10 @@ CMake to the system PATH.
 [endsect]
 
 [section Get Boost]
+[figure install-windows.png..Someone should make a nice screenshot on Windows 7]
+[figure install-darwin.png..If you know how to replace the image in the
+background, please let me know!]
+
 The easiest way to get a copy of Boost is to use an installer. We recommend
 using an installer because it can download and install precompiled library
 binaries, saving you the trouble of building them yourself. To complete this
@@ -46,18 +53,18 @@ they become available, or see the [@http://www.boostpro.com/products/free
 installers] provided by [@http://www.boostpro.com BoostPro Computing].
 
 RedHat, Debian, and other distribution packagers supply Boost library packages.
-However, these packages to not contain CMake package information and therefore
-cannot be used as described here[footnote If developers of Boost packages would
-like to build their packages with CMake support, we'd be glad to help. Please
-make your interest known to the
-[@http://www.boost.org/more/mailing_lists.htm#main Boost developers' list].].
+However, these packages do not contain CMake package information and therefore
+cannot be used as described here[footnote If package maintainers for Boost
+distributions would like to build their packages with CMake support, we'd be
+glad to help. Please make your interest known to the
+[@http://groups.google.com/group/ryppl-dev Ryppl hackers].].
 
 If you prefer to build everything yourself, follow the instructions in the [link
 boost_cmake.build Building From Source] section and come back here afterwards.
 
 [section Install on Ubuntu]
 On Ubuntu, Boost can be installed from
-[@https://launchpad.net/~purplekarrot/+archive/ppa my PPA]. Open a console
+[@https://launchpad.net/~purplekarrot/+archive/ppa this PPA]. Open a console
 window and type in the following: [teletype]
 
   $ sudo add-apt-repository ppa:purplekarrot/ppa
@@ -113,6 +120,10 @@ While it is possible to build your program in the source directory, we strongly
 suggest choosing a different directory.
 
 [section ... With an Integrated Development Environment (IDE)]
+[figure cmake-configure.png..When you click ["Configure] in the CMake GUI, a
+dialog will pop up and ask you for a generator. Select the IDE that you want to
+use and then click ["Finish].]
+
 Open up the CMake GUI (On Windows, that will be ["Start] -> ["All Programs] ->
 ["CMake 2.8] -> ["CMake (cmake-gui)]). In the CMake GUI, select your source
 directory (the directory where your `CMakeLists.txt` file is) and build
@@ -212,7 +223,7 @@ do to make this document clearer, please post it to the
 
 * [@http://www.cmake.org/cmake/help/syntax.html CMake Syntax]
 * [@http://www.cmake.org/cmake/help/examples.html CMake Examples]
-* [@http://www.cmake.org/cmake/help/cmake_tutorial.html CMake Turorial]
+* [@http://www.cmake.org/cmake/help/cmake_tutorial.html CMake Tutorial]
 * [@http://www.cmake.org/cmake/help/documentation.html CMake Manual]
 * [@http://www.boost.org/doc/libs/release/ Index of all Boost libraries]
 
