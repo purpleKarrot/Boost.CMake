@@ -219,7 +219,7 @@ execute_process(COMMAND date +%y%m%d
 set(package_file_name "${CPACK_DEBIAN_PACKAGE_NAME}_${day_suffix}")
 
 file(WRITE "${CMAKE_BINARY_DIR}/_Debian/cpack.cmake"
-  "set(CPACK_GENERATOR TGZ)\n"
+  "set(CPACK_GENERATOR TBZ2)\n"
   "set(CPACK_PACKAGE_NAME \"${CPACK_DEBIAN_PACKAGE_NAME}\")\n"
   "set(CPACK_PACKAGE_VERSION \"${CPACK_PACKAGE_VERSION}\")\n"
   "set(CPACK_PACKAGE_FILE_NAME \"${package_file_name}.orig\")\n"
@@ -228,7 +228,7 @@ file(WRITE "${CMAKE_BINARY_DIR}/_Debian/cpack.cmake"
   "set(CPACK_INSTALLED_DIRECTORIES \"${CPACK_SOURCE_INSTALLED_DIRECTORIES}\")\n"
   )
 
-set(orig_file "${CMAKE_BINARY_DIR}/_Debian/${package_file_name}.orig.tar.gz")
+set(orig_file "${CMAKE_BINARY_DIR}/_Debian/${package_file_name}.orig.tar.bz2")
 add_custom_command(OUTPUT "${orig_file}"
   COMMAND cpack --config ./cpack.cmake
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/_Debian"

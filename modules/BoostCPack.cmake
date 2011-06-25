@@ -126,14 +126,13 @@ endif(NOT DEFINED CPACK_RESOURCE_FILE_LICENSE)
 # Icons and Images                                                       #
 ##########################################################################
 
-if(APPLE)
-  set(CPACK_PACKAGE_ICON "${Boost_RESOURCE_PATH}/boost.icns")
-else(APPLE)
-  set(CPACK_PACKAGE_ICON "${Boost_RESOURCE_PATH}\\\\boost.bmp")
-endif(APPLE)
+set(CPACK_NSIS_INSTALLER_MUI_ICON_CODE "
+!define MUI_ICON \\\"${Boost_RESOURCE_PATH}/boost.ico\\\"
+!define MUI_UNICON \\\"${Boost_RESOURCE_PATH}/boost.ico\\\"
+!define MUI_HEADERIMAGE_BITMAP \\\"${Boost_RESOURCE_PATH}\\\\boost.bmp\\\"
+!define MUI_WELCOMEFINISHPAGE_BITMAP \\\"${Boost_RESOURCE_PATH}\\\\sidebar.bmp\\\"
+")
 
-set(CPACK_NSIS_MUI_ICON    "${Boost_RESOURCE_PATH}/boost.ico")
-set(CPACK_NSIS_MUI_UNIICON "${Boost_RESOURCE_PATH}/boost.ico")
 set(CPACK_NSIS_INSTALLED_ICON_NAME "Uninstall.exe")
 
 ##########################################################################

@@ -18,7 +18,13 @@ include(CMakeParseArguments)
 #
 function(boost_add_headers)
   cmake_parse_arguments(HDR "" "LOCATION" "" ${ARGN})
-  set(fwd_location "${CMAKE_BINARY_DIR}/include/boost/${HDR_LOCATION}")
+
+  set(destination "include/boost")
+  if(HDR_LOCATION)
+    set(destination "${destination}/${HDR_LOCATION}")
+  endif()
+
+  set(fwd_location "${CMAKE_BINARY_DIR}/${destination}")
 
   foreach(header ${HDR_UNPARSED_ARGUMENTS})
     get_filename_component(absolute "${header}" ABSOLUTE)
@@ -33,30 +39,9 @@ function(boost_add_headers)
     endif(IS_DIRECTORY "${absolute}")
 
     install(${signature} ${header}
-      DESTINATION "include/boost/${HDR_LOCATION}/"
+      DESTINATION "${destination}"
       COMPONENT "${BOOST_DEVELOP_COMPONENT}"
       CONFIGURATIONS "Release"
       )
   endforeach(header)
 endfunction(boost_add_headers)
-
-
-function(boost_add_headers_this_function_is_deprecated)
-  cmake_parse_arguments(HDR "" "PREFIX" "" ${ARGN})
-
-  if(HDR_PREFIX MATCHES "^!(.*)!(.*)!$")
-    get_filename_component(rootdir "${CMAKE_MATCH_1}" ABSOLUTE)
-    set(prefix "${CMAKE_MATCH_2}")
-  else()
-    set(rootdir "${CMAKE_CURRENT_SOURCE_DIR}")
-    set(prefix "${HDR_PREFIX}")
-  endif()
-
-  foreach(header ${HDR_UNPARSED_ARGUMENTS})
-    get_filename_component(absolute "${header}" ABSOLUTE)
-    get_filename_component(path "${absolute}" PATH)
-    file(RELATIVE_PATH location "${rootdir}" "${path}")
-    string(REGEX REPLACE "^/*boost/*" "" location "${prefix}/${location}")
-    boost_add_headers("${absolute}" LOCATION "${location}")
-  endforeach(header)
-endfunction(boost_add_headers_this_function_is_deprecated)
