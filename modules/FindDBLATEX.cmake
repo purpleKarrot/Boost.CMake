@@ -8,6 +8,10 @@
 
 # Find DocBook to LaTeX Publishing (http://dblatex.sourceforge.net/)
 
+if(DBLATEX_EXECUTABLE)
+  return()
+endif(DBLATEX_EXECUTABLE)
+
 if(CMAKE_HOST_WIN32)
   find_package(PythonInterp QUIET)
   find_file(dblatex_py dblatex

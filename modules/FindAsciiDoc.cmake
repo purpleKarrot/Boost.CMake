@@ -6,6 +6,10 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                       #
 ################################################################################
 
+if(ASCIIDOC_EXECUTABLE)
+  return()
+endif(ASCIIDOC_EXECUTABLE)
+
 find_program(ASCIIDOC_EXECUTABLE
   NAMES
     asciidoc
