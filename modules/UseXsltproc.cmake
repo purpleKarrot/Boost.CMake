@@ -1,5 +1,4 @@
 ##########################################################################
-# Copyright (C) 2008 Douglas Gregor <doug.gregor@gmail.com>              #
 # Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>             #
 #                                                                        #
 # Distributed under the Boost Software License, Version 1.0.             #
@@ -11,8 +10,9 @@ include(CMakeParseArguments)
 
 # Transforms the input XML file by applying the given XSL stylesheet.
 #
-#   boost_xsltproc(<output> <stylesheet> <input>
+#   xsltproc(<output> <stylesheet> <input>
 #     [PARAMETERS param1=value1 param2=value2 ...]
+#     [CATALOG <catalog file>]
 #     [DEPENDS <dependancies>]
 #     )
 #
@@ -27,17 +27,17 @@ include(CMakeParseArguments)
 # Additional dependancies may be passed via the DEPENDS argument.
 # For example, dependancies might refer to other XML files that are
 # included by the input file through XInclude.
-function(boost_xsltproc output stylesheet input)
-  cmake_parse_arguments(THIS_XSL "" "" "DEPENDS;PARAMETERS" ${ARGN})
+function(xsltproc output stylesheet input)
+  cmake_parse_arguments(THIS_XSL "" "CATALOG" "DEPENDS;PARAMETERS" ${ARGN})
 
   file(RELATIVE_PATH name "${CMAKE_CURRENT_BINARY_DIR}" "${output}")
   string(REGEX REPLACE "[./]" "_" name ${name})
   set(script "${CMAKE_CURRENT_BINARY_DIR}/${name}.cmake")
 
-  string(REPLACE " " "%20" catalog "${BOOSTBOOK_CATALOG}")
+  string(REPLACE " " "%20" catalog "${THIS_XSL_CATALOG}")
   file(WRITE ${script}
     "set(ENV{XML_CATALOG_FILES} \"${catalog}\")\n"
-    "execute_process(COMMAND \${XSLTPROC_EXECUTABLE} --xinclude --nonet\n"
+    "execute_process(COMMAND \${XSLTPROC} --xinclude --nonet\n"
     )
 
   # Translate XSL parameters into a form that xsltproc can use.
@@ -57,19 +57,9 @@ function(boost_xsltproc output stylesheet input)
     "endif()\n"
     )
 
-  if(CMAKE_HOST_WIN32)
-    set(XSLTPROC_EXECUTABLE "$<TARGET_FILE:${BOOST_NAMESPACE}xsltproc>")
-    list(APPEND THIS_XSL_DEPENDS "${BOOST_NAMESPACE}xsltproc")
-  else(CMAKE_HOST_WIN32)
-    find_program(XSLTPROC_EXECUTABLE xsltproc)
-    if(NOT XSLTPROC_EXECUTABLE)
-      message(FATAL_ERROR "xsltproc notfound!")
-    endif(NOT XSLTPROC_EXECUTABLE)
-  endif(CMAKE_HOST_WIN32)
-
   # Run the XSLT processor to do the XML transformation.
   add_custom_command(OUTPUT ${output}
-    COMMAND ${CMAKE_COMMAND} -DXSLTPROC_EXECUTABLE=${XSLTPROC_EXECUTABLE} -P ${script}
+    COMMAND ${CMAKE_COMMAND} -DXSLTPROC=${XSLTPROC_EXECUTABLE} -P ${script}
     DEPENDS ${input} ${THIS_XSL_DEPENDS}
     )
-endfunction(boost_xsltproc)
+endfunction(xsltproc)

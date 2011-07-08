@@ -6,24 +6,16 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-# This file transforms comments from a CMake module to QuickBook.
+find_program(XSLTPROC_EXECUTABLE
+  NAMES
+    xsltproc
+  DOC
+    "the xsltproc tool"
+  )
 
-file(WRITE ${OUTPUT_FILE} "")
-file(STRINGS ${INPUT_FILE} lines)
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(XSLTPROC DEFAULT_MSG XSLTPROC_EXECUTABLE)
 
-set(buffer)
-foreach(line ${lines})
-  if(line MATCHES "^##")
-    set(buffer)
-  elseif(line MATCHES "^# ?(.*)")
-    set(buffer "${buffer}${CMAKE_MATCH_1}\n")
-  else()
-    if(buffer AND line MATCHES "^([^ (]+)\\(([^ )]+)")
-      file(APPEND ${OUTPUT_FILE}
-        "=== ${CMAKE_MATCH_1} ${CMAKE_MATCH_2}\n"
-        "${buffer}b\n\n"
-        )
-    endif()
-    set(buffer)
-  endif()
-endforeach(line)
+if(XSLTPROC_FOUND)
+  set(XSLTPROC_USE_FILE "${CMAKE_CURRENT_LIST_DIR}/UseXsltproc.cmake")
+endif(XSLTPROC_FOUND)

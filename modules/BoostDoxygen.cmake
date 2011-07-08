@@ -7,7 +7,9 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-include(BoostXsltproc)
+find_package(Xsltproc REQUIRED)
+include("${XSLTPROC_USE_FILE}")
+
 include(CMakeParseArguments)
 
 #
@@ -81,7 +83,7 @@ function(boost_doxygen name)
 
   if(DOXY_XML)
     # Collect Doxygen XML into a single XML file
-    boost_xsltproc(
+    xsltproc(
       ${xml_dir}/all.xml
       ${xml_dir}/combine.xslt
       ${xml_dir}/index.xml

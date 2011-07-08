@@ -22,11 +22,13 @@
 # QuickBook
 # BoostBook (.XML extension):
 function(boost_documentation input)
+  cmake_parse_arguments(DOC "" "" "IMAGES" ${ARGN})
+
   get_filename_component(input ${input} ABSOLUTE)
   get_filename_component(input_ext ${input} EXT)
   get_filename_component(input_name ${input} NAME)
   set(input_file ${CMAKE_CURRENT_BINARY_DIR}/${input_name})
-  
+
   # copy to destination directory because quickbook screws up xinclude paths 
   # when the output is not in the source directory
   add_custom_command(OUTPUT ${input_file}
@@ -36,7 +38,7 @@ function(boost_documentation input)
 
   # copy all dependencies that are not built
   set(depends)
-  foreach(file ${ARGN})
+  foreach(file ${DOC_UNPARSED_ARGUMENTS})
     set(srcfile ${CMAKE_CURRENT_SOURCE_DIR}/${file})
     set(binfile ${CMAKE_CURRENT_BINARY_DIR}/${file})
     if(EXISTS ${srcfile})
@@ -48,10 +50,23 @@ function(boost_documentation input)
     list(APPEND depends ${binfile})
   endforeach(file)
 
-  if(input_ext STREQUAL ".qbk")
-    boost_qbk_doc(${input_file} ${depends})
+  # copy images
+  foreach(image ${DOC_IMAGES})
+    set(src ${CMAKE_CURRENT_SOURCE_DIR}/${image})
+    set(dst ${CMAKE_CURRENT_BINARY_DIR}/html/${image})
+    add_custom_command(OUTPUT ${dst}
+      COMMAND ${CMAKE_COMMAND} -E copy ${src} ${dst}
+      DEPENDS ${src}
+      )
+    list(APPEND depends ${dst})
+  endforeach(image)
+
+  if(input_ext STREQUAL ".txt")
+    boost_doc_asciidoc(${input_file} ${depends})
+  elseif(input_ext STREQUAL ".qbk")
+    boost_doc_quickbook(${input_file} ${depends})
   elseif(input_ext STREQUAL ".xml")
-    boost_xml_doc(${input_file} ${depends})
+    boost_doc_boostbook(${input_file} ${depends})
   elseif(input_ext STREQUAL ".html")
     boost_html_doc(${input_file} ${depends})
   else()
@@ -72,7 +87,13 @@ else()
 endif()
 
 include(BoostDoxygen)
-include(BoostXsltproc)
+
+if(CMAKE_HOST_WIN32)
+  set(XSLTPROC_EXECUTABLE "$<TARGET_FILE:${BOOST_NAMESPACE}xsltproc>")
+endif(CMAKE_HOST_WIN32)
+find_package(Xsltproc REQUIRED)
+include("${XSLTPROC_USE_FILE}")
+
 include(CMakeParseArguments)
 find_package(HTMLHelp QUIET)
 find_package(DBLATEX QUIET)
@@ -81,6 +102,7 @@ find_package(FOProcessor QUIET)
 ##########################################################################
 
 function(boost_docbook input)
+  find_package(Boost COMPONENTS boostbook NO_MODULE)
   set(doc_targets)
   set(html_dir "${CMAKE_CURRENT_BINARY_DIR}/html")
 
@@ -95,7 +117,7 @@ function(boost_docbook input)
     set(hhp_output "${html_dir}/htmlhelp.hhp")
     set(chm_output "${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm")
     set(stylesheet "${Boost_RESOURCE_PATH}/docbook-xsl/htmlhelp.xsl")
-    boost_xsltproc("${hhp_output}" "${stylesheet}" "${input}"
+    xsltproc("${hhp_output}" "${stylesheet}" "${input}"
       PARAMETERS "htmlhelp.chm=../${BOOST_CURRENT_PROJECT}.chm"
       )
     set(hhc_cmake ${CMAKE_CURRENT_BINARY_DIR}/hhc.cmake)
@@ -116,10 +138,12 @@ function(boost_docbook input)
   else() # generate HTML and manpages
     set(output_html "${html_dir}/index.html")
     set(stylesheet "${Boost_RESOURCE_PATH}/docbook-xsl/xhtml.xsl")
-    boost_xsltproc("${output_html}" "${stylesheet}" "${input}")
+    xsltproc("${output_html}" "${stylesheet}" "${input}"
+      CATALOG "${BOOSTBOOK_CATALOG}"
+      )
     list(APPEND doc_targets ${output_html})
 #   set(output_man  ${CMAKE_CURRENT_BINARY_DIR}/man/man.manifest)
-#   boost_xsltproc(${output_man} ${BOOSTBOOK_XSL_DIR}/manpages.xsl ${input})
+#   xsltproc(${output_man} ${BOOSTBOOK_XSL_DIR}/manpages.xsl ${input})
 #   list(APPEND doc_targets ${output_man})
     install(DIRECTORY "${html_dir}/"
       DESTINATION "share/doc/boost/${BOOST_CURRENT_PROJECT}"
@@ -144,7 +168,7 @@ function(boost_docbook input)
 
     if(FOPROCESSOR_FOUND)
       set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.fo)
-      boost_xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
+      xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
         PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
         )
       add_custom_command(OUTPUT ${pdf_file}
@@ -242,25 +266,25 @@ function(boost_html_doc input)
   endif(HTML_HELP_COMPILER)
 endfunction(boost_html_doc)
 
-##########################################################################
+################################################################################
+# BoostBook                                                                    #
+################################################################################
 
-function(boost_xml_doc input)
+function(boost_doc_boostbook input)
+  find_package(Boost COMPONENTS boostbook NO_MODULE)
   set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.docbook)
-  boost_xsltproc(${output} ${BOOSTBOOK_XSL_DIR}/docbook.xsl ${input}
+  xsltproc(${output} ${BOOSTBOOK_XSL_DIR}/docbook.xsl ${input}
     DEPENDS ${input} ${ARGN}
     )
-
-# add_custom_target(db-${BOOST_CURRENT_PROJECT} DEPENDS ${output})
-# set(doc ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}-complete.xml)
-# boost_xsltproc(${doc} ${CMAKE_SOURCE_DIR}/doc/copy.xslt ${input})
-# add_custom_target(doc-${BOOST_CURRENT_PROJECT} DEPENDS ${doc})
-
   boost_docbook(${output})
-endfunction(boost_xml_doc)
+endfunction(boost_doc_boostbook)
 
-##########################################################################
+################################################################################
+# Quickbook                                                                    #
+################################################################################
 
-function(boost_qbk_doc input)
+function(boost_doc_quickbook input)
+  find_package(Boost COMPONENTS quickbook NO_MODULE)
   get_filename_component(input_path ${input} PATH)
   set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.xml)
   add_custom_command(OUTPUT ${output}
@@ -271,5 +295,19 @@ function(boost_qbk_doc input)
             --output-file ${output}
     DEPENDS ${input} ${ARGN}
     )
-  boost_xml_doc(${output} ${ARGN})
-endfunction(boost_qbk_doc)
+  boost_doc_boostbook(${output} ${ARGN})
+endfunction(boost_doc_quickbook)
+
+################################################################################
+# AsciiDoc                                                                     #
+################################################################################
+
+function(boost_doc_asciidoc input)
+  find_package(AsciiDoc REQUIRED)
+  set(output "${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.docbook")
+  add_custom_command(OUTPUT "${output}"
+    COMMAND ${ASCIIDOC_EXECUTABLE} -b docbook -o ${output} ${input}
+    DEPENDS ${input} ${ARGN}
+    )
+  boost_docbook(${output})
+endfunction(boost_doc_asciidoc)

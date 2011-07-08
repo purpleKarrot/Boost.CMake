@@ -1,13 +1,13 @@
-[//////////////////////////////////////////////////////////////////////////////]
-[/ Copyright (C) 2006 David Abrahams                                          /]
-[/ Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>                 /]
-[/                                                                            /]
-[/ Distributed under the Boost Software License, Version 1.0.                 /]
-[/ See accompanying file LICENSE_1_0.txt or copy at                           /]
-[/   http://www.boost.org/LICENSE_1_0.txt                                     /]
-[//////////////////////////////////////////////////////////////////////////////]
+////////////////////////////////////////////////////////////////////////////////
+// Copyright (C) 2006 David Abrahams                                          //
+// Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>                 //
+//                                                                            //
+// Distributed under the Boost Software License, Version 1.0.                 //
+// See accompanying file LICENSE_1_0.txt or copy at                           //
+//   http://www.boost.org/LICENSE_1_0.txt                                     //
+////////////////////////////////////////////////////////////////////////////////
 
-[section Getting Started]
+== Getting Started
 
 Welcome to the Boost libraries! By the time you've completed this tutorial,
 you'll be at least somewhat comfortable with the contents of a Boost
@@ -19,11 +19,12 @@ keep things simple, we also left out some information intermediate and advanced
 users will probably want. At the end of this document, we'll refer you on to
 resources that can help you pursue these topics further.
 
-[section Get CMake]
-[figure cmake-install.png..If you intend to build Boost or the examples via the
-command line on Windows, make sure to add CMake to the system PATH.]
+=== Get CMake
 
-[@http://www.cmake.org/ CMake] is a cross-platform, open-source build system. It
+image:images/cmake_install.png["If you intend to build Boost or the examples via the
+command line on Windows, make sure to add CMake to the system PATH.",width=400]
+
+http://www.cmake.org/[CMake] is a cross-platform, open-source build system. It
 uses simple platform and compiler independent configuration files and generates
 native makefiles or workspaces that can be used in the compiler environment of
 your choice.
@@ -31,15 +32,16 @@ your choice.
 CMake is required to build Boost and we also use it in the following examples.
 
 You can get binary installers for CMake from the
-[@http://cmake.org/cmake/resources/software.html downloads] page. If you intend
+http://cmake.org/cmake/resources/software.html[downloads] page. If you intend
 to build Boost or the examples via the command line on Windows, make sure to add
 CMake to the system PATH.
-[endsect]
 
-[section Get Boost]
-[figure install-windows.png..Someone should make a nice screenshot on Windows 7]
-[figure install-darwin.png..If you know how to replace the image in the
-background, please let me know!]
+=== Get Boost
+
+image:images/install_windows.png["Someone should make a nice screenshot on
+Windows 7.",width=400,link="images/install_windows.png"]
+image:images/install_darwin.png["If you know how to replace the image in the
+background, please let me know!",width=400,link="images/install_darwin.png"]
 
 The easiest way to get a copy of Boost is to use an installer. We recommend
 using an installer because it can download and install precompiled library
@@ -47,37 +49,36 @@ binaries, saving you the trouble of building them yourself. To complete this
 tutorial, you'll need to at least install the developer components of
 Boost.Lambda and Boost.Regex as well as Boost.CMake.
 
-The [@http://www.boost.org/more/getting_started/index.html Boost website version
+The http://www.boost.org/more/getting_started/index.html[Boost website version
 of this Getting Started guide] will have undated information on installers as
-they become available, or see the [@http://www.boostpro.com/products/free
-installers] provided by [@http://www.boostpro.com BoostPro Computing].
+they become available, or see the http://www.boostpro.com/products/free[
+installers] provided by http://www.boostpro.com[BoostPro Computing].
 
 RedHat, Debian, and other distribution packagers supply Boost library packages.
 However, these packages do not contain CMake package information and therefore
 cannot be used as described here[footnote If package maintainers for Boost
 distributions would like to build their packages with CMake support, we'd be
 glad to help. Please make your interest known to the
-[@http://groups.google.com/group/ryppl-dev Ryppl hackers].].
+http://groups.google.com/group/ryppl-dev[Ryppl hackers].].
 
 If you prefer to build everything yourself, follow the instructions in the [link
 boost_cmake.build Building From Source] section and come back here afterwards.
 
-[section Install on Ubuntu]
+==== Install on Ubuntu
+
 On Ubuntu, Boost can be installed from
-[@https://launchpad.net/~purplekarrot/+archive/ppa this PPA]. Open a console
-window and type in the following: [teletype]
+https://launchpad.net/~purplekarrot/+archive/ppa[this PPA]. Open a console
+window and type in the following:
 
   $ sudo add-apt-repository ppa:purplekarrot/ppa
   $ sudo apt-get update
   $ sudo apt-get install boost-cmake libboost-lambda-dev libboost-regex-dev
 
-[endsect]
-[endsect]
+=== A Simple Program Using Boost
 
-[section A Simple Program Using Boost]
 To keep things simple, let's start by using a header-only library. The following
 program reads a sequence of integers from standard input, uses Boost.Lambda to
-multiply each number by three, and writes them to standard output: [c++]
+multiply each number by three, and writes them to standard output:
 
   #include <boost/lambda/lambda.hpp>
   #include <iostream>
@@ -112,33 +113,35 @@ the `NO_MODULE` keyword.
 The variable `Boost_USE_FILE` is set to the path of a CMake file that can be
 included to add the include and library paths.
 
-[section Build Your Program]
+==== Build Your Program
+
 To build your program, you can use an Integrated Development Environment (IDE)
 like Visual Studio, or you can issue commands from the command prompt. In both
 cases you need to choose a [*build directory] where your program will be built.
 While it is possible to build your program in the source directory, we strongly
 suggest choosing a different directory.
 
-[section ... With an Integrated Development Environment (IDE)]
-[figure cmake-configure.png..When you click ["Configure] in the CMake GUI, a
-dialog will pop up and ask you for a generator. Select the IDE that you want to
-use and then click ["Finish].]
+===== With an Integrated Development Environment (IDE)
 
-Open up the CMake GUI (On Windows, that will be ["Start] -> ["All Programs] ->
-["CMake 2.8] -> ["CMake (cmake-gui)]). In the CMake GUI, select your source
+image:images/cmake_configure.png["When you click ``Configure'' in the CMake GUI,
+a dialog will pop up and ask you for a generator. Select the IDE that you want
+to use and then click ``Finish''.",width=400]
+
+Open up the CMake GUI (On Windows, that will be ``Start'' -> ``All Programs''
+-> ``CMake 2.8'' -> ``CMake (cmake-gui)''). In the CMake GUI, select your source
 directory (the directory where your `CMakeLists.txt` file is) and build
-directory, then click ["Configure]. A dialog will pop up and ask you for a
-generator. Select the IDE that you want to use and then click ["Finish]. Click
-["Configure] again to make the ["Generate] button active. Click it. If
+directory, then click ``Configure''. A dialog will pop up and ask you for a
+generator. Select the IDE that you want to use and then click ``Finish''. Click
+``Configure'' again to make the ``Generate'' button active. Click it. If
 everything was successful, you can close CMake GUI.
 
 You now find a generated project or solution for your IDE in the build
 directory. In case of Visual Studio, this will be the file `Example1.sln`.
-[endsect]
 
-[section ... From the Command Prompt]
-To use the Visual Studio compiler on Windows, open the ["Visual Studio Command
-Prompt] and execute the following commands:
+===== From the Command Prompt
+
+To use the Visual Studio compiler on Windows, open the ``Visual Studio Command
+Prompt'' and execute the following commands:
 
   > md <build dir>
   > cd <build dir>
@@ -152,11 +155,8 @@ On Unix variants, open up a terminal and type the following:
   $ cmake <source dir>
   $ make
 
-[endsect]
-[endsect]
-[endsect]
+==== Link Your Program to a Boost Library
 
-[section Link Your Program to a Boost Library]
 To demonstrate linking with a Boost binary library, we'll use the following
 simple program that extracts the subject lines from emails. It uses the
 Boost.Regex library, which has a separately-compiled binary component.
@@ -194,12 +194,13 @@ To link agains Boost libraries, use the function `boost_link_libraries()`. This
 function works similar to `target_link_libraries()`, but it only links the
 libraries when autolinking is not supported.
 
-[section Build Your Program]
+===== Build Your Program
+
 You can build this program in exactly the same way as you built the previous
 one.
-[endsect]
 
-[section Test Your Program]
+===== Test Your Program
+
 To test our subject extraction, we'll filter the following text file. Copy it
 out of your browser and save it as `jayne.txt`:
 
@@ -209,25 +210,20 @@ out of your browser and save it as `jayne.txt`:
    ---
    See subject.
 
-[endsect]
-[endsect]
+=== Conclusion and Further Resources
 
-[section Conclusion and Further Resources]
 This concludes your introduction to Boost and to integrating it with your
 programs. As you start using Boost in earnest, there are surely a few additional
-points you'll wish we had covered. One day we may have a ["Book 3 in the Getting
-Started series] that addresses them. Until then, we suggest you pursue the
+points you'll wish we had covered. One day we may have a ``Book 3 in the Getting
+Started series'' that addresses them. Until then, we suggest you pursue the
 following resources. If you can't find what you need, or there's anything we can
 do to make this document clearer, please post it to the
-[@http://www.boost.org/more/mailing_lists.htm#users Boost Users' mailing list].
+http://www.boost.org/more/mailing_lists.htm#users[Boost Users' mailing list].
 
-* [@http://www.cmake.org/cmake/help/syntax.html CMake Syntax]
-* [@http://www.cmake.org/cmake/help/examples.html CMake Examples]
-* [@http://www.cmake.org/cmake/help/cmake_tutorial.html CMake Tutorial]
-* [@http://www.cmake.org/cmake/help/documentation.html CMake Manual]
-* [@http://www.boost.org/doc/libs/release/ Index of all Boost libraries]
+* http://www.cmake.org/cmake/help/syntax.html[CMake Syntax]
+* http://www.cmake.org/cmake/help/examples.html[CMake Examples]
+* http://www.cmake.org/cmake/help/cmake_tutorial.html[CMake Tutorial]
+* http://www.cmake.org/cmake/help/documentation.html[CMake Manual]
+* http://www.boost.org/doc/libs/release/[Index of all Boost libraries]
 
-[warning Boost is highly addictive!]
-[endsect]
-
-[endsect]
+WARNING: Boost is highly addictive!

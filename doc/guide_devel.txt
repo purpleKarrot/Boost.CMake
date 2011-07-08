@@ -1,17 +1,19 @@
-[////////////////////////////////////////////////////////////////////////]
-[/ Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>           /]
-[/                                                                      /]
-[/ Distributed under the Boost Software License, Version 1.0.           /]
-[/ See accompanying file LICENSE_1_0.txt or copy at                     /]
-[/   http://www.boost.org/LICENSE_1_0.txt                               /]
-[////////////////////////////////////////////////////////////////////////]
+////////////////////////////////////////////////////////////////////////////////
+// Copyright (C) 2006 David Abrahams                                          //
+// Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>                 //
+//                                                                            //
+// Distributed under the Boost Software License, Version 1.0.                 //
+// See accompanying file LICENSE_1_0.txt or copy at                           //
+//   http://www.boost.org/LICENSE_1_0.txt                                     //
+////////////////////////////////////////////////////////////////////////////////
 
-[section Boost.CMake for Boost projects]
+== Boost.CMake for Boost projects
 
 In this section I will guide you through the required steps to create a new
 Boost library or port an existing Boost library to the CMake build system.
 
-[section Handling Dependencies]
+=== Handling Dependencies
+
 If your project depends on other Boost components, these components should be
 installed with CMake. It follows, that you can only CMake-ify a Boost component
 once all dependencies have been CMake-ified before.
@@ -25,13 +27,11 @@ check for Boost.Filesystem.
 Next, include `Boost_DEV_FILE`. This will enable all the commands documented
 below.
 
-[note
-  The `Boost_USE_FILE` variable is intended for projects that are built with
-  CMake and depend on Boost. Projects that are part of Boost should use
-  `Boost_DEV_FILE` instead.
-]
+NOTE: The `Boost_USE_FILE` variable is intended for projects that are built with
+      CMake and depend on Boost. Projects that are part of Boost should use 
+      `Boost_DEV_FILE` instead.
 
-Your CMakeLists.txt file will look something like this: [python]
+Your CMakeLists.txt file will look something like this:
 
   # Distributed under the Boost Software License, Version 1.0.
   # See http://www.boost.org/LICENSE_1_0.txt
@@ -42,9 +42,9 @@ Your CMakeLists.txt file will look something like this: [python]
   include("${Boost_DEV_FILE}")
 
 In this example, the required components are Boost.Filesystem and Boost.Test.
-[endsect]
 
-[section Project Definition]
+=== Project Definition
+
 Call the `boost_project()` command to set a name and description to the project.
 If the name of your project contains spaces, you should put the whole project's
 name in quotes. 
@@ -67,9 +67,9 @@ dependencies for the generated package.
 In the shown example that means that everybody who installs our project, should
 also install Boost.Filesystem and all its dependencies. To build the project,
 Boost.Test is required too (e.g. because the unit tests depend on it).
-[endsect]
 
-[section Public Header Files]
+=== Public Header Files
+
 Declare your public header files with the `boost_add_headers()` command. This
 command will make sure that the headers get installed and can be included by
 other Boost projects when doing a monolithic build.
@@ -93,11 +93,10 @@ It is possible to specify a location:
 All the listed files and directories will be installed to
 ["<include dir>/boost/foobar].
 
-[endsect]
+=== Libraries and Executables
 
-[section Libraries and Executables]
 To add a compiled library, use the `boost_add_library()` command instead of
-[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library
+http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library[
 `add_library`].
 
   boost_add_library(example example.cpp)
@@ -117,7 +116,7 @@ To link third party libraries, list them after LINK_LIBRARIES.
     )
 
 To add an executable, use the `boost_add_executable()` command instead of
-[@http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable
+http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable[
 `add_executable()`].
 This command supports the same arguments as the `boost_add_library()` command.
 
@@ -128,9 +127,8 @@ This command supports the same arguments as the `boost_add_library()` command.
       example
     )
 
-[endsect]
+=== Precompiling Headers
 
-[section Precompiling Headers]
 Precompiling header files can speed up compilation by creating a partially
 processed version of some header files, and then using that version during
 compilations rather than repeatedly parsing the original headers.
@@ -153,20 +151,19 @@ is also not required to guard the inclusion with a PCH_ENABLED macro.
       ${ZLIB_LIBRARIES}
     )
 
-[endsect]
+=== Documentation
 
-[section Documentation]
 Generate documentation with the 'boost_documentation' command. Use
 'boost_add_reference' if you want to include one or more reference sections in
 the documentation.
-[endsect]
 
-[section Tests]
+=== Tests
+
 Use the 'boost_add_test' command to ad a single test case. Use
 'boost_test_suite' to add multiple tests at once.
-[endsect]
 
-[section Workspace]
+=== Workspace
+
 If you are a maintainer of more than one Boost library, you may want have some
 kind of workspace that contains just your libraries.
 
@@ -201,6 +198,3 @@ content:
   
 Instead of filesystem and quickbook, you will list all your libraries. It is
 important, that you also set the BOOST_*_MAINTENANCE variables to ON.
-[endsect]
-
-[endsect]

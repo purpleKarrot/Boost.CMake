@@ -1,0 +1,29 @@
+////////////////////////////////////////////////////////////////////////////////
+// Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>                 //
+//                                                                            //
+// Distributed under the Boost Software License, Version 1.0.                 //
+// See accompanying file LICENSE_1_0.txt or copy at                           //
+//   http://www.boost.org/LICENSE_1_0.txt                                     //
+////////////////////////////////////////////////////////////////////////////////
+
+== Building From Source
+
+=== Getting the Source Code
+
+* Download compressed archive footnote:[We recommend downloading boost.7z and
+  using http://www.7-zip.org[7-Zip] to decompress it. We no longer recommend
+  .zip files for Boost because they are twice as large as the equivalent .7z
+  files. We don't recommend using Windows' built-in decompression as it can be
+  painfully slow for large archives.].
+* Clone git repository
+
+=== Getting the Dependencies
+
+* DocBook
+* doxygen
+* xsltproc
+
+Building the documentation as PDF files, you need either
+http://xmlgraphics.apache.org/fop/[FOP] (requires Java) or
+http://www.renderx.com/tools/xep.html[XEP] (requires Java) or
+http://dblatex.sourceforge.net/[dblatex] (requires Python and LaTeX).

@@ -6,8 +6,6 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-find_package(Boost COMPONENTS boostbook quickbook NO_MODULE)
-
 set(boost_modules
   BoostProject
   BoostAddHeaders
@@ -25,7 +23,7 @@ set(boost_modules
 set(reference)
 foreach(module ${boost_modules})
   set(input "${CMAKE_CURRENT_SOURCE_DIR}/../modules/${module}.cmake")
-  set(output "${module}.qbk")
+  set(output "${module}.txt")
   add_custom_command(OUTPUT ${output}
     COMMAND ${CMAKE_COMMAND}
             -DINPUT_FILE=${input}
@@ -37,5 +35,15 @@ foreach(module ${boost_modules})
   list(APPEND reference ${output})
 endforeach(module)
 
-#
-boost_documentation(cmake.qbk ${reference})
+boost_documentation(boost_cmake.txt
+    build.txt
+    guide_user.txt
+    guide_devel.txt
+    reference.txt
+    ${reference}
+  IMAGES
+    images/cmake_configure.png
+    images/cmake_install.png
+    images/install_darwin.png
+    images/install_windows.png
+  )

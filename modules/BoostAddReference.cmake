@@ -8,7 +8,10 @@
 ##########################################################################
 
 include(BoostDoxygen)
-include(BoostXsltproc)
+
+find_package(Xsltproc REQUIRED)
+include("${XSLTPROC_USE_FILE}")
+
 include(CMakeParseArguments)
 
 # Use Doxygen to parse header files and produce BoostBook output.
@@ -46,7 +49,7 @@ function(boost_add_reference name)
     )
 
   # Transform single Doxygen XML file into BoostBook XML
-  boost_xsltproc(
+  xsltproc(
     "${CMAKE_CURRENT_BINARY_DIR}/${name}.xml"
     "${BOOSTBOOK_XSL_DIR}/doxygen/doxygen2boostbook.xsl"
     "${${name}_xml}"
