@@ -21,8 +21,9 @@ resources that can help you pursue these topics further.
 
 === Get CMake
 
-image:images/cmake_install.png["If you intend to build Boost or the examples via the
-command line on Windows, make sure to add CMake to the system PATH.",width=400]
+image:images/cmake_install.png["If you intend to build Boost or the examples via
+the command line on Windows, make sure to add CMake to the system PATH.",
+width=400]
 
 http://www.cmake.org/[CMake] is a cross-platform, open-source build system. It
 uses simple platform and compiler independent configuration files and generates
@@ -80,29 +81,34 @@ To keep things simple, let's start by using a header-only library. The following
 program reads a sequence of integers from standard input, uses Boost.Lambda to
 multiply each number by three, and writes them to standard output:
 
-  #include <boost/lambda/lambda.hpp>
-  #include <iostream>
-  #include <iterator>
-  #include <algorithm>
+[source,c++]
+--------------------------------------------------------------------------------
+#include <boost/lambda/lambda.hpp>
+#include <iostream>
+#include <iterator>
+#include <algorithm>
 
-  int main() 
-  {
-     using namespace boost::lambda;
-     typedef std::istream_iterator<int> in;
+int main() 
+{
+   using namespace boost::lambda;
+   typedef std::istream_iterator<int> in;
 
-     std::for_each(in(std::cin), in(), std::cout << (_1 * 3) << " ");
-  }
+   std::for_each(in(std::cin), in(), std::cout << (_1 * 3) << " ");
+}
+--------------------------------------------------------------------------------
 
 Copy the text of this program into a file called `example.cpp`. Create a file
 called `CMakeLists.txt` in the same directory and paste the following text:
 
-  cmake_minimum_required(VERSION 2.8)
-  project(Example1)
+................................................................................
+cmake_minimum_required(VERSION 2.8)
+project(Example1)
 
-  find_package(Boost "1.47" COMPONENTS lambda NO_MODULE)
-  include("${Boost_USE_FILE}")
+find_package(Boost "1.47" COMPONENTS lambda NO_MODULE)
+include("${Boost_USE_FILE}")
 
-  add_executable(example example.cpp)
+add_executable(example example.cpp)
+................................................................................
 
 Here, we tell CMake to find the `lambda` component of the `Boost` package. If
 you already used CMake, you might know that CMake provides a module for Boost.
@@ -161,34 +167,39 @@ To demonstrate linking with a Boost binary library, we'll use the following
 simple program that extracts the subject lines from emails. It uses the
 Boost.Regex library, which has a separately-compiled binary component.
 
-  #include <boost/regex.hpp>
-  #include <iostream>
-  #include <string>
+[source,c++]
+--------------------------------------------------------------------------------
+#include <boost/regex.hpp>
+#include <iostream>
+#include <string>
 
-  int main()
-  {
-     std::string line;
-     boost::regex pat( "^Subject: (Re: |Aw: )*(.*)" );
+int main()
+{
+   std::string line;
+   boost::regex pat( "^Subject: (Re: |Aw: )*(.*)" );
 
-     while (std::cin)
-     {
-        std::getline(std::cin, line);
-        boost::smatch matches;
-        if (boost::regex_match(line, matches, pat))
-           std::cout << matches[2] << std::endl;
-     }
-  }
+   while (std::cin)
+   {
+      std::getline(std::cin, line);
+      boost::smatch matches;
+      if (boost::regex_match(line, matches, pat))
+         std::cout << matches[2] << std::endl;
+   }
+}
+--------------------------------------------------------------------------------
 
 The according `CMakeLists.txt` file will look like this:
 
-  cmake_minimum_required(VERSION 2.8)
-  project(Example2)
+................................................................................
+cmake_minimum_required(VERSION 2.8)
+project(Example2)
 
-  find_package(Boost "1.47" COMPONENTS regex NO_MODULE)
-  include("${Boost_USE_FILE}")
+find_package(Boost "1.47" COMPONENTS regex NO_MODULE)
+include("${Boost_USE_FILE}")
 
-  add_executable(example example.cpp)
-  boost_link_libraries(example regex)
+add_executable(example example.cpp)
+boost_link_libraries(example regex)
+................................................................................
 
 To link agains Boost libraries, use the function `boost_link_libraries()`. This
 function works similar to `target_link_libraries()`, but it only links the
@@ -204,11 +215,13 @@ one.
 To test our subject extraction, we'll filter the following text file. Copy it
 out of your browser and save it as `jayne.txt`:
 
-   To: George Shmidlap
-   From: Rita Marlowe
-   Subject: Will Success Spoil Rock Hunter?
-   ---
-   See subject.
+................................................................................
+To: George Shmidlap
+From: Rita Marlowe
+Subject: Will Success Spoil Rock Hunter?
+---
+See subject.
+................................................................................
 
 === Conclusion and Further Resources
 

@@ -23,8 +23,6 @@ http://www.boost.org/more/getting_started/index.html[Getting Started] section
 on the Boost website. 
 ================================================================================
 
-== Motivation
-
 If you want to use a library that is proposed for Boost, you might find the
 following instructions in the install section of its documentation:
 
