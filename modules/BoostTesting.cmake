@@ -41,9 +41,12 @@ include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/test_impl_cmake.cmake")
 # test executable when it is run.
 #
 function(boost_add_test name)
-  #boost_test_impl_ctest(${name} ${ARGN})
+  if(NOT Boost_BUILD_TESTS)
+    return()
+  endif()
 
   if(NOT MSVC_IDE)
     boost_test_impl_cmake(${name} ${ARGN})
   endif(NOT MSVC_IDE)
+  #boost_test_impl_ctest(${name} ${ARGN})
 endfunction(boost_add_test)

@@ -42,6 +42,10 @@ include(BoostTesting)
 #   boost_add_test(baz LINK    baz.cpp LINK_BOOST_LIBRARIES unit_test_framework)
 #
 function(boost_test_suite)
+  if(NOT Boost_BUILD_TESTS)
+    return()
+  endif()
+
   set(args COMPILE COMPILE_FAIL LINK LINK_FAIL RUN RUN_FAIL
     LINK_BOOST_LIBRARIES LINK_LIBRARIES)
   cmake_parse_arguments(TEST "" "" "${args}" ${ARGN})

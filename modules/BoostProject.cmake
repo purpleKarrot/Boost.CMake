@@ -16,6 +16,7 @@ function(set_boost_project name value)
 endfunction(set_boost_project)
 
 set(boost_private_module_dir "${CMAKE_CURRENT_LIST_DIR}/boost_detail")
+include("${boost_private_module_dir}/optional_default.cmake")
 
 ##########################################################################
 
@@ -72,6 +73,10 @@ function(boost_project name)
     set_boost_project(${header_only} ON)
   endif(PROJ_TOOL)
   set(BOOST_HEADER_ONLY "${header_only}" PARENT_SCOPE)
+
+  boost_optional_default(DOCS ON)
+  boost_optional_default(TESTS ON)
+  boost_optional_default(EXAMPLES OFF)
 
   # this will be obsolete once CMake supports the FOLDER property on directories
   set(BOOST_CURRENT_FOLDER "${name}" PARENT_SCOPE)

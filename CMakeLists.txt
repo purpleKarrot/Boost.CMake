@@ -28,8 +28,8 @@ boost_project(CMake TOOL
     xsltproc
   )
 
-boost_add_docs_directory(doc)
-boost_add_tests_directory(test)
+add_subdirectory(doc)
+add_subdirectory(test)
 
 file(WRITE ${BOOST_EXPORT_FILE}
   "include(\${CMAKE_CURRENT_LIST_DIR}/boostbook.cmake)\n"

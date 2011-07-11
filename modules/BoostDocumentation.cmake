@@ -22,6 +22,10 @@
 # QuickBook
 # BoostBook (.XML extension):
 function(boost_documentation input)
+  if(NOT Boost_BUILD_DOCS)
+    return()
+  endif()
+
   cmake_parse_arguments(DOC "" "" "IMAGES" ${ARGN})
 
   get_filename_component(input ${input} ABSOLUTE)
