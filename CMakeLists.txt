@@ -24,6 +24,7 @@ boost_project(CMake TOOL
     boostbook
     quickbook
   DEB_DEPENDS
+    asciidoc
     doxygen
     xsltproc
   )
