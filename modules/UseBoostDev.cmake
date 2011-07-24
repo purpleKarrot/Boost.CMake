@@ -137,17 +137,10 @@ if (NOT BOOST_TOOLSET)
   set(BOOST_TOOLSET ${BOOST_TOOLSET} CACHE STRING "Boost toolset")
 endif (NOT BOOST_TOOLSET)
 
-
-# Append the Boost version number to the versioned name
-set(boost_version "${Boost_VERSION_MAJOR}_${Boost_VERSION_MINOR}")
-if(Boost_VERSION_PATCH GREATER 0)
-  set(boost_version "${boost_version}_${Boost_VERSION_PATCH}")
-endif(Boost_VERSION_PATCH GREATER 0)
-
 # The versioned name starts with the full Boost toolset
 if(WIN32)
   set(tag_toolset "-${BOOST_TOOLSET}")
-  set(tag_version "-${boost_version}")
+  string(REPLACE "." "_" tag_version "-${Boost_VERSION}")
 else(WIN32)
   set(tag_toolset "")
   set(tag_version "")

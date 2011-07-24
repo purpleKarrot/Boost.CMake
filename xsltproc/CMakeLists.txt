@@ -12,15 +12,20 @@ endif()
 
 include(BoostExtract)
 
+set(libxml2_mirror
+  "ftp://gd.tuwien.ac.at/pub/libxml"
+  #"ftp://xmlsoft.org/libxml2"
+  )
+
 ##########################################################################
 
 boost_extract(libxml2 DOWNLOAD
-  ftp://xmlsoft.org/libxml2/libxml2-2.7.8.tar.gz
+  "${libxml2_mirror}/libxml2-2.7.8.tar.gz"
   8127a65e8c3b08856093099b52599c86
   )
 
 boost_extract(libxslt DOWNLOAD
-  ftp://xmlsoft.org/libxml2/libxslt-1.1.26.tar.gz
+  "${libxml2_mirror}/libxslt-1.1.26.tar.gz"
   e61d0364a30146aaa3001296f853b2b9
   )
 
