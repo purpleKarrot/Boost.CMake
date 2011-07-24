@@ -101,6 +101,8 @@ function(boost_add_library)
     OUTPUT_NAME "boost_${TARGET_NAME}"
     FOLDER "${BOOST_CURRENT_FOLDER}"
     VERSION "${Boost_VERSION}"
+    DEBUG_POSTFIX "${BOOST_DEBUG_POSTFIX}"
+    RELEASE_POSTFIX "${BOOST_RELEASE_POSTFIX}"
     )
 
   boost_install_libraries(${targets})

@@ -165,9 +165,9 @@ endif(MSVC)
 set(tag_pydebug "y")
 
 # CMAKE_<CONFIG>_POSTFIX
-set(CMAKE_DEBUG_POSTFIX   "${tag_toolset}${tag_mt}-${tag_rtdebug}d${tag_version}")
-set(CMAKE_RELEASE_POSTFIX "${tag_toolset}${tag_mt}${tag_version}")
+set(BOOST_DEBUG_POSTFIX   "${tag_toolset}${tag_mt}-${tag_rtdebug}d${tag_version}")
+set(BOOST_RELEASE_POSTFIX "${tag_toolset}${tag_mt}${tag_version}")
 
 # Linking statically to the runtime library
-set(CMAKE_DEBUGSTATICRUNTIME_POSTFIX   "${tag_toolset}${tag_mt}-s${tag_rtdebug}d${tag_version}")
-set(CMAKE_RELEASESTATICRUNTIME_POSTFIX "${tag_toolset}${tag_mt}-s${tag_version}")
+set(BOOST_DEBUGSTATICRUNTIME_POSTFIX   "${tag_toolset}${tag_mt}-s${tag_rtdebug}d${tag_version}")
+set(BOOST_RELEASESTATICRUNTIME_POSTFIX "${tag_toolset}${tag_mt}-s${tag_version}")
