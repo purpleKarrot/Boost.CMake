@@ -20,7 +20,9 @@ include(BoostDocumentation)
 include(BoostTesting)
 include(BoostTestSuite)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/boost_module.cmake")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boost_module.cmake")
+  include("${CMAKE_CURRENT_SOURCE_DIR}/boost_module.cmake")
+endif()
 
 ##########################################################################
 
