@@ -20,6 +20,8 @@ include(BoostDocumentation)
 include(BoostTesting)
 include(BoostTestSuite)
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/boost_module.cmake")
+
 ##########################################################################
 
 # set CMAKE_THREAD_PREFER_PTHREAD if you prefer pthread on windows

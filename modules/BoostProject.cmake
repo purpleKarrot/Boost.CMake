@@ -131,3 +131,7 @@ function(boost_project name)
       )
   endif(PROJ_TOOL)
 endfunction(boost_project)
+
+macro(boost_module)
+  boost_project(${ARGN})
+endmacro(boost_module)

@@ -15,20 +15,6 @@ set(Boost_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
 set(Boost_USE_FILE UseBoost)
 include(UseBoostDev)
 
-boost_project(CMake TOOL
-  AUTHORS
-    "Daniel Pfeifer <daniel -at- pfeifer-mail.de>"
-  DESCRIPTION
-    "A collection of CMake modules to simplify the use and development of Boost libraries."
-  DEPENDS
-    boostbook
-    quickbook
-  DEB_DEPENDS
-    asciidoc
-    doxygen
-    xsltproc
-  )
-
 add_subdirectory(doc)
 add_subdirectory(test)
 
