@@ -13,12 +13,10 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
 set(Boost_RESOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/resources")
 set(Boost_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
 set(Boost_USE_FILE UseBoost)
+include(BoostProject)
 include(UseBoostDev)
 
-add_subdirectory(doc)
-add_subdirectory(test)
-
-file(WRITE ${BOOST_EXPORT_FILE}
+file(WRITE "${BOOST_EXPORTS_FILE}"
   "include(\${CMAKE_CURRENT_LIST_DIR}/boostbook.cmake)\n"
   "include(\${CMAKE_CURRENT_LIST_DIR}/quickbook.cmake)\n"
   )

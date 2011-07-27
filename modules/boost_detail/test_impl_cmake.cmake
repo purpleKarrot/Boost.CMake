@@ -30,7 +30,7 @@ function(boost_test_impl_cmake name)
   cmake_parse_arguments(TEST "COMPILE;LINK;RUN;FAIL" ""
     "ARGS;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
 
-  set(target "${BOOST_CURRENT_PROJECT}-test-${name}")
+  set(target "${BOOST_CURRENT}-test-${name}")
 
   # If no sources are specified, use the name of the test.cpp
   if(TEST_UNPARSED_ARGUMENTS)
@@ -113,7 +113,7 @@ function(boost_test_impl_cmake name)
       )
   endif(TEST_RUN)
 
-  set(project_test "${BOOST_CURRENT_PROJECT}-test")
+  set(project_test "${BOOST_CURRENT}-test")
   if(NOT TARGET ${project_test})
     add_custom_target(${project_test})
     if(TARGET test)

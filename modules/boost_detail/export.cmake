@@ -10,7 +10,7 @@ function(boost_export target)
   get_target_property(type ${target} TYPE)
 
   if(type STREQUAL "EXECUTABLE")
-    file(APPEND ${BOOST_EXPORT_FILE} "\n"
+    file(APPEND "${BOOST_EXPORTS_FILE}" "\n"
       "add_executable(\${BOOST_NAMESPACE}${target} IMPORTED)\n"
       )
   elseif(type STREQUAL "SHARED_LIBRARY" OR type STREQUAL "STATIC_LIBRARY")
@@ -25,7 +25,7 @@ function(boost_export target)
     foreach(lib ${ARGN})
       list(APPEND interface_libraries "\${BOOST_NAMESPACE}${lib}-${lower}")
     endforeach(lib)
-    file(APPEND ${BOOST_EXPORT_FILE} "\n"
+    file(APPEND "${BOOST_EXPORTS_FILE}" "\n"
       "add_library(\${BOOST_NAMESPACE}${target} ${upper} IMPORTED)\n"
       "set_target_properties(\${BOOST_NAMESPACE}${target} PROPERTIES\n"
       "  IMPORTED_LINK_INTERFACE_LANGUAGES \"CXX\"\n"
@@ -65,5 +65,5 @@ function(boost_export target)
       )
   endif(type STREQUAL "SHARED_LIBRARY" AND NOT WIN32)
 
-  file(APPEND ${BOOST_TARGET_LIST_FILE} "${target}\n")
+  file(APPEND "${BOOST_TARGETS_FILE}" "${target}\n")
 endfunction(boost_export)

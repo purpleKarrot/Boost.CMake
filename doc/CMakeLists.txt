@@ -6,10 +6,6 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-if(NOT Boost_BUILD_DOCS)
-  return()
-endif()
-
 set(boost_modules
   BoostProject
   BoostAddHeaders

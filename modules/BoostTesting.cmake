@@ -41,7 +41,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/test_impl_cmake.cmake")
 # test executable when it is run.
 #
 function(boost_add_test name)
-  if(NOT Boost_BUILD_TESTS)
+  if(NOT BOOST_CURRENT_TEST_ENABLED)
     return()
   endif()
 

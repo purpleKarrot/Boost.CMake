@@ -22,7 +22,7 @@
 # QuickBook
 # BoostBook (.XML extension):
 function(boost_documentation input)
-  if(NOT Boost_BUILD_DOCS)
+  if(NOT BOOST_CURRENT_DOC_ENABLED)
     return()
   endif()
 
@@ -74,7 +74,7 @@ function(boost_documentation input)
   elseif(input_ext STREQUAL ".html")
     boost_html_doc(${input_file} ${depends})
   else()
-    message(STATUS "${BOOST_CURRENT_PROJECT} has unknown doc format: ${input_ext}")
+    message(STATUS "${BOOST_CURRENT} has unknown doc format: ${input_ext}")
   endif()
 endfunction(boost_documentation)
 
@@ -120,10 +120,10 @@ function(boost_docbook input)
 
   if(HTML_HELP_COMPILER)
     set(hhp_output "${html_dir}/htmlhelp.hhp")
-    set(chm_output "${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm")
+    set(chm_output "${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT}.chm")
     set(stylesheet "${Boost_RESOURCE_PATH}/docbook-xsl/htmlhelp.xsl")
     xsltproc("${hhp_output}" "${stylesheet}" "${input}"
-      PARAMETERS "htmlhelp.chm=../${BOOST_CURRENT_PROJECT}.chm"
+      PARAMETERS "htmlhelp.chm=../${BOOST_CURRENT}.chm"
       )
     set(hhc_cmake ${CMAKE_CURRENT_BINARY_DIR}/hhc.cmake)
     file(WRITE ${hhc_cmake}
@@ -151,28 +151,28 @@ function(boost_docbook input)
 #   xsltproc(${output_man} ${BOOSTBOOK_XSL_DIR}/manpages.xsl ${input})
 #   list(APPEND doc_targets ${output_man})
     install(DIRECTORY "${html_dir}/"
-      DESTINATION "share/doc/boost/${BOOST_CURRENT_PROJECT}"
+      DESTINATION "share/doc/boost/${BOOST_CURRENT}"
       COMPONENT "${BOOST_MANUAL_COMPONENT}"
       CONFIGURATIONS "Release"
       )
   endif()
 
-  set(target "${BOOST_CURRENT_PROJECT}-doc")
+  set(target "${BOOST_CURRENT}-doc")
   add_custom_target(${target} DEPENDS ${doc_targets})
   set_target_properties(${target} PROPERTIES
-    FOLDER "${BOOST_CURRENT_FOLDER}"
-    PROJECT_LABEL "${BOOST_CURRENT_PROJECT} (documentation)"
+    FOLDER "${BOOST_CURRENT_NAME}"
+    PROJECT_LABEL "${BOOST_CURRENT} (documentation)"
     )
   add_dependencies(documentation ${target})
 
   # build documentation as pdf
   if(DBLATEX_FOUND OR FOPROCESSOR_FOUND)
     set(pdf_dir ${CMAKE_BINARY_DIR}/pdf)
-    set(pdf_file ${pdf_dir}/${BOOST_CURRENT_PROJECT}.pdf)
+    set(pdf_file ${pdf_dir}/${BOOST_CURRENT}.pdf)
     file(MAKE_DIRECTORY ${pdf_dir})
 
     if(FOPROCESSOR_FOUND)
-      set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.fo)
+      set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT}.fo)
       xsltproc(${fop_file} ${BOOSTBOOK_XSL_DIR}/fo.xsl ${input}
         PARAMETERS img.src.path=${CMAKE_CURRENT_BINARY_DIR}/images/
         )
@@ -188,11 +188,11 @@ function(boost_docbook input)
         )
     endif()
 
-    set(target "${BOOST_CURRENT_PROJECT}-pdf")
+    set(target "${BOOST_CURRENT}-pdf")
     add_custom_target(${target} DEPENDS ${pdf_file})
     set_target_properties(${target} PROPERTIES
-      FOLDER "${BOOST_CURRENT_FOLDER}"
-      PROJECT_LABEL "${BOOST_CURRENT_PROJECT} (pdf)"
+      FOLDER "${BOOST_CURRENT_NAME}"
+      PROJECT_LABEL "${BOOST_CURRENT} (pdf)"
       )
   endif(DBLATEX_FOUND OR FOPROCESSOR_FOUND)
 endfunction(boost_docbook)
@@ -221,7 +221,7 @@ endfunction(boost_docbook)
 
 ## TODO: this function can be used for more than html...
 function(boost_html_doc input)
-# set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.docbook)
+# set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT}.docbook)
 # add_custom_command(OUTPUT ${output}
 #   COMMAND ${PANDOC_EXECUTABLE} -S -w docbook ${input} -o ${output}
 #   DEPENDS ${input}
@@ -235,17 +235,17 @@ function(boost_html_doc input)
       "Binary TOC=Yes\n"
       "Auto TOC=9\n"
       "Compatibility=1.1 or later\n"
-      "Compiled file=${BOOST_CURRENT_PROJECT}.chm\n"
+      "Compiled file=${BOOST_CURRENT}.chm\n"
       "Contents file=toc.hhc\n"
       "Default Window=Main\n"
       "Default topic=index.html\n"
       "Display compile progress=No\n"
       "Full-text search=Yes\n"
       "Language=0x0409 English (UNITED STATES)\n"
-      "Title=Boost.${BOOST_CURRENT_PROJECT}\n"
+      "Title=Boost.${BOOST_CURRENT}\n"
       "Enhanced decompilation=No\n"
       "[WINDOWS]\n"
-      "Main=\"Boost.${BOOST_CURRENT_PROJECT}\",\"toc.hhc\",,\"index.html\",\"index.html\",,,,,0x2520,,0x603006,,,,,,,,0\n"
+      "Main=\"Boost.${BOOST_CURRENT}\",\"toc.hhc\",,\"index.html\",\"index.html\",,,,,0x2520,,0x603006,,,,,,,,0\n"
       "[FILES]\n"
       )
     foreach(file ${input} ${ARGN})
@@ -258,15 +258,15 @@ function(boost_html_doc input)
       " WORKING_DIRECTORY \"${CMAKE_CURRENT_BINARY_DIR}\""
       " OUTPUT_QUIET)"
       )
-    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm
+    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT}.chm
       COMMAND "${CMAKE_COMMAND}" -P "${hhc_cmake}"
       DEPENDS ${input} ${ARGN}
       )
-    set(target "${BOOST_CURRENT_PROJECT}-doc")
-    add_custom_target(${target} DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.chm)
+    set(target "${BOOST_CURRENT}-doc")
+    add_custom_target(${target} DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT}.chm)
     set_target_properties(${target} PROPERTIES
-      FOLDER "${BOOST_CURRENT_FOLDER}"
-      PROJECT_LABEL "${BOOST_CURRENT_PROJECT} (documentation)"
+      FOLDER "${BOOST_CURRENT_NAME}"
+      PROJECT_LABEL "${BOOST_CURRENT} (documentation)"
       )
   endif(HTML_HELP_COMPILER)
 endfunction(boost_html_doc)
@@ -277,7 +277,7 @@ endfunction(boost_html_doc)
 
 function(boost_doc_boostbook input)
   find_package(Boost COMPONENTS boostbook NO_MODULE)
-  set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.docbook)
+  set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT}.docbook)
   xsltproc(${output} ${BOOSTBOOK_XSL_DIR}/docbook.xsl ${input}
     DEPENDS ${input} ${ARGN}
     )
@@ -291,7 +291,7 @@ endfunction(boost_doc_boostbook)
 function(boost_doc_quickbook input)
   find_package(Boost COMPONENTS quickbook NO_MODULE)
   get_filename_component(input_path ${input} PATH)
-  set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.xml)
+  set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT}.xml)
   add_custom_command(OUTPUT ${output}
     COMMAND $<TARGET_FILE:${BOOST_NAMESPACE}quickbook>
             --input-file ${input}
@@ -309,7 +309,7 @@ endfunction(boost_doc_quickbook)
 
 function(boost_doc_asciidoc input)
   find_package(AsciiDoc REQUIRED)
-  set(output "${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT_PROJECT}.docbook")
+  set(output "${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT}.docbook")
   add_custom_command(OUTPUT "${output}"
     COMMAND ${ASCIIDOC_EXECUTABLE} -b docbook -o ${output} ${input}
     DEPENDS ${input} ${ARGN}

@@ -99,7 +99,7 @@ function(boost_add_library)
   set_target_properties(${targets} PROPERTIES
     DEFINE_SYMBOL "${TARGET_DEFINE_SYMBOL}"
     OUTPUT_NAME "boost_${TARGET_NAME}"
-    FOLDER "${BOOST_CURRENT_FOLDER}"
+    FOLDER "${BOOST_CURRENT_NAME}"
     VERSION "${Boost_VERSION}"
     DEBUG_POSTFIX "${BOOST_DEBUG_POSTFIX}"
     RELEASE_POSTFIX "${BOOST_RELEASE_POSTFIX}"
@@ -139,5 +139,5 @@ function(boost_install_libraries)
       COMPONENT "${BOOST_DEBUG_COMPONENT}"
       CONFIGURATIONS "Debug"
     )
-  set_boost_project("${BOOST_HEADER_ONLY}" OFF)
+  set("${BOOST_HEADER_ONLY_VAR}" OFF CACHE INTERNAL "" FORCE)
 endfunction(boost_install_libraries)

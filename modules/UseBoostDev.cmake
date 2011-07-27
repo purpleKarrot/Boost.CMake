@@ -1,16 +1,90 @@
-##########################################################################
-# Copyright (C) 2007-2009 Douglas Gregor <doug.gregor@gmail.com>         #
-# Copyright (C) 2007-2009 Troy Straszheim <troy@resophonic.com>          #
-# Copyright (C) 2010-2011 Daniel Pfeifer <daniel@pfeifer-mail.de>        #
-#                                                                        #
-# Distributed under the Boost Software License, Version 1.0.             #
-# See accompanying file LICENSE_1_0.txt or copy at                       #
-#   http://www.boost.org/LICENSE_1_0.txt                                 #
-##########################################################################
+################################################################################
+# Copyright (C) 2007-2009 Douglas Gregor <doug.gregor@gmail.com>               #
+# Copyright (C) 2007-2009 Troy Straszheim <troy@resophonic.com>                #
+# Copyright (C) 2010-2011 Daniel Pfeifer <daniel@pfeifer-mail.de>              #
+#                                                                              #
+# Distributed under the Boost Software License, Version 1.0.                   #
+# See accompanying file LICENSE_1_0.txt or copy at                             #
+#   http://www.boost.org/LICENSE_1_0.txt                                       #
+################################################################################
+
+include("${CMAKE_CURRENT_LIST_DIR}/BoostProject.cmake")
+boost_get_component_vars()
+
+if(NOT BOOST_CURRENT)
+  message(STATUS "invalid boost_module.cmake in ${CMAKE_CURRENT_SOURCE_DIR}")
+  return()
+endif()
+
+#
+foreach(component debug develop runtime manual)
+  string(TOUPPER "${component}" upper)
+  set(BOOST_${upper}_COMPONENT "${BOOST_CURRENT}_${component}")
+endforeach(component)
+
+set(BOOST_HEADER_ONLY_VAR BOOST_${BOOST_CURRENT}_HEADER_ONLY)
+if(BOOST_CURRENT_IS_TOOL)
+  set(${BOOST_HEADER_ONLY_VAR} OFF CACHE INTERNAL "" FORCE)
+else(BOOST_CURRENT_IS_TOOL)
+  set(${BOOST_HEADER_ONLY_VAR} ON CACHE INTERNAL "" FORCE)
+endif(BOOST_CURRENT_IS_TOOL)
+
+################################################################################
+# Export of CMake components                                                   #
+################################################################################
+
+set(BOOST_EXPORTS_FILE "${CMAKE_CURRENT_BINARY_DIR}/exports.txt")
+file(WRITE "${BOOST_EXPORTS_FILE}" "")
+
+set(BOOST_TARGETS_FILE "${CMAKE_CURRENT_BINARY_DIR}/targets.txt")
+file(WRITE "${BOOST_TARGETS_FILE}" "")
+
+set(install_code "set(BOOST_PROJECT ${BOOST_CURRENT})
+    set(BOOST_DEPENDS ${BOOST_CURRENT_DEPENDS})
+    set(BOOST_TARGETS \"${BOOST_TARGETS_FILE}\")
+    set(BOOST_EXPORTS \"${BOOST_EXPORTS_FILE}\")
+    set(BOOST_IS_TOOL ${BOOST_CURRENT_IS_TOOL})
+    set(BOOST_BINARY_DIR \"${CMAKE_BINARY_DIR}\")"
+  )
+
+# install(CODE) seems to ignore CONFIGURATIONS...
+set(debug_match
+  "\"\${CMAKE_INSTALL_CONFIG_NAME}\" MATCHES \"^([Dd][Ee][Bb][Uu][Gg])$\""
+  )
+set(release_match
+  "\"\${CMAKE_INSTALL_CONFIG_NAME}\" MATCHES \"^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$\""
+  )
+
+if(BOOST_CURRENT_IS_TOOL)
+  install(CODE "if(${release_match})
+    ${install_code}
+    include(\"${CMAKE_CURRENT_LIST_DIR}/boost_detail/install_component.cmake\")
+    include(\"${CMAKE_CURRENT_LIST_DIR}/boost_detail/install_component_config.cmake\")
+  endif(${release_match})"
+    COMPONENT "${BOOST_RUNTIME_COMPONENT}"
+    )
+else(BOOST_CURRENT_IS_TOOL)
+  install(CODE "if(${debug_match})
+    ${install_code}
+    include(\"${CMAKE_CURRENT_LIST_DIR}/boost_detail/install_component_config.cmake\")
+  endif(${debug_match})"
+    COMPONENT "${BOOST_DEBUG_COMPONENT}"
+    )
+  install(CODE "if(${release_match})
+    ${install_code}
+    include(\"${CMAKE_CURRENT_LIST_DIR}/boost_detail/install_component.cmake\")
+    include(\"${CMAKE_CURRENT_LIST_DIR}/boost_detail/install_component_config.cmake\")
+  endif(${release_match})"
+    COMPONENT "${BOOST_DEVELOP_COMPONENT}"
+    )
+endif(BOOST_CURRENT_IS_TOOL)
+
+################################################################################
+# include common used Boost.CMake modules                                      #
+################################################################################
 
 include("${Boost_USE_FILE}")
 
-include(BoostProject)
 include(BoostAddHeaders)
 include(BoostAddLibrary)
 include(BoostAddExecutable)
@@ -20,11 +94,51 @@ include(BoostDocumentation)
 include(BoostTesting)
 include(BoostTestSuite)
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boost_module.cmake")
-  include("${CMAKE_CURRENT_SOURCE_DIR}/boost_module.cmake")
-endif()
+################################################################################
+# set values and add subdirectories for DOC, TEST, and EXAMPLE                 #
+################################################################################
 
-##########################################################################
+macro(boost_optional_subdirectories option default)
+  if(NOT DEFINED BOOST_ENABLED_${option}S)
+    set(BOOST_CURRENT_${option}_ENABLED ${default})
+  elseif(BOOST_ENABLED_${option}S STREQUAL "NONE")
+    set(BOOST_CURRENT_${option}_ENABLED OFF)
+  elseif(BOOST_ENABLED_${option}S STREQUAL "ALL")
+    set(BOOST_CURRENT_${option}_ENABLED ON)
+  else()
+    list(FIND BOOST_ENABLED_${option}S ${BOOST_CURRENT} enabled)
+    if(enabled GREATER "-1")
+      set(BOOST_CURRENT_${option}_ENABLED ON)
+    else()
+      set(BOOST_CURRENT_${option}_ENABLED OFF)
+    endif()
+  endif()
+  if(BOOST_CURRENT_${option}_ENABLED AND BOOST_CURRENT_${option}_DIRECTORIES)
+    foreach(directory ${BOOST_CURRENT_${option}_DIRECTORIES})
+      add_subdirectory(${directory})
+    endforeach(directory)
+  endif()
+endmacro(boost_optional_subdirectories)
+
+boost_optional_subdirectories(DOC ON)
+boost_optional_subdirectories(TEST ON)
+boost_optional_subdirectories(EXAMPLE OFF)
+
+################################################################################
+# install content of include directories                                       #
+################################################################################
+
+if(BOOST_CURRENT_INCLUDE_DIRECTORIES)
+  install(DIRECTORY ${BOOST_CURRENT_INCLUDE_DIRECTORIES}
+    DESTINATION "${destination}"
+    COMPONENT "${BOOST_DEVELOP_COMPONENT}"
+    CONFIGURATIONS "Release"
+    )
+endif(BOOST_CURRENT_INCLUDE_DIRECTORIES)
+
+################################################################################
+#                                                                              #
+################################################################################
 
 # set CMAKE_THREAD_PREFER_PTHREAD if you prefer pthread on windows
 find_package(Threads)

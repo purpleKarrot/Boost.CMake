@@ -18,4 +18,8 @@ boost_module(CMake TOOL
     asciidoc
     doxygen
     xsltproc
+  DOC_DIRECTORIES
+    doc
+  TEST_DIRECTORIES
+    test
   )

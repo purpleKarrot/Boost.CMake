@@ -118,7 +118,7 @@ function(boost_test_impl_ctest name)
     set(boost_libraries_arg "-DLINK_BOOST_LIBRARIES=${link_boost_libraries}")
   endif()
 
-  set(testname "${BOOST_CURRENT_PROJECT}-${name}")
+  set(testname "${BOOST_CURRENT}-${name}")
 
   add_test(NAME ${testname} COMMAND ${CMAKE_CTEST_COMMAND}
     --build-and-test ${name} ${name}
@@ -148,7 +148,7 @@ function(boost_test_impl_ctest name)
   endif(TEST_FAIL)
 
   set_tests_properties(${testname} PROPERTIES
-    LABELS "${BOOST_CURRENT_PROJECT};${fail_label}"
+    LABELS "${BOOST_CURRENT};${fail_label}"
     WILL_FAIL "${will_fail}"
     )
 endfunction(boost_test_impl_ctest)

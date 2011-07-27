@@ -42,7 +42,7 @@ include(BoostTesting)
 #   boost_add_test(baz LINK    baz.cpp LINK_BOOST_LIBRARIES unit_test_framework)
 #
 function(boost_test_suite)
-  if(NOT Boost_BUILD_TESTS)
+  if(NOT BOOST_CURRENT_TEST_ENABLED)
     return()
   endif()
 

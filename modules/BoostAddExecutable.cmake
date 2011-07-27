@@ -78,7 +78,7 @@ function(boost_add_executable)
     )
 
   set_target_properties(${TARGET_NAME} PROPERTIES
-    FOLDER "${BOOST_CURRENT_FOLDER}"
+    FOLDER "${BOOST_CURRENT_NAME}"
     PROJECT_LABEL "${TARGET_NAME} (executable)"
     )
 
@@ -96,5 +96,4 @@ function(boost_add_executable)
     COMPONENT "${BOOST_RUNTIME_COMPONENT}"
     CONFIGURATIONS Release
     )
-  set_boost_project("${BOOST_HAS_RUNTIME_VAR}" ON)
 endfunction(boost_add_executable)

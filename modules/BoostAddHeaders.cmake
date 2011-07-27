@@ -10,12 +10,7 @@ include(BoostForwardFile)
 include(CMakeParseArguments)
 
 
-#
-#   boost_add_headers(
-#     <list of header files and folders>
-#     [LOCATION <location>]
-#     )
-#
+# this function is deprecated, use INCLUDE_DIRECTORIES in boost_module instead
 function(boost_add_headers)
   cmake_parse_arguments(HDR "" "LOCATION" "" ${ARGN})
 

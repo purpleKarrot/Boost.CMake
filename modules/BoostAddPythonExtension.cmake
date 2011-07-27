@@ -25,7 +25,7 @@ function(boost_add_python_extension)
     DEFINE_SYMBOL "${TARGET_DEFINE_SYMBOL}"
     OUTPUT_NAME "${TARGET_NAME}"
     PREFIX ""
-    FOLDER "${BOOST_CURRENT_FOLDER}"
+    FOLDER "${BOOST_CURRENT_NAME}"
     PROJECT_LABEL "${TARGET_NAME} (python extension)"
 #   VERSION "${Boost_VERSION}"
     )

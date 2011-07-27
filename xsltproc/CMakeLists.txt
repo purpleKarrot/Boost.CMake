@@ -200,7 +200,7 @@ add_executable(xsltproc
   )
 
 set_target_properties(xsltproc PROPERTIES
-  FOLDER "${BOOST_CURRENT_FOLDER}"
+  FOLDER "${BOOST_CURRENT_NAME}"
   PROJECT_LABEL "xsltproc (executable)"
   )
 
@@ -210,7 +210,7 @@ install(TARGETS xsltproc
   CONFIGURATIONS Release
   )
 
-file(APPEND ${BOOST_EXPORT_FILE}
+file(APPEND "${BOOST_EXPORTS_FILE}"
   "add_executable(\${BOOST_NAMESPACE}xsltproc IMPORTED)\n"
   "set_target_properties(\${BOOST_NAMESPACE}xsltproc PROPERTIES\n"
   " IMPORTED_LOCATION \"\${CMAKE_CURRENT_LIST_DIR}/../bin/xsltproc.exe\"\n"
