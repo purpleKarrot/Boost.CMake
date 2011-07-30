@@ -12,7 +12,9 @@ include("${CMAKE_CURRENT_LIST_DIR}/BoostProject.cmake")
 boost_get_component_vars()
 
 if(NOT BOOST_CURRENT)
-  message(STATUS "invalid boost_module.cmake in ${CMAKE_CURRENT_SOURCE_DIR}")
+  message(FATAL_ERROR
+    "invalid boost_module.cmake in ${CMAKE_CURRENT_SOURCE_DIR}"
+    )
   return()
 endif()
 
@@ -80,6 +82,19 @@ else(BOOST_CURRENT_IS_TOOL)
 endif(BOOST_CURRENT_IS_TOOL)
 
 ################################################################################
+# include directories                                                          #
+################################################################################
+
+if(BOOST_CURRENT_INCLUDE_DIRECTORIES)
+  install(DIRECTORY ${BOOST_CURRENT_INCLUDE_DIRECTORIES}
+    DESTINATION include
+    COMPONENT "${BOOST_DEVELOP_COMPONENT}"
+    CONFIGURATIONS "Release"
+    )
+  list(APPEND Boost_INCLUDE_DIRS ${BOOST_CURRENT_INCLUDE_DIRECTORIES})
+endif(BOOST_CURRENT_INCLUDE_DIRECTORIES)
+
+################################################################################
 # include common used Boost.CMake modules                                      #
 ################################################################################
 
@@ -123,18 +138,6 @@ endmacro(boost_optional_subdirectories)
 boost_optional_subdirectories(DOC ON)
 boost_optional_subdirectories(TEST ON)
 boost_optional_subdirectories(EXAMPLE OFF)
-
-################################################################################
-# install content of include directories                                       #
-################################################################################
-
-if(BOOST_CURRENT_INCLUDE_DIRECTORIES)
-  install(DIRECTORY ${BOOST_CURRENT_INCLUDE_DIRECTORIES}
-    DESTINATION "${destination}"
-    COMPONENT "${BOOST_DEVELOP_COMPONENT}"
-    CONFIGURATIONS "Release"
-    )
-endif(BOOST_CURRENT_INCLUDE_DIRECTORIES)
 
 ################################################################################
 #                                                                              #
