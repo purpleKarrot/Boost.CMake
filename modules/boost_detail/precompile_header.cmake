@@ -6,6 +6,7 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+include(BoostForwardFile)
 
 ##
 function(boost_add_pch name source_list)
@@ -77,7 +78,7 @@ function(boost_add_pch_to_target target header)
     separate_arguments(compile_flags)
 
     set(pch_header "${CMAKE_CURRENT_BINARY_DIR}/${target}.hpp")
-    boost_forward(${header} ${pch_header})
+    boost_forward_file(${header} ${pch_header})
     set(pch_binary "${pch_header}.gch")
 
     add_custom_command(OUTPUT ${pch_binary} 	

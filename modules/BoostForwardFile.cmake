@@ -21,67 +21,35 @@ if(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
 endif(CMAKE_HOST_WIN32 AND NOT DEFINED MKLINK_WORKING)
 
 
-# Create a symbolic link (new -> old) to a file or directory.
+# Make a header file available from another path.
 #
-#   boost_create_symlink(<old> <new>)
+#   boost_forward_file(<old> <new>)
 #
+# Where <old> is a path to an existing file that you want to include as if
+# it were located at <new>. This function creates symlinks where available.
+# As a fallback it simply creates a file at the new position that `#include`s
+# the appropriate file.
 # On Windows, symlinks are available since Vista, but they require the
 # /Create Symbolic Link/ privilege, which only administrators have by default.
-function(boost_create_symlink old new)
+function(boost_forward_file old new)
+  if(IS_DIRECTORY "${old}")
+    message(FATAL_ERROR "input must be a file!")
+  endif()
+  
+  if(EXISTS "${new}")
+    return()
+  endif()
+
+  get_filename_component(directory ${new} PATH)
+  file(MAKE_DIRECTORY ${directory})
+
   if(NOT CMAKE_HOST_WIN32)
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${old} ${new})
   elseif(MKLINK_WORKING)
     file(TO_NATIVE_PATH "${new}" native_new)
     file(TO_NATIVE_PATH "${old}" native_old)
-    if(IS_DIRECTORY "${old}")
-      execute_process(COMMAND cmd /C mklink /D ${native_new} ${native_old} OUTPUT_QUIET)
-    else(IS_DIRECTORY "${old}")
-      execute_process(COMMAND cmd /C mklink ${native_new} ${native_old} OUTPUT_QUIET)
-    endif(IS_DIRECTORY "${old}")
+    execute_process(COMMAND cmd /C mklink ${native_new} ${native_old} OUTPUT_QUIET)
   else()
-    message(FATAL_ERROR "Unable to create symbolic link: '${new}' -> '${old}'")
-  endif()
-endfunction(boost_create_symlink)
-
-
-# Make a header file available from another path.
-#
-#   boost_forward_header(<old> <new>)
-#
-# Where <old> is a path to an existing file that you want to include as if
-# it were located at <new>.
-function(boost_forward_header old new)
-  set(file_content)
-  if(EXISTS "${new}")
-    file(READ "${new}" file_content)
-  endif()
-  if(NOT file_content STREQUAL "#include \"${old}\"\n")
     file(WRITE "${new}" "#include \"${old}\"\n")
   endif()
-endfunction(boost_forward_header)
-
-
-#
-#   boost_forward(<old> <new>)
-#
-# This function creates symlinks where available. As a fallback it simply creates
-# a file at the new position that [c++] `#include`s the appropriate file.
-function(boost_forward old new)
-  get_filename_component(directory ${new} PATH)
-  file(MAKE_DIRECTORY ${directory})
-
-  if(EXISTS "${new}")
-    return()
-  endif()
-
-  if(NOT CMAKE_HOST_WIN32 OR MKLINK_WORKING)
-    boost_create_symlink("${old}" "${new}")
-  elseif(IS_DIRECTORY "${old}")
-	file(GLOB_RECURSE files RELATIVE "${old}" "${old}/*.?pp")
-	foreach(file ${files})
-      boost_forward_header("${old}/${file}" "${new}/${file}")
-	endforeach(file)
-  else()
-    boost_forward_header("${old}" "${new}")
-  endif()
-endfunction(boost_forward)
+endfunction(boost_forward_file)

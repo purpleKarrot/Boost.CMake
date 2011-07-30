@@ -100,14 +100,12 @@ endif(BOOST_CURRENT_INCLUDE_DIRECTORIES)
 
 include("${Boost_USE_FILE}")
 
-include(BoostAddHeaders)
 include(BoostAddLibrary)
 include(BoostAddExecutable)
 include(BoostAddPythonExtension)
 include(BoostAddReference)
 include(BoostDocumentation)
 include(BoostTesting)
-include(BoostTestSuite)
 
 ################################################################################
 # set values and add subdirectories for DOC, TEST, and EXAMPLE                 #

@@ -8,7 +8,6 @@
 
 set(boost_modules
   BoostProject
-  BoostAddHeaders
   BoostAddLibrary
   BoostAddExecutable
   BoostAddPythonExtension
@@ -16,7 +15,6 @@ set(boost_modules
   BoostDocumentation
   BoostExtract
   BoostTesting
-  BoostTestSuite
   )
 
 set(reference)
