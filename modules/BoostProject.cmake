@@ -33,6 +33,17 @@ function(boost_get_component_vars)
 
   include("${BOOST_CURRENT_SOURCE_DIR}/boost_module.cmake")
 
+  # make sure include directories are absolute and end with /
+  set(include_dirs)
+  foreach(dir ${MODULE_INCLUDE_DIRECTORIES})
+    if(IS_ABSOLUTE "${dir}")
+      list(APPEND include_dirs "${dir}/")
+    else()
+      list(APPEND include_dirs "${BOOST_CURRENT_SOURCE_DIR}/${dir}/")
+    endif()
+  endforeach(dir)
+  set(MODULE_INCLUDE_DIRECTORIES ${include_dirs})
+
   # put variables into parent scope
   set(BOOST_CURRENT "${MODULE}" PARENT_SCOPE)
   set(BOOST_CURRENT_NAME "${MODULE_NAME}" PARENT_SCOPE)
