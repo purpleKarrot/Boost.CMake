@@ -12,6 +12,8 @@ include(CMakeParseArguments)
 
 # this function is deprecated, use INCLUDE_DIRECTORIES in boost_module instead
 function(boost_add_headers)
+  message(STATUS "${BOOST_CURRENT} uses deprecated function boost_add_headers")
+
   cmake_parse_arguments(HDR "" "LOCATION" "" ${ARGN})
 
   set(destination "include/boost")
