@@ -107,7 +107,7 @@ find_package(FOProcessor QUIET)
 ##########################################################################
 
 function(boost_docbook input)
-  find_package(Boost COMPONENTS boostbook NO_MODULE)
+  #find_package(Boost COMPONENTS boostbook NO_MODULE)
   set(doc_targets)
   set(html_dir "${CMAKE_CURRENT_BINARY_DIR}/html")
 
@@ -276,7 +276,7 @@ endfunction(boost_html_doc)
 ################################################################################
 
 function(boost_doc_boostbook input)
-  find_package(Boost COMPONENTS boostbook NO_MODULE)
+  #find_package(Boost COMPONENTS boostbook NO_MODULE)
   set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT}.docbook)
   xsltproc(${output} ${BOOSTBOOK_XSL_DIR}/docbook.xsl ${input}
     DEPENDS ${input} ${ARGN}
@@ -289,7 +289,7 @@ endfunction(boost_doc_boostbook)
 ################################################################################
 
 function(boost_doc_quickbook input)
-  find_package(Boost COMPONENTS quickbook NO_MODULE)
+  #find_package(Boost COMPONENTS quickbook NO_MODULE)
   get_filename_component(input_path ${input} PATH)
   set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT}.xml)
   add_custom_command(OUTPUT ${output}
