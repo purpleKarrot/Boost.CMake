@@ -106,8 +106,8 @@ function(boost_test_impl_cmake name)
 
   if(TEST_RUN)
     set(test_run_args
-      "-DEXECUTABLE=$<TARGET_FILE:${target}>"
-      "-DARGS=${TEST_ARGS}"
+      "-DCOMMAND=$<TARGET_FILE:${target}> ${TEST_ARGS}"
+      "-DTARGET=$<TARGET_FILE:${target}>"
       )
     if(TEST_FAIL)
       list(APPEND test_run_args "-DFAIL=ON")

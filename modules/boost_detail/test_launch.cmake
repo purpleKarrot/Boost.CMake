@@ -6,13 +6,19 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-execute_process(COMMAND "${EXECUTABLE}"
+foreach(var ${ENVIRONMENT_VARS})
+  set(ENV{${var}} "${${var}}")
+endforeach(var)
+
+separate_arguments(COMMAND)
+
+execute_process(COMMAND ${COMMAND}
   RESULT_VARIABLE result
   ERROR_VARIABLE error
   ERROR_STRIP_TRAILING_WHITESPACE
   )
 
 if((FAIL AND result EQUAL 0) OR (NOT FAIL AND NOT result EQUAL 0))
-  file(REMOVE "${EXECUTABLE}")
+  file(REMOVE "${TARGET}")
   message(FATAL_ERROR "${error}")
 endif()
