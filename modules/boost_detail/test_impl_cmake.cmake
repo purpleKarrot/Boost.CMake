@@ -41,9 +41,9 @@ function(boost_test_impl_cmake name)
   # If no sources are specified, use the name of the test.cpp
   if(TEST_SOURCES OR TEST_UNPARSED_ARGUMENTS)
     set(sources ${TEST_SOURCES} ${TEST_UNPARSED_ARGUMENTS})
-  else(TEST_UNPARSED_ARGUMENTS)
+  else()
     set(sources ${name})
-  endif(TEST_UNPARSED_ARGUMENTS)
+  endif()
 
   if(TEST_COMPILE)
     add_library(${target} STATIC EXCLUDE_FROM_ALL ${sources})
