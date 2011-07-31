@@ -32,6 +32,11 @@ function(boost_test_impl_cmake name)
 
   set(target "${BOOST_CURRENT}-test-${name}")
 
+  # RUN is default
+  if(NOT (TEST_COMPILE OR TEST_LINK OR TEST_MODULE OR TEST_PYTHON))
+    set(TEST_RUN ON)
+  endif()
+
   # If no sources are specified, use the name of the test.cpp
   if(TEST_UNPARSED_ARGUMENTS)
     set(sources ${TEST_UNPARSED_ARGUMENTS})
