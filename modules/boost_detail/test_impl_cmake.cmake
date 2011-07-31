@@ -1,5 +1,6 @@
 ################################################################################
 # Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>                   #
+# Copyright (C) 2011 Ravikiran Rajagopal <lists_ravi@lavabit.com>              #
 #                                                                              #
 # Distributed under the Boost Software License, Version 1.0.                   #
 # See accompanying file LICENSE_1_0.txt or copy at                             #
@@ -28,7 +29,7 @@ set(boost_test_run_script "${CMAKE_CURRENT_LIST_DIR}/test_launch.cmake")
 
 function(boost_test_impl_cmake name)
   cmake_parse_arguments(TEST "COMPILE;LINK;MODULE;RUN;PYTHON;FAIL" ""
-    "ARGS;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
+    "SOURCES;ARGS;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
 
   set(target "${BOOST_CURRENT}-test-${name}")
 
@@ -38,8 +39,8 @@ function(boost_test_impl_cmake name)
   endif()
 
   # If no sources are specified, use the name of the test.cpp
-  if(TEST_UNPARSED_ARGUMENTS)
-    set(sources ${TEST_UNPARSED_ARGUMENTS})
+  if(TEST_SOURCES OR TEST_UNPARSED_ARGUMENTS)
+    set(sources ${TEST_SOURCES} ${TEST_UNPARSED_ARGUMENTS})
   else(TEST_UNPARSED_ARGUMENTS)
     set(sources ${name})
   endif(TEST_UNPARSED_ARGUMENTS)
