@@ -90,58 +90,23 @@ function(boost_add_multiple_tests)
   endif()
 
   set(args COMPILE COMPILE_FAIL LINK LINK_FAIL MODULE MODULE_FAIL RUN RUN_FAIL
-    LINK_BOOST_LIBRARIES LINK_LIBRARIES)
+    PYTHON PYTHON_FAIL LINK_BOOST_LIBRARIES LINK_LIBRARIES)
   cmake_parse_arguments(TEST "" "" "${args}" ${ARGN})
 
-  foreach(test ${TEST_COMPILE})
-    boost_add_test(${test} COMPILE)
-  endforeach(test)
-
-  foreach(test ${TEST_COMPILE_FAIL})
-    boost_add_test(${test} COMPILE FAIL)
-  endforeach(test)
-
-  foreach(test ${TEST_LINK})
-    boost_add_test(${test} LINK
-      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
-      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
-      )
-  endforeach(test)
-
-  foreach(test ${TEST_LINK_FAIL})
-    boost_add_test(${test} LINK FAIL
-      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
-      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
-      )
-  endforeach(test)
-
-  foreach(test ${TEST_MODULE})
-    boost_add_test(${test} MODULE
-      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
-      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
-      )
-  endforeach(test)
-
-  foreach(test ${TEST_MODULE_FAIL})
-    boost_add_test(${test} MODULE FAIL
-      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
-      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
-      )
-  endforeach(test)
-
-  foreach(test ${TEST_RUN})
-    boost_add_test(${test} RUN
-      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
-      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
-      )
-  endforeach(test)
-
-  foreach(test ${TEST_RUN_FAIL})
-    boost_add_test(${test} RUN FAIL
-      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
-      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
-      )
-  endforeach(test)
+  foreach(type COMPILE LINK MODULE RUN PYTHON)
+    foreach(test ${TEST_${type}})
+      boost_add_test(${test} ${type}
+        LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
+        LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
+        )
+    endforeach(test)
+    foreach(test ${TEST_${type}_FAIL})
+      boost_add_test(${test} ${type} FAIL
+        LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
+        LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
+        )
+    endforeach(test)
+  endforeach(type)
 endfunction(boost_add_multiple_tests)
 
 macro(boost_test_suite)
