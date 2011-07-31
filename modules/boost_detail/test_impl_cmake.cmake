@@ -27,7 +27,7 @@ endif(NOT TARGET boost_test_invert)
 set(boost_test_run_script "${CMAKE_CURRENT_LIST_DIR}/test_launch.cmake")
 
 function(boost_test_impl_cmake name)
-  cmake_parse_arguments(TEST "COMPILE;LINK;MODULE;RUN;FAIL" ""
+  cmake_parse_arguments(TEST "COMPILE;LINK;MODULE;RUN;PYTHON;FAIL" ""
     "ARGS;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
 
   set(target "${BOOST_CURRENT}-test-${name}")
@@ -79,18 +79,18 @@ function(boost_test_impl_cmake name)
 
   if(TEST_LINK OR TEST_RUN)
     add_executable(${target} EXCLUDE_FROM_ALL ${sources})
-  elseif(TEST_MODULE)
+  elseif(TEST_MODULE OR TEST_PYTHON)
     add_library(${target} MODULE EXCLUDE_FROM_ALL ${sources})
   endif()
 
-  if(TEST_LINK OR TEST_MODULE OR TEST_RUN)
+  if(TEST_LINK OR TEST_MODULE OR TEST_RUN OR TEST_PYTHON)
     boost_link_libraries(${target} STATIC
       ${TEST_LINK_BOOST_LIBRARIES}
       )
     target_link_libraries(${target}
       ${TEST_LINK_LIBRARIES}
       )
-  endif(TEST_LINK OR TEST_MODULE OR TEST_RUN)
+  endif(TEST_LINK OR TEST_MODULE OR TEST_RUN OR TEST_PYTHON)
 
   if(TEST_FAIL AND (TEST_LINK OR TEST_MODULE))
     add_dependencies(${target} boost_test_invert)
@@ -104,19 +104,39 @@ function(boost_test_impl_cmake name)
       )
   endif(TEST_FAIL AND (TEST_LINK OR TEST_MODULE))
 
+  set_target_properties(${target} PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    OUTPUT_NAME "${name}"
+    )
+
   if(TEST_RUN)
     set(test_run_args
       "-DCOMMAND=$<TARGET_FILE:${target}> ${TEST_ARGS}"
-      "-DTARGET=$<TARGET_FILE:${target}>"
       )
+  elseif(TEST_PYTHON)
+    find_package(PythonInterp REQUIRED)
+    set_target_properties(${target} PROPERTIES
+      OUTPUT_NAME "${name}_ext"
+      PREFIX ""
+      )
+    set(test_run_args
+      "-DENVIRONMENT_VARS=PYTHONPATH"
+      "-DPYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"
+      "-DCOMMAND=${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${name}.py"
+      )
+  endif()
+  
+  if(TEST_RUN OR TEST_PYTHON)
+    list(APPEND test_run_args "-DTARGET=$<TARGET_FILE:${target}>")
     if(TEST_FAIL)
       list(APPEND test_run_args "-DFAIL=ON")
     endif(TEST_FAIL)
-
     add_custom_command(TARGET ${target} POST_BUILD
       COMMAND ${CMAKE_COMMAND} ${test_run_args} -P "${boost_test_run_script}"
       )
-  endif(TEST_RUN)
+  endif(TEST_RUN OR TEST_PYTHON)
 
   set(project_test "${BOOST_CURRENT}-test")
   if(NOT TARGET ${project_test})
