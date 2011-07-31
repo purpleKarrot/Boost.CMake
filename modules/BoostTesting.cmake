@@ -54,7 +54,7 @@ endfunction(boost_add_test)
 
 # This function is used to add multiple tests at once.
 #
-#   boost_test_suite(
+#   boost_add_multiple_tests(
 #     [COMPILE <list of source files>]
 #     [COMPILE_FAIL <list of source files>]
 #     [LINK <list of source files>]
@@ -68,7 +68,7 @@ endfunction(boost_add_test)
 # Each file listed after COMPILE, LINK, RUN or their _FAIL conterparts creates
 # one test case.
 #
-#   boost_test_suite(
+#   boost_add_multiple_tests(
 #     COMPILE
 #       foo
 #       bar
@@ -84,12 +84,12 @@ endfunction(boost_add_test)
 #   boost_add_test(bar COMPILE bar.cpp LINK_BOOST_LIBRARIES unit_test_framework)
 #   boost_add_test(baz LINK    baz.cpp LINK_BOOST_LIBRARIES unit_test_framework)
 #
-function(boost_test_suite)
+function(boost_add_multiple_tests)
   if(NOT BOOST_CURRENT_TEST_ENABLED)
     return()
   endif()
 
-  set(args COMPILE COMPILE_FAIL LINK LINK_FAIL RUN RUN_FAIL
+  set(args COMPILE COMPILE_FAIL LINK LINK_FAIL MODULE MODULE_FAIL RUN RUN_FAIL
     LINK_BOOST_LIBRARIES LINK_LIBRARIES)
   cmake_parse_arguments(TEST "" "" "${args}" ${ARGN})
 
@@ -115,6 +115,20 @@ function(boost_test_suite)
       )
   endforeach(test)
 
+  foreach(test ${TEST_MODULE})
+    boost_add_test(${test} MODULE
+      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
+      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
+      )
+  endforeach(test)
+
+  foreach(test ${TEST_MODULE_FAIL})
+    boost_add_test(${test} MODULE FAIL
+      LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
+      LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
+      )
+  endforeach(test)
+
   foreach(test ${TEST_RUN})
     boost_add_test(${test} RUN
       LINK_BOOST_LIBRARIES ${TEST_LINK_BOOST_LIBRARIES}
@@ -128,4 +142,8 @@ function(boost_test_suite)
       LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
       )
   endforeach(test)
-endfunction(boost_test_suite)
+endfunction(boost_add_multiple_tests)
+
+macro(boost_test_suite)
+  boost_add_multiple_tests(${ARGN})
+endmacro(boost_test_suite)

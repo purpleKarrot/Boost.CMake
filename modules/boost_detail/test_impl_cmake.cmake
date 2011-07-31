@@ -27,7 +27,7 @@ endif(NOT TARGET boost_test_invert)
 set(boost_test_run_script "${CMAKE_CURRENT_LIST_DIR}/test_launch.cmake")
 
 function(boost_test_impl_cmake name)
-  cmake_parse_arguments(TEST "COMPILE;LINK;RUN;FAIL" ""
+  cmake_parse_arguments(TEST "COMPILE;LINK;MODULE;RUN;FAIL" ""
     "ARGS;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
 
   set(target "${BOOST_CURRENT}-test-${name}")
@@ -79,15 +79,20 @@ function(boost_test_impl_cmake name)
 
   if(TEST_LINK OR TEST_RUN)
     add_executable(${target} EXCLUDE_FROM_ALL ${sources})
+  elseif(TEST_MODULE)
+    add_library(${target} MODULE EXCLUDE_FROM_ALL ${sources})
+  endif()
+
+  if(TEST_LINK OR TEST_MODULE OR TEST_RUN)
     boost_link_libraries(${target} STATIC
       ${TEST_LINK_BOOST_LIBRARIES}
       )
     target_link_libraries(${target}
       ${TEST_LINK_LIBRARIES}
       )
-  endif(TEST_LINK OR TEST_RUN)
+  endif(TEST_LINK OR TEST_MODULE OR TEST_RUN)
 
-  if(TEST_LINK AND TEST_FAIL)
+  if(TEST_FAIL AND (TEST_LINK OR TEST_MODULE))
     add_dependencies(${target} boost_test_invert)
     get_target_property(invert boost_test_invert LOCATION)
 
@@ -97,7 +102,7 @@ function(boost_test_impl_cmake name)
     add_custom_command(TARGET ${target} POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E touch "$<TARGET_FILE:${target}>"
       )
-  endif(TEST_LINK AND TEST_FAIL)
+  endif(TEST_FAIL AND (TEST_LINK OR TEST_MODULE))
 
   if(TEST_RUN)
     set(test_run_args
