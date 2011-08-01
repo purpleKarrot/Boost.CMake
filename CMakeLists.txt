@@ -56,4 +56,4 @@ set(CPACK_PACKAGE_VENDOR "http://purplekarrot.net/")
 set(CPACK_PACKAGE_CONTACT "Daniel Pfeifer <daniel@pfeifer-mail.de>")
 set(CPACK_PACKAGE_VERSION "0.8.15")
 
-include(BoostCPack)
+#include(BoostCPack)

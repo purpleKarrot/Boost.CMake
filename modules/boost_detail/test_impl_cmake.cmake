@@ -27,10 +27,11 @@ endif(NOT TARGET boost_test_invert)
 
 set(boost_test_run_script "${CMAKE_CURRENT_LIST_DIR}/test_launch.cmake")
 
-function(boost_test_impl_cmake name)
+function(boost_test_impl_cmake param)
   cmake_parse_arguments(TEST "COMPILE;LINK;MODULE;RUN;PYTHON;FAIL" ""
     "SOURCES;ARGS;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
 
+  get_filename_component(name "${param}" NAME_WE)
   set(target "${BOOST_CURRENT}-test-${name}")
 
   # RUN is default
@@ -42,7 +43,7 @@ function(boost_test_impl_cmake name)
   if(TEST_SOURCES OR TEST_UNPARSED_ARGUMENTS)
     set(sources ${TEST_SOURCES} ${TEST_UNPARSED_ARGUMENTS})
   else()
-    set(sources ${name})
+    set(sources ${param})
   endif()
 
   if(TEST_COMPILE)
