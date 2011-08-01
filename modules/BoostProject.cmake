@@ -22,56 +22,54 @@ set(_boost_component_params
   INCLUDE_DIRECTORIES
   )
 
-function(boost_get_component_vars)
-  if(ARGV0)
-    if(EXISTS "${Boost_SOURCE_DIR}/libs/${ARGV0}")
-      set(BOOST_CURRENT_SOURCE_DIR "${Boost_SOURCE_DIR}/libs/${ARGV0}")
-      set(BOOST_CURRENT_BINARY_DIR "${Boost_BINARY_DIR}/libs/${ARGV0}")
-    elseif(EXISTS "${Boost_SOURCE_DIR}/tools/${ARGV0}")
-      set(BOOST_CURRENT_SOURCE_DIR "${Boost_SOURCE_DIR}/tools/${ARGV0}")
-      set(BOOST_CURRENT_BINARY_DIR "${Boost_BINARY_DIR}/tools/${ARGV0}")
-    else()
-      message(FATAL_ERROR "unknown Boost component: ${ARGV0}")
-      return()
-    endif()
-  else()
-    set(BOOST_CURRENT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-    set(BOOST_CURRENT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-  endif()
+##
+function(boost_precache dir)
+  set(BOOST_CURRENT_SOURCE_DIR "${Boost_SOURCE_DIR}/${dir}")
+  set(BOOST_CURRENT_BINARY_DIR "${Boost_BINARY_DIR}/${dir}")
 
   include("${BOOST_CURRENT_SOURCE_DIR}/boost_module.cmake")
 
-  # make sure include directories are absolute and end with /
+  set(BOOST_PROJECTS_ALL ${BOOST_PROJECTS_ALL} ${MODULE} PARENT_SCOPE)
+
+  # make sure include directories are absolute
   set(include_dirs)
   foreach(dir ${MODULE_INCLUDE_DIRECTORIES})
     if(IS_ABSOLUTE "${dir}")
-      list(APPEND include_dirs "${dir}/")
+      list(APPEND include_dirs "${dir}")
     else()
-      list(APPEND include_dirs "${BOOST_CURRENT_SOURCE_DIR}/${dir}/")
+      list(APPEND include_dirs "${BOOST_CURRENT_SOURCE_DIR}/${dir}")
     endif()
   endforeach(dir)
   set(MODULE_INCLUDE_DIRECTORIES ${include_dirs})
 
-  # put variables into parent scope
+  set(BOOST_${MODULE}_NAME "${MODULE_NAME}" PARENT_SCOPE)
+  set(BOOST_${MODULE}_IS_TOOL "${MODULE_TOOL}" PARENT_SCOPE)
+
+  foreach(param ${_boost_component_params})
+    set(BOOST_${MODULE}_${param} "${MODULE_${param}}" PARENT_SCOPE)
+  endforeach(param)
+endfunction(boost_precache)
+
+##
+function(boost_get_component_vars)
+  set(BOOST_CURRENT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+  set(BOOST_CURRENT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+
+  include("${BOOST_CURRENT_SOURCE_DIR}/boost_module.cmake")
+
+  # make sure include directories end with /
+  set(include_dirs)
+  foreach(dir ${MODULE_INCLUDE_DIRECTORIES})
+    list(APPEND include_dirs "${dir}/")
+  endforeach(dir)
+  set(MODULE_INCLUDE_DIRECTORIES ${include_dirs})
+
   set(BOOST_CURRENT "${MODULE}" PARENT_SCOPE)
   set(BOOST_CURRENT_NAME "${MODULE_NAME}" PARENT_SCOPE)
   set(BOOST_CURRENT_IS_TOOL "${MODULE_TOOL}" PARENT_SCOPE)
+
   foreach(param ${_boost_component_params})
     set(BOOST_CURRENT_${param} "${MODULE_${param}}" PARENT_SCOPE)
-  endforeach(param)
-
-  #
-  if(ARGV0)
-    return()
-  endif()
-
-  # put variables into cache
-  list(APPEND BOOST_PROJECTS_ALL ${MODULE})
-  set(BOOST_PROJECTS_ALL ${BOOST_PROJECTS_ALL} CACHE INTERNAL "" FORCE)
-  set(BOOST_${MODULE}_NAME "${MODULE_NAME}" CACHE INTERNAL "" FORCE)
-  set(BOOST_${MODULE}_IS_TOOL "${MODULE_TOOL}" CACHE INTERNAL "" FORCE)
-  foreach(param ${_boost_component_params})
-    set(BOOST_${MODULE}_${param} "${MODULE_${param}}" CACHE INTERNAL "" FORCE)
   endforeach(param)
 endfunction(boost_get_component_vars)
 
