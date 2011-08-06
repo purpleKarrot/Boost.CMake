@@ -141,7 +141,5 @@ set(CPACK_NSIS_INSTALLED_ICON_NAME "Uninstall.exe")
 
 include(CPack)
 
-if(BOOST_DEBIAN_PACKAGES)
-  include(BoostDebian)
-endif(BOOST_DEBIAN_PACKAGES)
-
+include(BoostDebian)
+#include(BoostRPM)

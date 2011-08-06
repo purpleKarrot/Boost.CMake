@@ -7,7 +7,7 @@
 ################################################################################
 
 string(TOLOWER ${CPACK_PACKAGE_NAME} package_name)
-set(specfile "${BOOST_MONOLITHIC_DIR}/${package_name}.spec")
+set(specfile "${CMAKE_BINARY_DIR}/_RPM/${package_name}.spec")
 
 file(WRITE ${specfile}
   "# -*- rpm-spec -*-\n"
@@ -136,7 +136,7 @@ file(APPEND ${specfile}
 # deploy
 
 find_program(RPMBUILD_COMMAND rpmbuild)
-set(RPM_ROOTDIR ${CMAKE_BINARY_DIR}/RPM)
+set(RPM_ROOTDIR ${CMAKE_BINARY_DIR}/_RPM)
 
 file(MAKE_DIRECTORY ${RPM_ROOTDIR})
 file(MAKE_DIRECTORY ${RPM_ROOTDIR}/tmp)
