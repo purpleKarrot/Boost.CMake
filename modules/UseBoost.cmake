@@ -9,6 +9,13 @@
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
+## if xsltproc is not found on Windows, use the one from Boost.CMake
+find_package(Xsltproc QUIET)
+if(CMAKE_HOST_WIN32 AND NOT XSLTPROC_FOUND)
+  set(XSLTPROC_EXECUTABLE "$<TARGET_FILE:${BOOST_NAMESPACE}xsltproc>"
+    CACHE INTERNAL "" FORCE)
+endif(CMAKE_HOST_WIN32 AND NOT XSLTPROC_FOUND)
+
 ## this function is like 'target_link_libraries, except only for boost libs
 function(boost_link_libraries target)
   cmake_parse_arguments(LIBS "SHARED;STATIC" "" "" ${ARGN})

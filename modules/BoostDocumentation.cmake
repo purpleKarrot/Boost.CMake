@@ -92,10 +92,6 @@ endif()
 
 include(BoostDoxygen)
 
-find_package(Xsltproc QUIET)
-if(CMAKE_HOST_WIN32 AND NOT XSLTPROC_FOUND)
-  set(XSLTPROC_EXECUTABLE "$<TARGET_FILE:${BOOST_NAMESPACE}xsltproc>")
-endif()
 find_package(Xsltproc REQUIRED)
 include("${XSLTPROC_USE_FILE}")
 
