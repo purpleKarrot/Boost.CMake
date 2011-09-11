@@ -9,11 +9,9 @@
 == Reference
 
 include::BoostProject.txt[]
-include::BoostAddHeaders.txt[]
 include::BoostAddLibrary.txt[]
 include::BoostAddExecutable.txt[]
 include::BoostAddPythonExtension.txt[]
 include::BoostAddReference.txt[]
 include::BoostDocumentation.txt[]
 include::BoostTesting.txt[]
-include::BoostTestSuite.txt[]

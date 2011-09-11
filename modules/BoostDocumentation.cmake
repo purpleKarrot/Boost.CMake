@@ -275,6 +275,7 @@ function(boost_doc_boostbook input)
   #find_package(Boost COMPONENTS boostbook NO_MODULE)
   set(output ${CMAKE_CURRENT_BINARY_DIR}/${BOOST_CURRENT}.docbook)
   xsltproc(${output} ${BOOSTBOOK_XSL_DIR}/docbook.xsl ${input}
+    CATALOG "${BOOSTBOOK_CATALOG}"
     DEPENDS ${input} ${ARGN}
     )
   boost_docbook(${output})
