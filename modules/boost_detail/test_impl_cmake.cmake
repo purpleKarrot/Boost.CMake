@@ -9,6 +9,23 @@
 
 include(CMakeParseArguments)
 
+if(NOT TARGET boost_test_true)
+  find_program(TRUE_EXECUTABLE true)
+  if(TRUE_EXECUTABLE)
+    add_executable(boost_test_true IMPORTED)
+    set_target_properties(boost_test_true PROPERTIES
+      IMPORTED_LOCATION "${TRUE_EXECUTABLE}"
+      )
+  else()
+    set(boost_test_true_source "${CMAKE_BINARY_DIR}/boost_test_true.cpp")
+    file(WRITE "${boost_test_true_source}.in"
+      "int main(int argc, char* argv[]) { return 0; }\n"
+      )
+    configure_file("${boost_test_true_source}.in" "${boost_test_true_source}" COPYONLY)
+    add_executable(boost_test_true EXCLUDE_FROM_ALL ${boost_test_true_source})
+  endif()
+endif(NOT TARGET boost_test_true)
+
 if(NOT TARGET boost_test_invert)
   set(boost_test_invert_source "${CMAKE_BINARY_DIR}/boost_test_invert.cpp")
   file(WRITE "${boost_test_invert_source}.in"
@@ -48,12 +65,6 @@ function(boost_test_impl_cmake param)
 
   if(TEST_COMPILE)
     add_library(${target} STATIC EXCLUDE_FROM_ALL ${sources})
-    set(object_dir "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${target}.dir")
-
-    # make the link step always suceed
-    add_custom_command(TARGET ${target} PRE_LINK
-      COMMAND ${CMAKE_COMMAND} -E echo "true" >"${object_dir}/link.txt"
-      )
 
     if(TEST_FAIL)
       add_dependencies(${target} boost_test_invert)
@@ -70,18 +81,25 @@ function(boost_test_impl_cmake param)
         if(NOT file MATCHES "[.]cpp$")
           set(file "${file}.cpp")
         endif(NOT file MATCHES "[.]cpp$")
-        list(APPEND object_files "${object_dir}/${file}")
+        list(APPEND object_files
+          "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${target}.dir/${file}"
+          )
       endforeach(file)
 
       add_custom_command(TARGET ${target} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E touch ${object_files}
-        COMMAND ${CMAKE_COMMAND} -E touch "$<TARGET_FILE:${target}>"
-        )
-    else(TEST_FAIL)
-      add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E touch "$<TARGET_FILE:${target}>"
         )
     endif(TEST_FAIL)
+
+    # make the link step always suceed
+    add_dependencies(${target} boost_test_true)
+    get_target_property(true boost_test_true LOCATION)
+    set_target_properties(${target} PROPERTIES
+      RULE_LAUNCH_LINK "${true}"
+      )
+    add_custom_command(TARGET ${target} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E touch "$<TARGET_FILE:${target}>"
+      )
   endif(TEST_COMPILE)
 
   if(TEST_LINK OR TEST_RUN)
