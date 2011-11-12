@@ -81,6 +81,7 @@ function(boost_test_impl_cmake param)
         if(NOT file MATCHES "[.]cpp$")
           set(file "${file}.cpp")
         endif(NOT file MATCHES "[.]cpp$")
+        string(REPLACE ".." "__" file "${file}")
         list(APPEND object_files
           "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${target}.dir/${file}"
           )
