@@ -6,36 +6,25 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8.5 FATAL_ERROR)
+project(BoostCMake NONE)
 
-#find_package(Boost NO_MODULE)
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
-set(Boost_RESOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/resources")
-set(Boost_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
-set(Boost_USE_FILE UseBoost)
-include(BoostProject)
-include(UseBoostDev)
+set(CMAKE_MODULE_PATH "${BoostCMake_SOURCE_DIR}/modules")
 
-file(WRITE "${BOOST_EXPORTS_FILE}"
-  "include(\${CMAKE_CURRENT_LIST_DIR}/boostbook.cmake)\n"
-  "include(\${CMAKE_CURRENT_LIST_DIR}/quickbook.cmake)\n"
-  )
+include(BoostExport)
+include(BoostAddDirectory)
 
 if(WIN32)
   set(boost_data_dir  ".")
-  set(BOOST_INCLUDE   "\${CMAKE_CURRENT_LIST_DIR}/include")
-  set(BOOST_LIBRARIES "\${CMAKE_CURRENT_LIST_DIR}/lib")
 else(WIN32)
   set(boost_data_dir  "share/boost")
-  set(BOOST_INCLUDE   "\${CMAKE_CURRENT_LIST_DIR}/../../include")
-  set(BOOST_LIBRARIES "\${CMAKE_CURRENT_LIST_DIR}/../../lib")
 endif(WIN32)
 
-set(config_file "${CMAKE_CURRENT_BINARY_DIR}/boost-config.cmake")
-set(version_file "${CMAKE_CURRENT_BINARY_DIR}/boost-config-version.cmake")
+set(config_file "${CMAKE_CURRENT_BINARY_DIR}/BoostConfig.cmake")
+set(version_file "${CMAKE_CURRENT_BINARY_DIR}/BoostConfigVersion.cmake")
 
-configure_file(boost-config.cmake.in "${config_file}" @ONLY)
-configure_file(boost-config-version.cmake.in "${version_file}" @ONLY)
+configure_file(BoostConfig.cmake "${config_file}" COPYONLY)
+configure_file(BoostConfigVersion.cmake.in "${version_file}" @ONLY)
 
 install(FILES "${config_file}" "${version_file}"
   DESTINATION "${boost_data_dir}"
@@ -51,9 +40,10 @@ if(WIN32)
   add_subdirectory(xsltproc)
 endif(WIN32)
 
-set(CPACK_PACKAGE_NAME "BoostCMake")
-set(CPACK_PACKAGE_VENDOR "http://purplekarrot.net/")
-set(CPACK_PACKAGE_CONTACT "Daniel Pfeifer <daniel@pfeifer-mail.de>")
-set(CPACK_PACKAGE_VERSION "0.8.15")
+boost_export(
+  MODULE_PATH
+    modules
+  )
 
-#include(BoostCPack)
+boost_add_directory(DOC doc)
+boost_add_directory(TEST test)

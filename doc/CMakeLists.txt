@@ -6,6 +6,11 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+find_package(AsciiDoc REQUIRED)
+find_package(Boost COMPONENTS cmake boostbook quickbook NO_MODULE)
+include(${Boost_USE_FILE})
+include(BoostDocumentation)
+
 set(boost_modules
   BoostProject
   BoostAddLibrary
@@ -32,12 +37,19 @@ foreach(module ${boost_modules})
   list(APPEND reference ${output})
 endforeach(module)
 
-boost_documentation(boost_cmake.txt
+set(docbook_file "${CMAKE_CURRENT_BINARY_DIR}/boost_cmake.dbk")
+add_custom_command(OUTPUT "${docbook_file}"
+  COMMAND
+    ${ASCIIDOC_EXECUTABLE} -b docbook -o "${docbook_file}" boost_cmake.txt
+  DEPENDS
     build.txt
     guide_user.txt
     guide_devel.txt
     reference.txt
     ${reference}
+  )
+
+boost_documentation(${docbook_file}
   IMAGES
     images/cmake_configure.png
     images/cmake_install.png

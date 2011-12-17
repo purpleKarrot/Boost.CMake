@@ -6,8 +6,9 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+add_definitions(${Boost_DEFINITIONS})
 include_directories(${Boost_INCLUDE_DIRS})
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+list(APPEND CMAKE_MODULE_PATH ${Boost_MODULE_PATH})
 
 ## if xsltproc is not found on Windows, use the one from Boost.CMake
 find_package(Xsltproc QUIET)

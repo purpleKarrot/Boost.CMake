@@ -49,7 +49,7 @@ function(boost_test_impl_cmake param)
     "SOURCES;ARGS;LINK_BOOST_LIBRARIES;LINK_LIBRARIES" ${ARGN})
 
   get_filename_component(name "${param}" NAME_WE)
-  set(target "${BOOST_CURRENT}-test-${name}")
+  set(target "${CMAKE_PROJECT_NAME}-test-${name}")
 
   # RUN is default
   if(NOT (TEST_COMPILE OR TEST_LINK OR TEST_MODULE OR TEST_PYTHON))
@@ -164,7 +164,7 @@ function(boost_test_impl_cmake param)
       )
   endif(TEST_RUN OR TEST_PYTHON)
 
-  set(project_test "${BOOST_CURRENT}-test")
+  set(project_test "${CMAKE_PROJECT_NAME}-test")
   if(NOT TARGET ${project_test})
     add_custom_target(${project_test})
     if(TARGET test)

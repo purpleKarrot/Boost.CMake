@@ -6,17 +6,15 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-project(BoostCMakeTest CXX)
+if(COMMAND boost_add_directory)
+  return()
+endif(COMMAND boost_add_directory)
 
-find_package(Boost COMPONENTS cmake NO_MODULE)
-include(${Boost_USE_FILE})
 
-include(BoostTesting)
-
-boost_add_test(fail_compile FAIL COMPILE )
-boost_add_test(fail_link    FAIL LINK    )
-boost_add_test(fail_run     FAIL RUN     )
-
-boost_add_test(succeed_compile COMPILE succeed.cpp )
-boost_add_test(succeed_link    LINK    succeed.cpp )
-boost_add_test(succeed_run     RUN     succeed.cpp )
+function(boost_add_directory type name)
+  string(TOUPPER "BOOST_ENABLE_${CMAKE_PROJECT_NAME}_${type}" option)
+  option(${option} "Enable ${type} for ${CMAKE_PROJECT_NAME}" ON)
+  if(${${option}})
+    add_subdirectory(${name})
+  endif(${${option}})
+endfunction(boost_add_directory)

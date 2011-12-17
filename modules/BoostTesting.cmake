@@ -41,7 +41,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/test_impl_cmake.cmake")
 # test executable when it is run.
 #
 function(boost_add_test name)
-  if(NOT BOOST_CURRENT_TEST_ENABLED)
+  if(BOOST_DISABLE_TESTS)
     return()
   endif()
 
@@ -85,7 +85,7 @@ endfunction(boost_add_test)
 #   boost_add_test(baz LINK    baz.cpp LINK_BOOST_LIBRARIES unit_test_framework)
 #
 function(boost_add_multiple_tests)
-  if(NOT BOOST_CURRENT_TEST_ENABLED)
+  if(BOOST_DISABLE_TESTS)
     return()
   endif()
 
