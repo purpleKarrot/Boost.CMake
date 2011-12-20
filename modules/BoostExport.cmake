@@ -13,12 +13,13 @@ set(_boost_cmake_templates_dir "${CMAKE_CURRENT_LIST_DIR}/templates")
 # Export of Boost projects
 function(boost_export)
   set(parameters
-    DEPENDS
     BOOST_DEPENDS
+    CODE
     DEFINITIONS
+    DEPENDS
     INCLUDE_DIRS
-    TARGETS
     MODULE_PATH
+    TARGETS
     )
   cmake_parse_arguments(EXPORT "" "VERSION" "${parameters}" ${ARGN})
 
@@ -48,11 +49,13 @@ function(boost_export)
   endforeach(path)
 
   foreach(depends ${EXPORT_DEPENDS})
+    string(FIND ${depends} " " index)
+    string(SUBSTRING ${depends} 0 ${index} name)
     set(_find_package "${_find_package}\nfind_package(${depends})")
-    set(_definitions  "${_definitions}\${${depends}_DEFINITIONS}\n  ")
-    set(_include_dirs "${_include_dirs}\${${depends}_INCLUDE_DIRS}\n  ")
-    set(_libraries    "${_libraries}\${${depends}_LIBRARIES}\n  ")
-    #set(_module_path  "${_module_path}\${${depends}_MODULE_PATH}\n  ")
+    set(_definitions  "${_definitions}\${${name}_DEFINITIONS}\n  ")
+    set(_include_dirs "${_include_dirs}\${${name}_INCLUDE_DIRS}\n  ")
+    set(_libraries    "${_libraries}\${${name}_LIBRARIES}\n  ")
+    #set(_module_path  "${_module_path}\${${name}_MODULE_PATH}\n  ")
   endforeach(depends)
 
   if(EXPORT_BOOST_DEPENDS)
@@ -107,6 +110,10 @@ function(boost_export)
       "set(${CMAKE_PROJECT_NAME}_MODULE_PATH\n  ${_module_path})\n"
       )
   endif(_module_path)
+
+  foreach(code ${EXPORT_CODE})
+    file(APPEND "${_export_file}" "${code}")
+  endforeach(code)
 
   export(PACKAGE ${CMAKE_PROJECT_NAME})
 endfunction(boost_export)
