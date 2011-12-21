@@ -31,6 +31,9 @@ install(FILES "${config_file}" "${version_file}"
   COMPONENT "${BOOST_RUNTIME_COMPONENT}"
   )
 
+# make the binary directory usable...
+file(COPY modules resources DESTINATION .)
+
 install(DIRECTORY modules resources
   DESTINATION "${boost_data_dir}"
   COMPONENT "${BOOST_RUNTIME_COMPONENT}"
@@ -40,9 +43,9 @@ if(WIN32)
   add_subdirectory(xsltproc)
 endif(WIN32)
 
-boost_export(
-  MODULE_PATH
-    modules
+boost_export(CODE
+  "set(Boost_MODULE_PATH \"\${CMAKE_CURRENT_LIST_DIR}/../cmake/modules\")\n"
+  "set(Boost_RESOURCE_PATH \"\${CMAKE_CURRENT_LIST_DIR}/../cmake/resources\")\n"
   )
 
 boost_add_directory(DOC doc)

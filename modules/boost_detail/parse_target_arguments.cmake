@@ -11,20 +11,13 @@ include(CMakeParseArguments)
 ##
 function(boost_parse_target_arguments name)
   cmake_parse_arguments(TARGET
-    "SHARED;STATIC;SINGLE_THREADED;MULTI_THREADED;NO_SYMBOL"
+    "SHARED;STATIC;SINGLE_THREADED;MULTI_THREADED"
     ""
-    "PRECOMPILE;SOURCES;LINK_BOOST_LIBRARIES;LINK_LIBRARIES"
+    "PRECOMPILE;SOURCES;LINK_LIBRARIES"
     ${ARGN}
     )
 
   set(TARGET_NAME ${name} PARENT_SCOPE)
-
-  if(NOT TARGET_NO_SYMBOL)
-    string(TOUPPER "BOOST_${name}_SOURCE" define_symbol)
-  else()
-    set(define_symbol)
-  endif()
-  set(TARGET_DEFINE_SYMBOL ${define_symbol} PARENT_SCOPE)
 
   if(NOT TARGET_SHARED AND NOT TARGET_STATIC)
     set(TARGET_SHARED ON)
@@ -39,6 +32,7 @@ function(boost_parse_target_arguments name)
 # endif(NOT LIB_SINGLE_THREAD AND NOT LIB_MULTI_THREAD)
 
   set(sources ${TARGET_SOURCES} ${TARGET_UNPARSED_ARGUMENTS})
+
   if(TARGET_PRECOMPILE)
     boost_add_pch(${name} sources ${TARGET_PRECOMPILE})
   else(TARGET_PRECOMPILE)
@@ -46,7 +40,5 @@ function(boost_parse_target_arguments name)
   endif(TARGET_PRECOMPILE)
   set(TARGET_PCH ${PCH_HEADER} PARENT_SCOPE)
   set(TARGET_SOURCES ${sources} PARENT_SCOPE)
-
-  set(TARGET_LINK_BOOST_LIBRARIES ${TARGET_LINK_BOOST_LIBRARIES} PARENT_SCOPE)
   set(TARGET_LINK_LIBRARIES ${TARGET_LINK_LIBRARIES} PARENT_SCOPE)
 endfunction(boost_parse_target_arguments)

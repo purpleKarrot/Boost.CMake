@@ -10,7 +10,6 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/parse_target_arguments.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/precompile_header.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/export.cmake")
 
 # Creates a Boost library target that generates a compiled library
 # (.a, .lib, .dll, .so, etc) from source files.
@@ -22,8 +21,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/export.cmake")
 #   boost_add_library(<name> [SHARED|STATIC]
 #     [PRECOMPILE  <list of headers to precompile>]
 #     [SOURCES <list of source files>]
-#     [LINK_BOOST_LIBRARIES <list of boost libraries to link>]
-#     [LINK_LIBRARIES <list of third party libraries to link>]
+#     [LINK_LIBRARIES <list of libraries to link>]
 #     )
 #
 # where "name" is the name of library (e.g. "regex", not "boost_regex")
@@ -67,7 +65,6 @@ function(boost_add_library)
   if(TARGET_SHARED)
     set(target ${TARGET_NAME}-shared)
     add_library(${target} SHARED ${TARGET_SOURCES})
-    boost_link_libraries(${target} ${TARGET_LINK_BOOST_LIBRARIES} SHARED)
     target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
 #   string(TOUPPER "BOOST_${TARGET_NAME}_DYN_LINK=1" shared_definition)
     set_property(TARGET ${target} APPEND PROPERTY
@@ -78,66 +75,27 @@ function(boost_add_library)
       PROJECT_LABEL "${TARGET_NAME} (shared library)"
       )
     boost_add_pch_to_target(${target} ${TARGET_PCH})
-    boost_export(${target} ${TARGET_LINK_BOOST_LIBRARIES})      
     list(APPEND targets ${target})
   endif(TARGET_SHARED)
 
   if(TARGET_STATIC)
     set(target ${TARGET_NAME}-static)
     add_library(${target} STATIC ${TARGET_SOURCES})
-    boost_link_libraries(${target} ${TARGET_LINK_BOOST_LIBRARIES} STATIC)
     target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
     set_target_properties(${target} PROPERTIES
       PROJECT_LABEL "${TARGET_NAME} (static library)"
       PREFIX "lib"
       )
     boost_add_pch_to_target(${target} ${TARGET_PCH})
-    boost_export(${target} ${TARGET_LINK_BOOST_LIBRARIES})      
     list(APPEND targets ${target})
   endif(TARGET_STATIC)
 
   set_target_properties(${targets} PROPERTIES
-    DEFINE_SYMBOL "${TARGET_DEFINE_SYMBOL}"
+    #DEFINE_SYMBOL "${TARGET_DEFINE_SYMBOL}"
     OUTPUT_NAME "boost_${TARGET_NAME}"
     FOLDER "${BOOST_CURRENT_NAME}"
     VERSION "${Boost_VERSION}"
     DEBUG_POSTFIX "${BOOST_DEBUG_POSTFIX}"
     RELEASE_POSTFIX "${BOOST_RELEASE_POSTFIX}"
     )
-
-  boost_install_libraries(${targets})
 endfunction(boost_add_library)
-
-
-##
-function(boost_install_libraries)
-  install(TARGETS ${ARGN}
-    ARCHIVE
-      DESTINATION lib
-      COMPONENT "${BOOST_DEVELOP_COMPONENT}"
-      CONFIGURATIONS "Release"
-    LIBRARY
-      DESTINATION lib
-      COMPONENT "${BOOST_RUNTIME_COMPONENT}"
-      CONFIGURATIONS "Release"
-    RUNTIME
-      DESTINATION bin
-      COMPONENT "${BOOST_RUNTIME_COMPONENT}"
-      CONFIGURATIONS "Release"
-    )
-  install(TARGETS ${ARGN}
-    ARCHIVE
-      DESTINATION lib
-      COMPONENT "${BOOST_DEBUG_COMPONENT}"
-      CONFIGURATIONS "Debug"
-    LIBRARY
-      DESTINATION lib
-      COMPONENT "${BOOST_DEBUG_COMPONENT}"
-      CONFIGURATIONS "Debug"
-    RUNTIME
-      DESTINATION bin
-      COMPONENT "${BOOST_DEBUG_COMPONENT}"
-      CONFIGURATIONS "Debug"
-    )
-  set("${BOOST_HEADER_ONLY_VAR}" OFF CACHE INTERNAL "" FORCE)
-endfunction(boost_install_libraries)

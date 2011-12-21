@@ -6,10 +6,11 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-find_package(AsciiDoc REQUIRED)
 find_package(Boost COMPONENTS cmake boostbook quickbook NO_MODULE)
 include(${Boost_USE_FILE})
 include(BoostDocumentation)
+
+find_package(AsciiDoc REQUIRED)
 
 set(boost_modules
   BoostProject

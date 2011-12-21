@@ -10,7 +10,6 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/parse_target_arguments.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/precompile_header.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/export.cmake")
 
 # Creates a new executable from source files.
 #
@@ -21,8 +20,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/export.cmake")
 #   boost_add_executable(<name> [SHARED|STATIC]
 #     [PRECOMPILE <list of headers to precompile>]
 #     [SOURCES <list of source files>]
-#     [LINK_BOOST_LIBRARIES <list of boost libraries to link>]
-#     [LINK_LIBRARIES <list of third party libraries to link>]
+#     [LINK_LIBRARIES <list of libraries to link>]
 #     )
 #
 # where exename is the name of the executable (e.g., "wave").  source1,
@@ -65,35 +63,16 @@ include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/export.cmake")
 #     )
 function(boost_add_executable)
   boost_parse_target_arguments(${ARGN})
-
   add_executable(${TARGET_NAME}
     ${TARGET_SOURCES}
-    ${Boost_RESOURCE_PATH}/exe.rc
-    )
-  boost_link_libraries(${TARGET_NAME}
-    ${TARGET_LINK_BOOST_LIBRARIES}
+    #${Boost_RESOURCE_PATH}/exe.rc
     )
   target_link_libraries(${TARGET_NAME}
     ${TARGET_LINK_LIBRARIES}
     )
-
   set_target_properties(${TARGET_NAME} PROPERTIES
-    FOLDER "${BOOST_CURRENT_NAME}"
+    FOLDER "${PROJECT_NAME}"
     PROJECT_LABEL "${TARGET_NAME} (executable)"
     )
-
-# if(_BOOST_MONOLITHIC_BUILD)
-    set_property(TARGET ${TARGET_NAME} APPEND PROPERTY
-      COMPILE_DEFINITIONS "BOOST_ALL_NO_LIB=1"
-      )
-# endif(_BOOST_MONOLITHIC_BUILD)
-
   boost_add_pch_to_target(${TARGET_NAME} ${TARGET_PCH})
-  boost_export(${TARGET_NAME})
-
-  install(TARGETS ${TARGET_NAME}
-    DESTINATION bin
-    COMPONENT "${BOOST_RUNTIME_COMPONENT}"
-    CONFIGURATIONS Release
-    )
 endfunction(boost_add_executable)
