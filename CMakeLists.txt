@@ -11,8 +11,8 @@ project(BoostCMake NONE)
 
 set(CMAKE_MODULE_PATH "${BoostCMake_SOURCE_DIR}/modules")
 
-include(BoostExport)
 include(BoostAddDirectory)
+include(BoostExport)
 
 if(WIN32)
   set(boost_data_dir  ".")
@@ -20,13 +20,12 @@ else(WIN32)
   set(boost_data_dir  "share/boost")
 endif(WIN32)
 
-set(config_file "${CMAKE_CURRENT_BINARY_DIR}/BoostConfig.cmake")
-set(version_file "${CMAKE_CURRENT_BINARY_DIR}/BoostConfigVersion.cmake")
-
-configure_file(BoostConfig.cmake "${config_file}" COPYONLY)
-configure_file(BoostConfigVersion.cmake.in "${version_file}" @ONLY)
-
-install(FILES "${config_file}" "${version_file}"
+install(
+  FILES
+    ${Boost_SOURCE_DIR}/BoostComponents.cmake
+    ${Boost_SOURCE_DIR}/BoostConfig.cmake
+    ${Boost_SOURCE_DIR}/BoostConfigVersion.cmake
+    ${Boost_SOURCE_DIR}/UseBoost.cmake
   DESTINATION "${boost_data_dir}"
   COMPONENT "${BOOST_RUNTIME_COMPONENT}"
   )
