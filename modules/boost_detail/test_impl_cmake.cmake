@@ -110,11 +110,9 @@ function(boost_test_impl_cmake param)
   endif()
 
   if(TEST_LINK OR TEST_MODULE OR TEST_RUN OR TEST_PYTHON)
-    boost_link_libraries(${target} STATIC
-      ${TEST_LINK_BOOST_LIBRARIES}
-      )
     target_link_libraries(${target}
       ${TEST_LINK_LIBRARIES}
+      ${TEST_LINK_BOOST_LIBRARIES}
       )
   endif(TEST_LINK OR TEST_MODULE OR TEST_RUN OR TEST_PYTHON)
 

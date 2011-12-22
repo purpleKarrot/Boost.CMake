@@ -299,17 +299,3 @@ function(boost_doc_quickbook input)
     )
   boost_doc_boostbook(${output} ${ARGN})
 endfunction(boost_doc_quickbook)
-
-################################################################################
-# AsciiDoc                                                                     #
-################################################################################
-
-function(boost_doc_asciidoc input)
-  find_package(AsciiDoc REQUIRED)
-  set(output "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.docbook")
-  add_custom_command(OUTPUT "${output}"
-    COMMAND ${ASCIIDOC_EXECUTABLE} -b docbook -o ${output} ${input}
-    DEPENDS ${input} ${ARGN}
-    )
-  boost_docbook(${output})
-endfunction(boost_doc_asciidoc)
