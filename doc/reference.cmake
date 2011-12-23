@@ -8,7 +8,10 @@
 
 # This file transforms comments from a CMake module to QuickBook.
 
-file(WRITE ${OUTPUT_FILE} "")
+get_filename_component(name ${INPUT_FILE} NAME_WE)
+
+file(WRITE ${OUTPUT_FILE} "=== ${name}\n")
+
 file(STRINGS ${INPUT_FILE} lines)
 
 set(buffer)
@@ -20,8 +23,8 @@ foreach(line ${lines})
   else()
     if(buffer AND line MATCHES "^([^ (]+)\\(([^ )]+)")
       file(APPEND ${OUTPUT_FILE}
-        "=== ${CMAKE_MATCH_1} ${CMAKE_MATCH_2}\n"
-        "${buffer}b\n\n"
+        "==== ${CMAKE_MATCH_1} ${CMAKE_MATCH_2}\n"
+        "${buffer}\n\n"
         )
     endif()
     set(buffer)
