@@ -11,12 +11,19 @@ project(BoostCMake CXX)
 find_package(Boost COMPONENTS cmake NO_MODULE)
 include(${Boost_USE_FILE})
 
-include(BoostTesting)
+include(BoostAddTestSuite)
 
-boost_add_test(fail_compile FAIL COMPILE )
-boost_add_test(fail_link    FAIL LINK    )
-boost_add_test(fail_run     FAIL RUN     )
-
-boost_add_test(succeed_compile COMPILE succeed.cpp )
-boost_add_test(succeed_link    LINK    succeed.cpp )
-boost_add_test(succeed_run     RUN     succeed.cpp )
+boost_add_test_suite(
+  COMPILE
+    compile.cpp
+  COMPILE_FAIL
+    compile_fail.cpp
+  LINK
+    link.cpp
+  LINK_FAIL
+    link_fail.cpp
+  RUN
+    run.cpp
+  RUN_FAIL
+    run_fail.cpp
+  )
