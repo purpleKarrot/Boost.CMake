@@ -18,31 +18,31 @@ set(depends)
 set(dbk_file "${CMAKE_CURRENT_BINARY_DIR}/boost_cmake.dbk")
 
 set(sources
-  boost_cmake.txt
-  build.txt
-  guide_user.txt
-  guide_devel.txt
+  boost_cmake.asciidoc
+  build.asciidoc
+  guide_user.asciidoc
+  guide_devel.asciidoc
   )
 
 set(modules
-  BoostAddDirectory
+# BoostAddDirectory
   BoostAddExecutable
   BoostAddLibrary
-  BoostAddPythonExtension
+# BoostAddPythonExtension
   BoostAddReference
+  BoostAddTestSuite
   BoostDocumentation
   BoostDoxygen
   BoostExport
   BoostExtract
-  BoostTesting
   BoostVariables
-  FindAsciiDoc
+# FindAsciiDoc
   FindDBLATEX
-  FindFOProcessor
+# FindFOProcessor
   FindIconv
   FindICU
-  FindPandoc
-  FindQuickbook
+# FindPandoc
+# FindQuickbook
   FindXSLTPROC
   )
 
@@ -56,13 +56,13 @@ foreach(file ${sources})
   list(APPEND depends ${binfile})
 endforeach(file)
 
-set(reference_file "${CMAKE_CURRENT_BINARY_DIR}/reference.txt")
+set(reference_file "${CMAKE_CURRENT_BINARY_DIR}/reference.asciidoc")
 file(WRITE ${reference_file} "//\n\n== Module Reference\n\n")
 list(APPEND depends ${reference_file})
 
 foreach(module ${modules})
   set(srcfile "${CMAKE_CURRENT_SOURCE_DIR}/../modules/${module}.cmake")
-  set(binfile "${CMAKE_CURRENT_BINARY_DIR}/${module}.txt")
+  set(binfile "${CMAKE_CURRENT_BINARY_DIR}/${module}.asciidoc")
   add_custom_command(OUTPUT ${binfile}
     COMMAND ${CMAKE_COMMAND}
             -DINPUT_FILE=${srcfile}
@@ -70,12 +70,12 @@ foreach(module ${modules})
             -P ${CMAKE_CURRENT_SOURCE_DIR}/reference.cmake
     DEPENDS ${srcfile} reference.cmake
     )
-  file(APPEND ${reference_file} "include::${module}.txt[]\n")
+  file(APPEND ${reference_file} "include::${module}.asciidoc[]\n")
   list(APPEND depends ${binfile})
 endforeach(module)
 
 add_custom_command(OUTPUT ${dbk_file}
-  COMMAND ${ASCIIDOC_EXECUTABLE} -b docbook -o ${dbk_file} boost_cmake.txt
+  COMMAND ${ASCIIDOC_EXECUTABLE} -b docbook -o ${dbk_file} boost_cmake.asciidoc
   DEPENDS ${depends}
   )
 

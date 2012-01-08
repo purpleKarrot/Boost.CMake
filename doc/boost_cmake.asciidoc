@@ -56,7 +56,7 @@ one individual library. The only requirement is that all its dependencies are
 installed. It is still possible to build the whole Boost distribution at once.
 In that case, the dependencies of each library do not have to be installed.
 
-include::guide_user.txt[]
-include::build.txt[]
-include::guide_devel.txt[]
-include::reference.txt[]
+include::guide_user.asciidoc[]
+include::build.asciidoc[]
+include::guide_devel.asciidoc[]
+include::reference.asciidoc[]
