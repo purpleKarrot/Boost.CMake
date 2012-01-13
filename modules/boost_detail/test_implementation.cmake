@@ -7,21 +7,13 @@
 ################################################################################
 
 
-if(NOT TARGET boost_cmake_fail)
-  add_executable(boost_cmake_fail EXCLUDE_FROM_ALL
-    "${CMAKE_CURRENT_LIST_DIR}/fail.cpp"
-    )
-  set_target_properties(boost_cmake_fail PROPERTIES
-    OUTPUT_NAME fail
-    )
-endif(NOT TARGET boost_cmake_fail)
-
-
-set(__boost_test_python "${CMAKE_CURRENT_LIST_DIR}/test_python.cmake")
+set(__boost_test_run "${CMAKE_CURRENT_LIST_DIR}/test_run.cmake")
+set(__boost_test_summary "${CMAKE_CURRENT_LIST_DIR}/test_summary.cmake")
 
 
 macro(__boost_add_test_compile fail)
   get_filename_component(name ${FILE} NAME_WE)
+  set(output ${name}_ok.txt)
 
   get_filename_component(SOURCE ${FILE} ABSOLUTE)
   set(OBJECT ${name}.o)
@@ -30,22 +22,26 @@ macro(__boost_add_test_compile fail)
     "${CMAKE_CXX_COMPILE_OBJECT}"
     )
   string(CONFIGURE "${compile}" compile @ONLY)
-  separate_arguments(compile)
 
-  add_custom_command(OUTPUT ${OBJECT}
-    COMMAND ${CMAKE_COMMAND} -E remove ${OBJECT}
-  # COMMAND ${CMAKE_COMMAND} -E echo ${compile}
-    COMMAND ${EXIT_${fail}_RULE} ${compile}
-    COMMAND ${CMAKE_COMMAND} -E touch ${OBJECT}
+  add_custom_command(OUTPUT ${output}
+    COMMAND ${CMAKE_COMMAND}
+      -D "OUTPUT=${output}"
+      -D "COMMANDS=COMPILE"
+      -D "COMPILE=${compile}"
+      -D "COMPILE_FAIL=${fail}"
+      -P "${__boost_test_run}"
     DEPENDS ${FILE}
     COMMENT "compile test: ${name}"
     )
-  list(APPEND TEST_OUTPUT ${OBJECT})
+
+  list(APPEND TEST_NAMES ${name})
+  list(APPEND TEST_FILES ${output})
 endmacro(__boost_add_test_compile)
 
 
 macro(__boost_add_test_link link_rule fail)
   get_filename_component(name ${FILE} NAME_WE)
+  set(output ${name}_ok.txt)
 
   get_filename_component(SOURCE ${FILE} ABSOLUTE)
   set(TARGET ${name}_ok)
@@ -60,38 +56,47 @@ macro(__boost_add_test_link link_rule fail)
     )
   string(CONFIGURE "${compile}" compile @ONLY)
   string(CONFIGURE "${link}" link @ONLY)
-  separate_arguments(compile)
-  separate_arguments(link)
 
-  add_custom_command(OUTPUT ${TARGET}
-    COMMAND ${CMAKE_COMMAND} -E remove ${TARGET}
-    COMMAND ${CMAKE_COMMAND} -E echo ${compile}
-    COMMAND ${CMAKE_COMMAND} -E echo ${link}
-    COMMAND ${compile}
-    COMMAND ${EXIT_${fail}_RULE} ${link}
-    COMMAND ${CMAKE_COMMAND} -E touch ${TARGET}
+  add_custom_command(OUTPUT ${output}
+    COMMAND ${CMAKE_COMMAND}
+      -D "OUTPUT=${output}"
+      -D "COMMANDS=COMPILE LINK"
+      -D "COMPILE=${compile}"
+      -D "LINK=${link}"
+      -D "LINK_FAIL=${fail}"
+      -P "${__boost_test_run}"
     DEPENDS ${FILE}
     COMMENT "link test: ${name}"
     )
-  list(APPEND TEST_OUTPUT ${TARGET})
+
+  list(APPEND TEST_NAMES ${name})
+  list(APPEND TEST_FILES ${output})
 endmacro(__boost_add_test_link)
 
 
 macro(__boost_add_test_run driver fail)
   get_filename_component(name ${FILE} NAME_WE)
-  add_custom_command(OUTPUT ${name}_ok
-    COMMAND ${CMAKE_COMMAND} -E remove ${name}_ok
-    COMMAND ${EXIT_${fail}_RULE} $<TARGET_FILE:${driver}> ${name}
-    COMMAND ${CMAKE_COMMAND} -E touch ${name}_ok
+  set(output ${name}_ok.txt)
+
+  add_custom_command(OUTPUT ${output}
+    COMMAND ${CMAKE_COMMAND}
+      -D "OUTPUT=${output}"
+      -D "COMMANDS=RUN"
+      -D "RUN=$<TARGET_FILE:${driver}> ${name}"
+      -D "RUN_FAIL=${fail}"
+      -P "${__boost_test_run}"
     DEPENDS ${FILE}
     COMMENT "Running test: ${name}"
     )
-  list(APPEND TEST_OUTPUT ${name}_ok)
+
+  list(APPEND TEST_NAMES ${name})
+  list(APPEND TEST_FILES ${output})
 endmacro(__boost_add_test_run)
 
 
 macro(__boost_add_test_python fail)
   get_filename_component(name ${FILE} NAME_WE)
+  set(output ${name}_ok.txt)
 
   set(module "${PROJECT_NAME}-test-${name}-ext")
   add_library(${module} MODULE EXCLUDE_FROM_ALL ${FILE})
@@ -104,17 +109,18 @@ macro(__boost_add_test_python fail)
     PREFIX ""
     )
 
-  add_custom_command(OUTPUT ${name}_ok
-    COMMAND ${CMAKE_COMMAND} -E remove ${name}_ok
+  add_custom_command(OUTPUT ${output}
     COMMAND ${CMAKE_COMMAND}
+      -D "OUTPUT=${output}"
       -D "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"
-      -D "PYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}"
-      -D "PYTHON_FILE=${CMAKE_CURRENT_SOURCE_DIR}/${name}.py"
-      -D "FAIL=${fail}"
-      -P "${__boost_test_python}"
-    COMMAND ${CMAKE_COMMAND} -E touch ${name}_ok
+      -D "COMMANDS=RUN"
+      -D "RUN=${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${name}.py"
+      -D "RUN_FAIL=${fail}"
+      -P "${__boost_test_run}"
     DEPENDS ${FILE} ${module}
     COMMENT "Running test: ${name}"
     )
-  list(APPEND TEST_OUTPUT ${name}_ok)
+
+  list(APPEND TEST_NAMES ${name})
+  list(APPEND TEST_FILES ${output})
 endmacro(__boost_add_test_python)

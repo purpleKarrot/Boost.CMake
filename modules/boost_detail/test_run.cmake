@@ -6,12 +6,27 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-set(ENV{PYTHONPATH} ${PYTHONPATH})
+if(PYTHONPATH)
+  set(ENV{PYTHONPATH} ${PYTHONPATH})
+endif(PYTHONPATH)
 
-execute_process(COMMAND ${PYTHON_EXECUTABLE} ${PYTHON_FILE}
-  RESULT_VARIABLE result
-  )
+set(success 1)
 
-if((FAIL AND result EQUAL 0) OR (NOT FAIL AND NOT result EQUAL 0))
-  message(FATAL_ERROR "")
-endif()
+separate_arguments(COMMANDS)
+
+foreach(cmd ${COMMANDS})
+  set(command "${${cmd}}")
+  set(fail "${${cmd}_FAIL}")
+
+  separate_arguments(command)
+  execute_process(COMMAND ${command}
+    RESULT_VARIABLE result
+    )
+
+  if((fail AND result EQUAL 0) OR (NOT fail AND NOT result EQUAL 0))
+    set(success 0)
+    break()
+  endif()
+endforeach(cmd)
+
+file(WRITE ${OUTPUT} ${success})

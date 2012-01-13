@@ -47,9 +47,6 @@ function(boost_add_test_suite)
 
   cmake_parse_arguments(TEST "" "" "${args}" ${ARGN})
 
-  set(EXIT_0_RULE)
-  set(EXIT_1_RULE "$<TARGET_FILE:boost_cmake_fail>")
-
   set(target ${PROJECT_NAME}-test)
   set(driver ${PROJECT_NAME}-testdriver)
 
@@ -62,7 +59,7 @@ function(boost_add_test_suite)
     set(driver ${driver}${suffix})
   endif(TARGET ${target})
 
-  set(TEST_OUTPUT)
+  set(TEST_FILES)
 
   # COMPILE tests
   foreach(FILE ${TEST_COMPILE})
@@ -113,7 +110,11 @@ function(boost_add_test_suite)
   endforeach(FILE)
 
   # add the actual test target
+  string(REPLACE ";" " " TEST_NAMES "${TEST_NAMES}")
   add_custom_target(${target}
-    DEPENDS ${TEST_OUTPUT}
+    COMMAND ${CMAKE_COMMAND}
+      -D "TESTS=${TEST_NAMES}"
+      -P "${__boost_test_summary}"
+    DEPENDS ${TEST_FILES}
     )
 endfunction(boost_add_test_suite)
