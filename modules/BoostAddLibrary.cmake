@@ -64,8 +64,12 @@ function(boost_add_library)
 
   if(TARGET_SHARED)
     set(target ${TARGET_NAME}-shared)
-    add_library(${target} SHARED ${TARGET_SOURCES})
-    target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
+    add_library(${target} SHARED
+      ${TARGET_SOURCES}
+      )
+    target_link_libraries(${target}
+      ${TARGET_SHARED_LIBRARIES}
+      )
 #   string(TOUPPER "BOOST_${TARGET_NAME}_DYN_LINK=1" shared_definition)
     set_property(TARGET ${target} APPEND PROPERTY
 #     COMPILE_DEFINITIONS "${shared_definition};BOOST_ALL_NO_LIB=1"
@@ -80,8 +84,12 @@ function(boost_add_library)
 
   if(TARGET_STATIC)
     set(target ${TARGET_NAME}-static)
-    add_library(${target} STATIC ${TARGET_SOURCES})
-    target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
+    add_library(${target} STATIC
+      ${TARGET_SOURCES}
+      )
+    target_link_libraries(${target}
+      ${TARGET_STATIC_LIBRARIES}
+      )
     set_target_properties(${target} PROPERTIES
       PROJECT_LABEL "${TARGET_NAME} (static library)"
       PREFIX "lib"
@@ -93,7 +101,7 @@ function(boost_add_library)
   set_target_properties(${targets} PROPERTIES
     #DEFINE_SYMBOL "${TARGET_DEFINE_SYMBOL}"
     OUTPUT_NAME "boost_${TARGET_NAME}"
-    FOLDER "${BOOST_CURRENT_NAME}"
+    FOLDER "${PROJECT_NAME}"
     VERSION "${Boost_VERSION}"
     DEBUG_POSTFIX "${BOOST_DEBUG_POSTFIX}"
     RELEASE_POSTFIX "${BOOST_RELEASE_POSTFIX}"

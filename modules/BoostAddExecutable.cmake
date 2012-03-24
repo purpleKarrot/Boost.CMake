@@ -1,7 +1,7 @@
 ##########################################################################
 # Copyright (C) 2007-2009 Douglas Gregor <doug.gregor@gmail.com>         #
 # Copyright (C) 2007-2009 Troy Straszheim <troy@resophonic.com>          #
-# Copyright (C) 2010-2011 Daniel Pfeifer <daniel@pfeifer-mail.de>        #
+# Copyright (C) 2010-2012 Daniel Pfeifer <daniel@pfeifer-mail.de>        #
 #                                                                        #
 # Distributed under the Boost Software License, Version 1.0.             #
 # See accompanying file LICENSE_1_0.txt or copy at                       #
@@ -68,7 +68,7 @@ function(boost_add_executable)
     #${Boost_RESOURCE_PATH}/exe.rc
     )
   target_link_libraries(${TARGET_NAME}
-    ${TARGET_LINK_LIBRARIES}
+    ${TARGET_SHARED_LIBRARIES}
     )
   set_target_properties(${TARGET_NAME} PROPERTIES
     FOLDER "${PROJECT_NAME}"

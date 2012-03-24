@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (C) 2010-2011 Daniel Pfeifer <daniel@pfeifer-mail.de>        #
+# Copyright (C) 2010-2012 Daniel Pfeifer <daniel@pfeifer-mail.de>        #
 #                                                                        #
 # Distributed under the Boost Software License, Version 1.0.             #
 # See accompanying file LICENSE_1_0.txt or copy at                       #
@@ -40,5 +40,18 @@ function(boost_parse_target_arguments name)
   endif(TARGET_PRECOMPILE)
   set(TARGET_PCH ${PCH_HEADER} PARENT_SCOPE)
   set(TARGET_SOURCES ${sources} PARENT_SCOPE)
-  set(TARGET_LINK_LIBRARIES ${TARGET_LINK_LIBRARIES} PARENT_SCOPE)
+
+  set(shared_libraries)
+  set(static_libraries)
+  foreach(library ${TARGET_LINK_LIBRARIES})
+    if("${library}" MATCHES "(.+)-(shared|static)$")
+      list(APPEND shared_libraries "${CMAKE_MATCH_1}-shared")
+      list(APPEND static_libraries "${CMAKE_MATCH_1}-static")
+    else()
+      list(APPEND shared_libraries "${library}")
+      list(APPEND static_libraries "${library}")
+    endif()
+  endforeach(library)
+  set(TARGET_SHARED_LIBRARIES ${shared_libraries} PARENT_SCOPE)
+  set(TARGET_STATIC_LIBRARIES ${static_libraries} PARENT_SCOPE)
 endfunction(boost_parse_target_arguments)
