@@ -112,7 +112,10 @@ function(boost_export)
 
   if(_definitions)
     file(APPEND "${_export_file}"
-      "set(${PROJECT_NAME}_DEFINITIONS\n  ${_definitions})\n\n"
+      "set(${PROJECT_NAME}_DEFINITIONS\n  ${_definitions})\n"
+      "if(${PROJECT_NAME}_DEFINITIONS)\n"
+      "  list(REMOVE_DUPLICATES ${PROJECT_NAME}_DEFINITIONS)\n"
+      "endif()\n\n"
       )
   endif(_definitions)
 
@@ -123,13 +126,19 @@ function(boost_export)
       CONFIGURATIONS "Release"
       )
     file(APPEND "${_export_file}"
-      "set(${PROJECT_NAME}_INCLUDE_DIRS\n  ${_include_dirs})\n\n"
+      "set(${PROJECT_NAME}_INCLUDE_DIRS\n  ${_include_dirs})\n"
+      "if(${PROJECT_NAME}_INCLUDE_DIRS)\n"
+      "  list(REMOVE_DUPLICATES ${PROJECT_NAME}_INCLUDE_DIRS)\n"
+      "endif()\n\n"
       )
   endif(_include_dirs)
 
   if(_libraries)
     file(APPEND "${_export_file}"
-      "set(${PROJECT_NAME}_LIBRARIES\n  ${_libraries})\n\n"
+      "set(${PROJECT_NAME}_LIBRARIES\n  ${_libraries})\n"
+      "if(${PROJECT_NAME}_LIBRARIES)\n"
+      "  list(REMOVE_DUPLICATES ${PROJECT_NAME}_LIBRARIES)\n"
+      "endif()\n\n"
       )
   endif(_libraries)
 
