@@ -10,8 +10,6 @@ cmake_minimum_required(VERSION 2.8.5 FATAL_ERROR)
 project(BoostCMake NONE)
 
 set(CMAKE_MODULE_PATH "${BoostCMake_SOURCE_DIR}/modules")
-
-include(BoostAddDirectory)
 include(BoostExport)
 
 if(WIN32)
@@ -47,5 +45,5 @@ boost_export(CODE
   "set(Boost_RESOURCE_PATH \"\${CMAKE_CURRENT_LIST_DIR}/../cmake/resources\")\n"
   )
 
-boost_add_directory(DOC doc)
-boost_add_directory(TEST test)
+add_subdirectory(doc)
+add_subdirectory(test)

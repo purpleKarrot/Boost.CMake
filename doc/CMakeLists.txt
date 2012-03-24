@@ -6,8 +6,6 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-project(BoostCMake NONE)
-
 find_package(Boost COMPONENTS cmake boostbook NO_MODULE)
 include(${Boost_USE_FILE})
 include(BoostDocumentation)
@@ -25,25 +23,14 @@ set(sources
   )
 
 set(modules
-# BoostAddDirectory
   BoostAddExecutable
   BoostAddLibrary
-# BoostAddPythonExtension
+  BoostAddPythonExtension
   BoostAddReference
   BoostAddTestSuite
   BoostDocumentation
   BoostDoxygen
   BoostExport
-  BoostExtract
-  BoostVariables
-# FindAsciiDoc
-  FindDBLATEX
-# FindFOProcessor
-  FindIconv
-  FindICU
-# FindPandoc
-# FindQuickbook
-  FindXSLTPROC
   )
 
 foreach(file ${sources})

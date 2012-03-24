@@ -6,11 +6,6 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-project(BoostCMake CXX)
-
-find_package(Boost COMPONENTS cmake NO_MODULE)
-include(${Boost_USE_FILE})
-
 include(BoostAddTestSuite)
 
 boost_add_test_suite(
