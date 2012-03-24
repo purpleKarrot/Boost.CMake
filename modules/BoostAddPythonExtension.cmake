@@ -15,7 +15,7 @@ function(boost_add_python_extension)
 
   set(target ${TARGET_NAME}_py)
   add_library(${target} SHARED ${TARGET_SOURCES})
-  boost_link_libraries(${target} python ${TARGET_LINK_BOOST_LIBRARIES} SHARED)
+  #boost_link_libraries(${target} python ${TARGET_LINK_BOOST_LIBRARIES} SHARED)
   target_link_libraries(${target} ${TARGET_LINK_LIBRARIES})
 
   set_property(TARGET ${target} APPEND PROPERTY
@@ -37,5 +37,5 @@ function(boost_add_python_extension)
       )
   endif()
 
-  boost_install_libraries(${target})
+  #boost_install_libraries(${target})
 endfunction(boost_add_python_extension)

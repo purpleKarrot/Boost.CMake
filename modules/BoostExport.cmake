@@ -7,7 +7,7 @@
 ##########################################################################
 
 include(CMakeParseArguments)
-include("${Boost_SOURCE_DIR}/BoostComponents.cmake")
+include("${Boost_DIR}/BoostCatalog.cmake")
 
 set(_boost_cmake_templates_dir "${CMAKE_CURRENT_LIST_DIR}/templates")
 
@@ -53,14 +53,14 @@ function(boost_export)
 
   # not sure about this...
   foreach(depends ${EXPORT_BOOST_DEPENDS})
-    list(FIND Boost_COMPONENT_TABLE ${depends} index)
+    list(FIND Boost_CATALOG ${depends} index)
     if(index EQUAL "-1")
-      message(WARNING "unknown Boost component: ${component}")
+      message(WARNING "unknown Boost component: ${depends}")
     else()
       math(EXPR package_index "${index} + 1")
       math(EXPR version_index "${index} + 2")
-      list(GET Boost_COMPONENT_TABLE ${package_index} package)
-      list(GET Boost_COMPONENT_TABLE ${version_index} version)
+      list(GET Boost_CATALOG ${package_index} package)
+      list(GET Boost_CATALOG ${version_index} version)
       list(APPEND EXPORT_DEPENDS "${package} ${version}")
     endif()
   endforeach(depends)
