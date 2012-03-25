@@ -90,20 +90,35 @@ function(boost_add_test_suite)
   endforeach(FILE)
 
   # RUN tests
-  create_test_sourcelist(run_sources ${driver}.cpp
-    ${TEST_RUN}
-    ${TEST_RUN_FAIL}
-    )
-  add_executable(${driver} EXCLUDE_FROM_ALL
-    ${run_sources}
-    ${TEST_ADDITIONAL_SOURCES}
-    )
-  foreach(FILE ${TEST_RUN})
-    __boost_add_test_run(${driver} 0)
-  endforeach(FILE)
-  foreach(FILE ${TEST_RUN_FAIL})
-    __boost_add_test_run(${driver} 1)
-  endforeach(FILE)
+  if(TEST_RUN OR TEST_RUN_FAIL)
+    set(run_sources
+      ${TEST_RUN}
+      ${TEST_RUN_FAIL}
+      )
+    list(LENGTH run_sources length)
+    if(length GREATER 1)
+      foreach(file ${run_sources})
+        get_filename_component(name "${file}" NAME_WE)
+        set_property(SOURCE "${file}" APPEND PROPERTY
+          COMPILE_DEFINITIONS "main=${name}"
+          )
+      endforeach(file)
+      create_test_sourcelist(run_sources ${driver}.cpp ${run_sources})
+    endif(length GREATER 1)
+    add_executable(${driver}
+      ${run_sources}
+      ${TEST_ADDITIONAL_SOURCES}
+      )
+    target_link_libraries(${driver}
+      ${TEST_LINK_LIBRARIES}
+      )
+    foreach(FILE ${TEST_RUN})
+      __boost_add_test_run(${driver} 0)
+    endforeach(FILE)
+    foreach(FILE ${TEST_RUN_FAIL})
+      __boost_add_test_run(${driver} 1)
+    endforeach(FILE)
+  endif(TEST_RUN OR TEST_RUN_FAIL)
 
   # PYTHON tests
   foreach(FILE ${TEST_PYTHON})
@@ -123,3 +138,33 @@ function(boost_add_test_suite)
     )
   add_dependencies(test ${target})
 endfunction(boost_add_test_suite)
+
+
+# DEPRECATED
+function(boost_add_multiple_tests)
+  set(types
+    COMPILE
+    COMPILE_FAIL
+    LINK
+    LINK_FAIL
+    MODULE
+    MODULE_FAIL
+    RUN
+    RUN_FAIL
+    PYTHON
+    PYTHON_FAIL
+    )
+  cmake_parse_arguments(TEST "" "" "${types};LINK_LIBRARIES" ${ARGN})
+  foreach(type ${types})
+    foreach(test ${TEST_${type}})
+      boost_add_test_suite(${type} ${test}
+        LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
+        )
+    endforeach(test)
+  endforeach(type)
+endfunction(boost_add_multiple_tests)
+
+# DEPRECATED
+macro(boost_test_suite)
+  boost_add_multiple_tests(${ARGN})
+endmacro(boost_test_suite)
