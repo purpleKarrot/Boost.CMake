@@ -68,7 +68,7 @@ function(boost_add_executable)
     #${Boost_RESOURCE_PATH}/exe.rc
     )
   target_link_libraries(${TARGET_NAME}
-    ${TARGET_SHARED_LIBRARIES}
+    ${TARGET_LINK_LIBRARIES}
     )
   set_target_properties(${TARGET_NAME} PROPERTIES
     FOLDER "${PROJECT_NAME}"

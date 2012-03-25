@@ -1,13 +1,14 @@
 ##########################################################################
 # Copyright (C) 2007-2009 Douglas Gregor <doug.gregor@gmail.com>         #
 # Copyright (C) 2007-2009 Troy Straszheim <troy@resophonic.com>          #
-# Copyright (C) 2010-2011 Daniel Pfeifer <daniel@pfeifer-mail.de>        #
+# Copyright (C) 2010-2012 Daniel Pfeifer <daniel@pfeifer-mail.de>        #
 #                                                                        #
 # Distributed under the Boost Software License, Version 1.0.             #
 # See accompanying file LICENSE_1_0.txt or copy at                       #
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/library_naming.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/parse_target_arguments.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/precompile_header.cmake")
 
