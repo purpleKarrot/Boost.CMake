@@ -1,16 +1,18 @@
 ##########################################################################
-# Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>             #
+# Copyright (C) 2011-2012 Daniel Pfeifer <daniel@pfeifer-mail.de>        #
 #                                                                        #
 # Distributed under the Boost Software License, Version 1.0.             #
 # See accompanying file LICENSE_1_0.txt or copy at                       #
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-find_package(Boost COMPONENTS cmake boostbook NO_MODULE)
-include(${Boost_USE_FILE})
-include(BoostDocumentation)
+find_package(AsciiDoc)
+if(NOT ASCIIDOC_EXECUTABLE)
+  return()
+endif(NOT ASCIIDOC_EXECUTABLE)
 
-find_package(AsciiDoc REQUIRED)
+find_package(Boostbook)
+include(BoostDocumentation)
 
 set(depends)
 set(dbk_file "${CMAKE_CURRENT_BINARY_DIR}/boost_cmake.dbk")

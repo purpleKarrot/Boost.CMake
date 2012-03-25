@@ -18,10 +18,19 @@ macro(__boost_add_test_compile fail)
   get_filename_component(SOURCE ${FILE} ABSOLUTE)
   set(OBJECT ${name}.o)
 
+  string(TOUPPER "${CMAKE_BUILD_TYPE}" build_type)
+  set(FLAGS ${CMAKE_CXX_FLAGS_${build_type}})
+
+  get_directory_property(include_directories INCLUDE_DIRECTORIES)
+  foreach(dir ${include_directories})
+    list(APPEND FLAGS "-I${dir}")
+  endforeach(dir)
+
   string(REGEX REPLACE "<([A-Z_]+)>" "@\\1@" compile
     "${CMAKE_CXX_COMPILE_OBJECT}"
     )
   string(CONFIGURE "${compile}" compile @ONLY)
+  string(REPLACE ";" " " compile "${compile}")
 
   add_custom_command(OUTPUT ${output}
     COMMAND ${CMAKE_COMMAND}

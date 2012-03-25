@@ -10,6 +10,7 @@ cmake_minimum_required(VERSION 2.8.5 FATAL_ERROR)
 project(BoostCMake NONE)
 
 set(CMAKE_MODULE_PATH "${BoostCMake_SOURCE_DIR}/modules")
+set(Boost_RESOURCE_PATH "${BoostCMake_SOURCE_DIR}/resources")
 include(BoostExport)
 
 if(WIN32)
