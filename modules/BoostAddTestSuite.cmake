@@ -105,7 +105,7 @@ function(boost_add_test_suite)
       endforeach(file)
       create_test_sourcelist(run_sources ${driver}.cpp ${run_sources})
     endif(length GREATER 1)
-    add_executable(${driver}
+    add_executable(${driver} EXCLUDE_FROM_ALL
       ${run_sources}
       ${TEST_ADDITIONAL_SOURCES}
       )
