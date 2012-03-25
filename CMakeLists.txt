@@ -36,10 +36,6 @@ install(DIRECTORY modules resources
   COMPONENT "${BOOST_RUNTIME_COMPONENT}"
   )
 
-if(WIN32)
-  add_subdirectory(xsltproc)
-endif(WIN32)
-
 boost_export(CODE
   "set(Boost_MODULE_PATH \"\${CMAKE_CURRENT_LIST_DIR}/../cmake/modules\")\n"
   "set(Boost_RESOURCE_PATH \"\${CMAKE_CURRENT_LIST_DIR}/../cmake/resources\")\n"

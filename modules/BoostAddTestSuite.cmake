@@ -9,6 +9,10 @@
 include(CMakeParseArguments)
 include(boost_detail/test_implementation)
 
+if(NOT TARGET test)
+  add_custom_target(test)
+endif(NOT TARGET test)  
+
 # This function creates a suite of regression tests.
 #
 #   boost_add_test_suite([name]
@@ -90,7 +94,7 @@ function(boost_add_test_suite)
     ${TEST_RUN}
     ${TEST_RUN_FAIL}
     )
-  add_executable(${driver}
+  add_executable(${driver} EXCLUDE_FROM_ALL
     ${run_sources}
     ${TEST_ADDITIONAL_SOURCES}
     )
@@ -117,4 +121,5 @@ function(boost_add_test_suite)
       -P "${__boost_test_summary}"
     DEPENDS ${TEST_FILES}
     )
+  add_dependencies(test ${target})
 endfunction(boost_add_test_suite)
