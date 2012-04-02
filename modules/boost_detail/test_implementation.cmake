@@ -103,6 +103,36 @@ macro(__boost_add_test_run driver fail)
 endmacro(__boost_add_test_run)
 
 
+macro(__boost_add_test_run_deprecated driver fail)
+  get_filename_component(name ${FILE} NAME_WE)
+  set(output ${name}_ok.txt)
+
+  set(testdriver ${driver}${SUFFIX})
+  math(EXPR SUFFIX "${SUFFIX} + 1")
+  add_executable(${testdriver} EXCLUDE_FROM_ALL
+    ${FILE}
+    ${TEST_ADDITIONAL_SOURCES}
+    )
+  target_link_libraries(${testdriver}
+    ${TEST_LINK_LIBRARIES}
+    )
+
+  add_custom_command(OUTPUT ${output}
+    COMMAND ${CMAKE_COMMAND}
+      -D "OUTPUT=${output}"
+      -D "COMMANDS=RUN"
+      -D "RUN=$<TARGET_FILE:${testdriver}>"
+      -D "RUN_FAIL=${fail}"
+      -P "${__boost_test_run}"
+    DEPENDS ${FILE}
+    COMMENT "Running test: ${name}"
+    )
+
+  list(APPEND TEST_NAMES ${name})
+  list(APPEND TEST_FILES ${output})
+endmacro(__boost_add_test_run_deprecated)
+
+
 macro(__boost_add_test_python fail)
   get_filename_component(name ${FILE} NAME_WE)
   set(output ${name}_ok.txt)

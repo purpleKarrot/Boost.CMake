@@ -27,6 +27,7 @@ endif(NOT TARGET test)
 #     [PYTHON         <list of source files>]
 #     [PYTHON_FAIL    <list of source files>]
 #     [LINK_LIBRARIES <list of libraries to link>]
+#     [NO_SINGLE_TARGET (deprecated!)]
 #     )
 #
 function(boost_add_test_suite)
@@ -49,7 +50,7 @@ function(boost_add_test_suite)
     LINK_LIBRARIES
     )
 
-  cmake_parse_arguments(TEST "" "" "${args}" ${ARGN})
+  cmake_parse_arguments(TEST "NO_SINGLE_TARGET" "" "${args}" ${ARGN})
 
   set(target ${PROJECT_NAME}-test)
   set(driver ${PROJECT_NAME}-testdriver)
@@ -60,7 +61,7 @@ function(boost_add_test_suite)
       math(EXPR suffix "${suffix} + 1")
     endwhile(TARGET ${target}${suffix})
     set(target ${target}${suffix})
-    set(driver ${driver}${suffix})
+    set(driver ${target}driver)
   endif(TARGET ${target})
 
   set(TEST_FILES)
@@ -90,7 +91,7 @@ function(boost_add_test_suite)
   endforeach(FILE)
 
   # RUN tests
-  if(TEST_RUN OR TEST_RUN_FAIL)
+  if(NOT TEST_NO_SINGLE_TARGET AND (TEST_RUN OR TEST_RUN_FAIL))
     set(run_sources
       ${TEST_RUN}
       ${TEST_RUN_FAIL}
@@ -118,7 +119,18 @@ function(boost_add_test_suite)
     foreach(FILE ${TEST_RUN_FAIL})
       __boost_add_test_run(${driver} 1)
     endforeach(FILE)
-  endif(TEST_RUN OR TEST_RUN_FAIL)
+  endif(NOT TEST_NO_SINGLE_TARGET AND (TEST_RUN OR TEST_RUN_FAIL))
+
+  # deprecated RUN tests
+  if(TEST_NO_SINGLE_TARGET AND (TEST_RUN OR TEST_RUN_FAIL))
+    set(SUFFIX 0)
+    foreach(FILE ${TEST_RUN})
+      __boost_add_test_run_deprecated(${driver} 0)
+    endforeach(FILE)
+    foreach(FILE ${TEST_RUN_FAIL})
+      __boost_add_test_run_deprecated(${driver} 1)
+    endforeach(FILE)
+  endif(TEST_NO_SINGLE_TARGET AND (TEST_RUN OR TEST_RUN_FAIL))
 
   # PYTHON tests
   foreach(FILE ${TEST_PYTHON})
@@ -138,33 +150,3 @@ function(boost_add_test_suite)
     )
   add_dependencies(test ${target})
 endfunction(boost_add_test_suite)
-
-
-# DEPRECATED
-function(boost_add_multiple_tests)
-  set(types
-    COMPILE
-    COMPILE_FAIL
-    LINK
-    LINK_FAIL
-    MODULE
-    MODULE_FAIL
-    RUN
-    RUN_FAIL
-    PYTHON
-    PYTHON_FAIL
-    )
-  cmake_parse_arguments(TEST "" "" "${types};LINK_LIBRARIES" ${ARGN})
-  foreach(type ${types})
-    foreach(test ${TEST_${type}})
-      boost_add_test_suite(${type} ${test}
-        LINK_LIBRARIES ${TEST_LINK_LIBRARIES}
-        )
-    endforeach(test)
-  endforeach(type)
-endfunction(boost_add_multiple_tests)
-
-# DEPRECATED
-macro(boost_test_suite)
-  boost_add_multiple_tests(${ARGN})
-endmacro(boost_test_suite)

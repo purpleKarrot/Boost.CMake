@@ -6,6 +6,10 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
+if(BOOST_INITIAL_PASS)
+  return()
+endif()
+
 find_package(AsciiDoc)
 if(NOT ASCIIDOC_EXECUTABLE)
   return()

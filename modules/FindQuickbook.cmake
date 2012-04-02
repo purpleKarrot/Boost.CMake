@@ -38,11 +38,13 @@ if(NOT Quickbook_FOUND)
   return()
 endif()
 
+include(CMakeParseArguments)
+
 function(quickbook input)
   get_filename_component(input_path ${input} PATH)
   set(output ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.xml)
   add_custom_command(OUTPUT ${output}
-    COMMAND $<TARGET_FILE:${BOOST_NAMESPACE}quickbook>
+    COMMAND ${Quickbook_EXECUTABLE}
             --input-file ${input}
             --include-path ${input_path}
             --include-path ${CMAKE_CURRENT_SOURCE_DIR}
