@@ -52,8 +52,14 @@ function(boost_add_test_suite)
 
   cmake_parse_arguments(TEST "NO_SINGLE_TARGET" "" "${args}" ${ARGN})
 
-  set(target ${PROJECT_NAME}-test)
-  set(driver ${PROJECT_NAME}-testdriver)
+  list(FIND Boost_CATALOG ${PROJECT_NAME} index)
+  if(index EQUAL "-1")
+    set(target ${PROJECT_NAME}-test)
+  else()
+    math(EXPR project_index "${index} - 1")
+    list(GET Boost_CATALOG ${project_index} project)
+    set(target ${project}-test)
+  endif()
 
   if(TARGET ${target})
     set(suffix 2)
@@ -61,9 +67,9 @@ function(boost_add_test_suite)
       math(EXPR suffix "${suffix} + 1")
     endwhile(TARGET ${target}${suffix})
     set(target ${target}${suffix})
-    set(driver ${target}driver)
   endif(TARGET ${target})
 
+  set(driver ${target}driver)
   set(TEST_FILES)
 
   # COMPILE tests

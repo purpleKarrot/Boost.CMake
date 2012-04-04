@@ -1,6 +1,6 @@
 ##########################################################################
 # Copyright (C) 2008 Douglas Gregor <doug.gregor@gmail.com>              #
-# Copyright (C) 2011 Daniel Pfeifer <daniel@pfeifer-mail.de>             #
+# Copyright (C) 2011-2012 Daniel Pfeifer <daniel@pfeifer-mail.de>        #
 #                                                                        #
 # Distributed under the Boost Software License, Version 1.0.             #
 # See accompanying file LICENSE_1_0.txt or copy at                       #
@@ -17,7 +17,7 @@ else()
   set(dev_null /dev/null)
 endif()
 
-find_package(Boostbook REQUIRED)
+find_package(Boostbook QUIET)
 find_package(DBLATEX QUIET)
 find_package(FOProcessor QUIET)
 find_package(HTMLHelp QUIET)
@@ -41,6 +41,14 @@ find_package(XSLTPROC REQUIRED)
 function(boost_documentation input)
   if(BOOST_DISABLE_DOCS)
     return()
+  endif()
+
+  list(FIND Boost_CATALOG ${PROJECT_NAME} index)
+  if(index EQUAL "-1")
+    set(project_name ${PROJECT_NAME})
+  else()
+    math(EXPR project_index "${index} - 1")
+    list(GET Boost_CATALOG ${project_index} project_name)
   endif()
 
   set(doc_targets)
@@ -71,13 +79,13 @@ function(boost_documentation input)
 
   if(HTML_HELP_COMPILER)
     set(hhp_output "${html_dir}/htmlhelp.hhp")
-    set(chm_output "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.chm")
+    set(chm_output "${CMAKE_CURRENT_BINARY_DIR}/${project_name}.chm")
     xsltproc(
       INPUT      ${input}
       OUTPUT     ${hhp_output}
       CATALOG    ${BOOSTBOOK_CATALOG}
       STYLESHEET ${Boost_RESOURCE_PATH}/docbook-xsl/htmlhelp.xsl
-      PARAMETERS "htmlhelp.chm=../${PROJECT_NAME}.chm"
+      PARAMETERS "htmlhelp.chm=../${project_name}.chm"
       )
     set(hhc_cmake ${CMAKE_CURRENT_BINARY_DIR}/hhc.cmake)
     file(WRITE ${hhc_cmake}
@@ -107,28 +115,28 @@ function(boost_documentation input)
 #   xsltproc(${output_man} ${BOOSTBOOK_XSL_DIR}/manpages.xsl ${input})
 #   list(APPEND doc_targets ${output_man})
     install(DIRECTORY "${html_dir}/"
-      DESTINATION "share/doc/boost/${PROJECT_NAME}"
+      DESTINATION "share/doc/boost/${project_name}"
       COMPONENT "${BOOST_MANUAL_COMPONENT}"
       CONFIGURATIONS "Release"
       )
   endif()
 
-  set(target "${PROJECT_NAME}-doc")
+  set(target "${project_name}-doc")
   add_custom_target(${target} DEPENDS ${doc_targets})
   set_target_properties(${target} PROPERTIES
     FOLDER "${PROJECT_NAME}"
-    PROJECT_LABEL "${PROJECT_NAME} (documentation)"
+    PROJECT_LABEL "${project_name} (documentation)"
     )
   add_dependencies(documentation ${target})
 
   # build documentation as pdf
   if(DBLATEX_FOUND OR FOPROCESSOR_FOUND)
     set(pdf_dir ${CMAKE_BINARY_DIR}/pdf)
-    set(pdf_file ${pdf_dir}/${PROJECT_NAME}.pdf)
+    set(pdf_file ${pdf_dir}/${project_name}.pdf)
     file(MAKE_DIRECTORY ${pdf_dir})
 
     if(FOPROCESSOR_FOUND)
-      set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.fo)
+      set(fop_file ${CMAKE_CURRENT_BINARY_DIR}/${project_name}.fo)
       xsltproc(
         INPUT      ${input}
         OUTPUT     ${fop_file}
@@ -148,11 +156,11 @@ function(boost_documentation input)
         )
     endif()
 
-    set(target "${PROJECT_NAME}-pdf")
+    set(target "${project_name}-pdf")
     add_custom_target(${target} DEPENDS ${pdf_file})
     set_target_properties(${target} PROPERTIES
       FOLDER "${PROJECT_NAME}"
-      PROJECT_LABEL "${PROJECT_NAME} (pdf)"
+      PROJECT_LABEL "${project_name} (pdf)"
       )
   endif(DBLATEX_FOUND OR FOPROCESSOR_FOUND)
 endfunction(boost_documentation)
