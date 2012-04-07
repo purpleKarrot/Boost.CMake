@@ -105,6 +105,7 @@ endmacro(__boost_add_test_run)
 
 macro(__boost_add_test_run_deprecated driver fail)
   get_filename_component(name ${FILE} NAME_WE)
+  set(name ${target}-${name})
   set(output ${name}_ok.txt)
 
   set(testdriver ${driver}${SUFFIX})

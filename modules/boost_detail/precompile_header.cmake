@@ -45,9 +45,9 @@ endfunction(boost_add_pch)
 
 ##
 function(boost_add_pch_to_target target header)
-  if(NOT header)
+  if(NOT header OR BOOST_DISABLE_PCH)
     return()
-  endif(NOT header)
+  endif(NOT header OR BOOST_DISABLE_PCH)
 
   if(XCODE_VERSION)
     set_target_properties(${target} PROPERTIES
