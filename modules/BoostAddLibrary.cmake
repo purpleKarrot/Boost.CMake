@@ -8,9 +8,7 @@
 #   http://www.boost.org/LICENSE_1_0.txt                                 #
 ##########################################################################
 
-include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/library_naming.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/parse_target_arguments.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/precompile_header.cmake")
 
 # Creates a Boost library target that generates a compiled library
 # (.a, .lib, .dll, .so, etc) from source files.
@@ -59,6 +57,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/boost_detail/precompile_header.cmake")
 # link against multi-threaded variants of boost_python.
 #
 function(boost_add_library)
+  message(STATUS "library ${ARGV0}")
   boost_parse_target_arguments(${ARGN})
 
   set(targets)
@@ -71,15 +70,9 @@ function(boost_add_library)
     target_link_libraries(${target}
       ${TARGET_SHARED_LIBRARIES}
       )
-#   string(TOUPPER "BOOST_${TARGET_NAME}_DYN_LINK=1" shared_definition)
     set_property(TARGET ${target} APPEND PROPERTY
-#     COMPILE_DEFINITIONS "${shared_definition};BOOST_ALL_NO_LIB=1"
       COMPILE_DEFINITIONS "BOOST_ALL_DYN_LINK=1;BOOST_ALL_NO_LIB=1"
       )
-    set_target_properties(${target} PROPERTIES
-      PROJECT_LABEL "${TARGET_NAME} (shared library)"
-      )
-    boost_add_pch_to_target(${target} ${TARGET_PCH})
     list(APPEND targets ${target})
   endif(TARGET_SHARED)
 
@@ -95,16 +88,14 @@ function(boost_add_library)
       PROJECT_LABEL "${TARGET_NAME} (static library)"
       PREFIX "lib"
       )
-    boost_add_pch_to_target(${target} ${TARGET_PCH})
     list(APPEND targets ${target})
   endif(TARGET_STATIC)
 
   set_target_properties(${targets} PROPERTIES
-    #DEFINE_SYMBOL "${TARGET_DEFINE_SYMBOL}"
     OUTPUT_NAME "boost_${TARGET_NAME}"
-    FOLDER "${PROJECT_NAME}"
-    VERSION "${Boost_VERSION}"
-    DEBUG_POSTFIX "${BOOST_DEBUG_POSTFIX}"
-    RELEASE_POSTFIX "${BOOST_RELEASE_POSTFIX}"
+#   FOLDER "${PROJECT_NAME}"
+#   VERSION "${Boost_VERSION}"
+#   DEBUG_POSTFIX "${BOOST_DEBUG_POSTFIX}"
+#   RELEASE_POSTFIX "${BOOST_RELEASE_POSTFIX}"
     )
 endfunction(boost_add_library)
